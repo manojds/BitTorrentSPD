@@ -18,6 +18,8 @@
 #include "BTHostIntrnlMsgsSPD_m.h"
 #include "../BitTorrent/BTLogImpl.h"
 
+Define_Module(BTTrackerClientSPD);
+
 BTTrackerClientSPD::BTTrackerClientSPD():
 b_Downloader(true)
 {

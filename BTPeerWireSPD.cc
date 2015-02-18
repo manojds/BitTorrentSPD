@@ -18,6 +18,8 @@
 #include "../BTTrackerClientBase.h"
 #include "BTHostIntrnlMsgsSPD_m.h"
 
+Define_Module(BTPeerWireSPD);
+
 BTPeerWireSPD::BTPeerWireSPD() {
 
 }
