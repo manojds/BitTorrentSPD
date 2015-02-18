@@ -22,7 +22,7 @@ simple BTTrackerClientSPD extends BTTrackerClientBase
     parameters:
         @class(BTTrackerClientSPD);
         
-        double downloaderRelayPeerRatio;
-        double relay_RelayPeerRatio; 
+        double downloaderRelayPeerRatio  = default(1.0);
+        double relay_RelayPeerRatio= default(0.0);
 
 }
