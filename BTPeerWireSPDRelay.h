@@ -7,7 +7,7 @@
 
 #ifndef BTPEERWIREBASERELAY_H_
 #define BTPEERWIREBASERELAY_H_
-#include "../BitTorrent/BTPeerWireBase.h"
+#include "BTPeerWireSPD.h"
 #include <map>
 
 #define INTERNAL_TRACKER_REALY_COM_MSG                  208
