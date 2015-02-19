@@ -25,7 +25,7 @@ BTPeerWireSPDRelay::~BTPeerWireSPDRelay() {
 
 void BTPeerWireSPDRelay::initialize()
 {
-    BTPeerWireBase::initialize();
+    BTPeerWireSPD::initialize();
     evtRelayTrackerComm = new cMessage(toString(INTERNAL_TRACKER_REALY_COM_MSG), INTERNAL_TRACKER_REALY_COM_MSG);
     //TODO :: uncomment this to enble communication with tracker as relay peer
     //          after respective modifications done in the tracker.
@@ -43,7 +43,7 @@ void BTPeerWireSPDRelay::handleMessage(cMessage *msg)
     else
     {
         //This is not related to us. let the super handle this message.
-        BTPeerWireBase::handleMessage(msg);
+        BTPeerWireSPD::handleMessage(msg);
     }
 }
 
@@ -108,12 +108,12 @@ void BTPeerWireSPDRelay::handleSelfMessage(cMessage* msg)
     case INTERNAL_EXIT_SAFE_MSG:
     {
         cancelAndDelete(evtRelayTrackerComm);
-        BTPeerWireBase::handleSelfMessage(msg);
+        BTPeerWireSPD::handleSelfMessage(msg);
         break;
     }
 
     default:
-        BTPeerWireBase::handleSelfMessage(msg);
+        BTPeerWireSPD::handleSelfMessage(msg);
         break;
 
     }
@@ -123,7 +123,7 @@ void BTPeerWireSPDRelay::scheduleTrackerCommAt(simtime_t t)
 {
     if(b_TrackerCommIsEnbled)
     {
-        BTPeerWireBase::scheduleTrackerCommAt(t);
+        BTPeerWireSPD::scheduleTrackerCommAt(t);
     }
 
 }
@@ -258,7 +258,7 @@ const char* BTPeerWireSPDRelay::toString(int type)
             return "INTERNAL_TRACKER_REALY_COM_MSG";
             break;
         default:
-            return BTPeerWireBase::toString(type);
+            return BTPeerWireSPD::toString(type);
             break;
     }
     return NULL;

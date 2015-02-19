@@ -25,7 +25,7 @@ package inet.applications.BitTorrentSPD;
 import inet.applications.BitTorrent.BTPeerWireBase;
 import inet.applications.tcpapp.TCPApp;
 
-simple BTPeerWireSPDRelay extends BTPeerWireBase like TCPApp
+simple BTPeerWireSPDRelay extends BTPeerWireSPD like TCPApp
 {
     parameters:
 		@class(BTPeerWireSPDRelay); 
