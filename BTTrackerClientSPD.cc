@@ -23,19 +23,15 @@ Define_Module(BTTrackerClientSPD);
 BTTrackerClientSPD::BTTrackerClientSPD():
 b_Downloader(true)
 {
-    d_DownloaderRelayPeerRatio=par("downloaderRelayPeerRatio");
-    d_Relay_RelayPeerRatio=par("relay_RelayPeerRatio");
+
 
 }
-
-
 
 void BTTrackerClientSPD::initialize() {
 
     BTTrackerClientBase::initialize();
 
     d_DownloaderRelayPeerRatio = par("downloaderRelayPeerRatio");
-
     d_Relay_RelayPeerRatio = par("relay_RelayPeerRatio");
 
 }
