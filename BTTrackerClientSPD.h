@@ -24,6 +24,7 @@ public:
     virtual ~BTTrackerClientSPD();
 
 protected:
+    virtual void initialize();
     virtual void handleMessage(cMessage*);
 
     virtual BTTrackerMsgAnnounce * createAnnounceMsg();

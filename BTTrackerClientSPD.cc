@@ -28,6 +28,18 @@ b_Downloader(true)
 
 }
 
+
+
+void BTTrackerClientSPD::initialize() {
+
+    BTTrackerClientBase::initialize();
+
+    d_DownloaderRelayPeerRatio = par("downloaderRelayPeerRatio");
+
+    d_Relay_RelayPeerRatio = par("relay_RelayPeerRatio");
+
+}
+
 BTTrackerClientSPD::~BTTrackerClientSPD() {
 }
 
