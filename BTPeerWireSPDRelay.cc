@@ -9,6 +9,7 @@
 #include "../BitTorrent/BTPeerWireClientHandlerBase.h"
 #include "../BitTorrent/BTLogImpl.h"
 #include "BTStatisticsRelay.h"
+#include "BTHostIntrnlMsgsSPD_m.h"
 
 Define_Module(BTPeerWireSPDRelay);
 
@@ -117,6 +118,16 @@ void BTPeerWireSPDRelay::handleSelfMessage(cMessage* msg)
         break;
 
     }
+}
+
+cMessage * BTPeerWireSPDRelay::createTrackerCommMsg()
+{
+    cMessage * pMsg= BTPeerWireSPD::createTrackerCommMsg();
+
+    BTRequestTrackerCommSPD * pTrackerCommMsg=check_and_cast<BTRequestTrackerCommSPD *>(pMsg);
+
+    pTrackerCommMsg->setDownloader(false);
+    return pTrackerCommMsg;
 }
 
 void BTPeerWireSPDRelay::scheduleTrackerCommAt(simtime_t t)

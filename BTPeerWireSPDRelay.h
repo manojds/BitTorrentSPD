@@ -27,6 +27,8 @@ protected:
     virtual void handleSelfMessage(cMessage* msg);
     virtual void scheduleTrackerCommAt(simtime_t t);
 
+    virtual cMessage * createTrackerCommMsg();
+
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void connectionLostFromPeer(PEER peer);
