@@ -15,6 +15,7 @@
 
 #include "BTTrackerClientHandlerSPD.h"
 #include "../BitTorrent/BTLogImpl.h"
+#include "BTTrackerMsgSPD_m.h"
 
 Register_Class(BTTrackerClientHandlerSPD);
 
@@ -47,7 +48,7 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
     //otherwise we let super class to handle it
     if(amsg->infoHash() == getHostModule()->relayInfoHash())
     {
-        BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::processAnnounce", "Announce request for relay hash from client[address="
+        BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::processAnnounce", "Announce request for relay hash from client[address="
                 << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "] with event ["<<amsg->event()<<"]");
 
         // temporary peer struct with the announce info
@@ -230,9 +231,16 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     //if it is relay hash we don't fill peers.
     if(strcmp(amsg->infoHash(), getHostModule()->relayInfoHash().c_str()) == 0)
     {
-        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHandlerSPD::fillPeersInResponse", "Avoiding filling peers for relay hash announce. "
+        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "Avoiding filling peers for relay hash announce. "
                 "Client details [address="<< getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "]");
         return;
+    }
+
+    BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
+    if(pSPDMsg == NULL)
+    {
+        throw cRuntimeError
+            ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
     }
 
     BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
@@ -241,9 +249,9 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
 
     cArray& relayPeers=getHostModule()->relayPeers();
 
-    BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHandlerSPD::fillPeersInResponse",
-            "filling peers, number of true peers in response ["<< iTruePeerCount<<
-            "], number of available relay peers ["<<relayPeers.size()<<"]");
+    BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
+            "filling peers, requested relay peer ratio ["<<pSPDMsg->relayPeerRatio()<<"] number of true peers in response ["
+            << iTruePeerCount<<"], number of available relay peers ["<<relayPeers.size()<<"]");
 
 
 

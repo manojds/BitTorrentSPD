@@ -23,6 +23,8 @@ Define_Module(BTTrackerClientSPD);
 BTTrackerClientSPD::BTTrackerClientSPD():
 b_Downloader(true)
 {
+    d_DownloaderRelayPeerRatio=par("downloaderRelayPeerRatio");
+    d_Relay_RelayPeerRatio=par("relay_RelayPeerRatio");
 
 }
 
@@ -58,10 +60,19 @@ BTTrackerMsgAnnounce * BTTrackerClientSPD::createAnnounceMsg()
     BTTrackerMsgAnnounceSPD * pMsg=new BTTrackerMsgAnnounceSPD();
 
 
+    double dRelayPeerRatio=0.0;
+
     if(b_Downloader)
-        pMsg->setRelayPeerRatio(d_DownloaderRelayPeerRatio);
+        dRelayPeerRatio=d_DownloaderRelayPeerRatio;
+
     else
-        pMsg->setRelayPeerRatio(d_Relay_RelayPeerRatio);
+        dRelayPeerRatio=d_Relay_RelayPeerRatio;
+
+
+    BT_LOG_DETAIL(btLogSinker,"BTTrackerClientSPD::handleMessage","["<<this->getParentModule()->getFullName()<<
+            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<"]");
+
+    pMsg->setRelayPeerRatio(dRelayPeerRatio);
 
     return pMsg;
 
