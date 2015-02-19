@@ -35,38 +35,9 @@ void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
         {
             BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] instructing communication with the tracker...");
 
-            cMessage * pMsg(NULL);
+            cMessage * pMsg= createTrackerCommMsg();
 
-            switch (getState())
-            {
-                case NORMAL:
-                case ENDGAME:
-                case SEEDER:
-                {
-                    pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
-
-                    send( pMsg,"btorrentOut");
-                    break;
-                }
-                case COMPLETED:
-                case SEEDING:
-                {
-                    pMsg= new BTRequestTrackerCommSPD(toString(EVT_COMP),EVT_COMP);
-                    send(pMsg,"btorrentOut");
-                    break;
-                }
-                case EXITING:
-                {
-                    pMsg= new BTRequestTrackerCommSPD(toString(EVT_STOP),EVT_STOP);
-
-                    send( pMsg,"btorrentOut");
-                    break;
-                }
-                default:
-                    error("%s:%d at %s() Invalid client state (STATE = %d). \n", __FILE__, __LINE__, __func__,getState());
-
-            }
-
+            send( pMsg,"btorrentOut");
 
             break;
         }
@@ -75,6 +46,40 @@ void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
             break;
 
     }
+}
+
+cMessage * BTPeerWireSPD::createTrackerCommMsg()
+{
+    cMessage * pMsg(NULL);
+
+    switch (getState())
+    {
+        case NORMAL:
+        case ENDGAME:
+        case SEEDER:
+        {
+            pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
+
+            break;
+        }
+        case COMPLETED:
+        case SEEDING:
+        {
+            pMsg= new BTRequestTrackerCommSPD(toString(EVT_COMP),EVT_COMP);
+            break;
+        }
+        case EXITING:
+        {
+            pMsg= new BTRequestTrackerCommSPD(toString(EVT_STOP),EVT_STOP);
+            break;
+        }
+        default:
+            error("%s:%d at %s() Invalid client state (STATE = %d). \n", __FILE__, __LINE__, __func__,getState());
+
+    }
+
+    return pMsg;
+
 }
 
 

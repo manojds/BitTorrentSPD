@@ -27,6 +27,7 @@ public:
 protected:
 
     virtual void handleSelfMessage(cMessage* msg);
+    virtual cMessage * createTrackerCommMsg();
 };
 
 #endif /* BTPEERWIRESPD_H_ */
