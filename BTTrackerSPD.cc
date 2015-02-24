@@ -29,8 +29,10 @@ BTTrackerSPD::~BTTrackerSPD() {
 void BTTrackerSPD::initialize()
 {
     BTTrackerBase::initialize();
+
     relayPeerPropotionInReply_var   = (double)par("relayPeerPropotionInReply");
-    realyIfoHash                    =  par("realyInfoHash").stdstringValue ();
+    useRelayPropotioninRequest_var  = par("useRelayPropotioninRequest");
+    realyIfoHash                    = par("realyInfoHash").stdstringValue ();
 
 
     realyPeersNum_var   = 0;
@@ -80,6 +82,14 @@ double BTTrackerSPD::relayPeerPropotionInReply() const
 void BTTrackerSPD::setRelayPeerPropotionInReply(double relayPeerPropotionInReply)
 {
     relayPeerPropotionInReply_var = relayPeerPropotionInReply;
+}
+
+/*
+ * Get the flag which indicate whether to use the requested relay peer ration by the client
+ */
+bool BTTrackerSPD::useRelayPropotioninRequest() const
+{
+    return useRelayPropotioninRequest_var;
 }
 
 /**

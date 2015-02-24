@@ -31,6 +31,7 @@ public:
 
     double  relayPeerPropotionInReply() const;
     void    setRelayPeerPropotionInReply(double relayPeerPropotionInReply);
+    bool    useRelayPropotioninRequest() const;
     void    cleanRemoveRelayPeer(int);
 protected:
     virtual void initialize();
@@ -39,10 +40,11 @@ protected:
 
 
 
-    size_t realyPeersNum_var;    // relay peers counter
-    double relayPeerPropotionInReply_var;
-    string realyIfoHash;
-    cArray relayPeers_var;   // relay peers container
+    size_t  realyPeersNum_var;    // relay peers counter
+    double  relayPeerPropotionInReply_var;
+    bool    useRelayPropotioninRequest_var;
+    string  realyIfoHash;
+    cArray  relayPeers_var;   // relay peers container
 };
 
 #endif /* BTTRACKERRELAYENABLED_H_ */
