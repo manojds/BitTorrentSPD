@@ -336,9 +336,16 @@ void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcnt
         int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount )
 {
     int iMaxPeersInRes=getHostModule()->maxPeersInReply();
+    bool bUseRelayPropotioninRequest=getHostModule()->useRelayPropotioninRequest();
+
     double dDelta=0.000001;
 
-    double dRelayPeerPcntg=_dRequestedRelayPeerPcntg;
+    double dRelayPeerPcntg(0.0);
+
+    if(bUseRelayPropotioninRequest == false)
+        dRelayPeerPcntg=getHostModule()->relayPeerPropotionInReply();
+    else
+        dRelayPeerPcntg=_dRequestedRelayPeerPcntg;
 
     //if ratio is negative or greater than one, it is invalid
     if( (dRelayPeerPcntg + dDelta) < 0 || (dRelayPeerPcntg - dDelta) > 1 )
