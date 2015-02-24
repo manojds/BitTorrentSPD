@@ -236,6 +236,12 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         return;
     }
 
+    //first let super class to fill true peer on its will
+    BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
+
+
+    //then we start our work
+    //This message should be a BTTrackerMsgAnnounceSPD message
     BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
     if(pSPDMsg == NULL)
     {
@@ -243,90 +249,163 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
             ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
     }
 
-    BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
-
-    int iTruePeerCount=rmsg->peersArraySize();
-
     cArray& relayPeers=getHostModule()->relayPeers();
 
-    BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
-            "filling peers, requested relay peer ratio ["<<pSPDMsg->relayPeerRatio()<<"] number of true peers in response ["
-            << iTruePeerCount<<"], number of available relay peers ["<<relayPeers.size()<<"]");
+    int iAvailableTruePeerCount=rmsg->peersArraySize();
+    int iAvaialbeRelayPeerCount=relayPeers.size();
 
+    int iMaxTruePeerCount(0);
+    int iMaxRelayPeersCount(0);
 
+    determinePeerMix(pSPDMsg->relayPeerRatio(), iAvailableTruePeerCount, iAvaialbeRelayPeerCount , iMaxTruePeerCount, iMaxRelayPeersCount);
 
-    // temporary peer from the peers pool
-    BTTrackerStructBase* tpeer;
-    // temporary peer to add to the response
-    PEER ttpeer;
-
-    // peers added
-    set<int> added_peers;
-
-    //TODO : this was added temporarily.
-    // remove this and add relay peers according to the proportion
-    //currently we add at most same number of relay peers as true peers.
-
-
-    int iMaxRelayPeers(0);
-    if( iTruePeerCount < relayPeers.size())
-        iMaxRelayPeers=iTruePeerCount;
-    else
-        iMaxRelayPeers= relayPeers.size();
-
-    for (int i=0; (added_peers.size() < iMaxRelayPeers) && (i < relayPeers.size()) ; i++ )
+    //if the true peer count needs to be changed
+    if (iAvailableTruePeerCount != iMaxTruePeerCount)
     {
+        //now shrink the Peer array to the required size
+        rmsg->setPeersArraySize(iMaxTruePeerCount);
+    }
+
+    //if there are relay peers to fill
+    if(  iMaxRelayPeersCount != 0 )
+    {
+        // temporary peer from the peers pool
+        BTTrackerStructBase* tpeer;
+        // temporary peer to add to the response
+        PEER ttpeer;
+
+        // peers added
+        set<int> added_peers;
 
 
-        //if there is peer at this index add it
-        if(relayPeers[i] != NULL)
+        for (int i=0; ((int)added_peers.size() < iMaxRelayPeersCount) && (i < (int)relayPeers.size()) ; i++ )
         {
-            //This announcing peer is also could be a relay peer.
-            //So this particular index may be give us the same peer from relay peer array.
-            //We should not add the same peer requesting in the response
-            if(amsg->peerId()  == ((BTTrackerStructBase*)relayPeers[i])->peerId())
-                continue;
-            //also check whether this peer already in true peers list
-            //bcz it is participating in the swarm
-            bool bPresent(false);
-            for(int j=0; j< rmsg->peersArraySize(); j++)
+            //if there is peer at this index add it
+            if(relayPeers[i] != NULL)
             {
-                if( strcmp ((rmsg->peers(j)).peerId.c_str(),  ((BTTrackerStructBase*)relayPeers[i])->peerId().c_str() ) == 0 )
+                //This announcing peer is also could be a relay peer.
+                //So this particular index may be give us the same peer from relay peer array.
+                //We should not add the same peer requesting in the response
+                if(amsg->peerId()  == ((BTTrackerStructBase*)relayPeers[i])->peerId())
+                    continue;
+                //also check whether this peer already in true peers list
+                //bcz it is participating in the swarm
+                bool bPresent(false);
+                for(int j=0; j< (int)rmsg->peersArraySize(); j++)
                 {
-                    bPresent=true;
-                    break;
+                    if( strcmp ((rmsg->peers(j)).peerId.c_str(),  ((BTTrackerStructBase*)relayPeers[i])->peerId().c_str() ) == 0 )
+                    {
+                        bPresent=true;
+                        break;
+                    }
+
                 }
 
+                if(!bPresent)
+                    added_peers.insert(i);
             }
-
-            if(!bPresent)
-                added_peers.insert(i);
         }
-    }
 
 
 
-    rmsg->setPeersArraySize(iTruePeerCount+added_peers.size());
+        rmsg->setPeersArraySize(iMaxTruePeerCount+added_peers.size());
 
-    set<int>::iterator it= added_peers.begin();
-    int i=0;
-    for( ; it != added_peers.end(); it++, i++)
-    {
-        // get the peer from the pool
-        tpeer = (BTTrackerStructBase*)relayPeers[*it];
-
-
-        // copy some fields/values
-        if(!no_peer_id)
+        set<int>::iterator it= added_peers.begin();
+        int i=0;
+        for( ; it != added_peers.end(); it++, i++)
         {
-            ttpeer.peerId       = tpeer->peerId().c_str();
-        }
-        ttpeer.peerPort     = tpeer->peerPort();
-        ttpeer.ipAddress    = tpeer->ipAddress();
+            // get the peer from the pool
+            tpeer = (BTTrackerStructBase*)relayPeers[*it];
 
-        // insert the peer to the response
-        rmsg->setPeers(iTruePeerCount+i, ttpeer);
+
+            // copy some fields/values
+            if(!no_peer_id)
+            {
+                ttpeer.peerId       = tpeer->peerId().c_str();
+            }
+            ttpeer.peerPort     = tpeer->peerPort();
+            ttpeer.ipAddress    = tpeer->ipAddress();
+
+            // insert the peer to the response
+            rmsg->setPeers(iMaxTruePeerCount+i, ttpeer);
+        }
     }
+}
+
+void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes,
+        int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount )
+{
+    int iMaxPeersInRes=getHostModule()->maxPeersInReply();
+    double dDelta=0.000001;
+
+    double dRelayPeerPcntg=_dRequestedRelayPeerPcntg;
+
+    //if ratio is negative or greater than one, it is invalid
+    if( (dRelayPeerPcntg + dDelta) < 0 || (dRelayPeerPcntg - dDelta) > 1 )
+    {
+        throw cRuntimeError("BTTrackerClientHandlerSPD::determinePeerMix - invalid relay peer ratio [%f] specified", dRelayPeerPcntg);
+
+    }
+    else if(dRelayPeerPcntg < dDelta) // if requested relay peer percentage is zero
+    {
+        _iTruePeerCount=iCurrenTruePeerCountinRes;
+        _iRelayPeerCount=0;
+    }
+    else if(  (1-dDelta) < dRelayPeerPcntg &&
+            dRelayPeerPcntg < (1+dDelta) )    //if requested relay peer ratio is one
+    {
+        _iTruePeerCount= 0;
+
+        if(iMaxPeersInRes < _iAvailableRelayPeerCount)
+            _iRelayPeerCount=iMaxPeersInRes;
+        else
+            _iRelayPeerCount=_iAvailableRelayPeerCount;
+    }
+    //if we don't have atleast one true peer or atleast one relay peer
+    else if (iCurrenTruePeerCountinRes==0 || _iAvailableRelayPeerCount==0)
+    {
+        //both should be zero. because we can't fulfill the percentage requirement
+        _iRelayPeerCount=0;
+        _iTruePeerCount=0;
+
+    }
+    else
+    {
+        int iMaxPossibleTruePeers=(1-dRelayPeerPcntg)*iMaxPeersInRes;
+        int iMaxPossibleRelayPeers= dRelayPeerPcntg*iMaxPeersInRes;
+
+        //if we have don't have enough true peers or relay peers to reach max number of peers
+
+        if ( _iAvailableRelayPeerCount < iMaxPossibleRelayPeers || iCurrenTruePeerCountinRes < iMaxPossibleTruePeers)
+        {
+            double dAvailableRelayPcntg=(double)_iAvailableRelayPeerCount/(iCurrenTruePeerCountinRes+_iAvailableRelayPeerCount);
+
+            if(dAvailableRelayPcntg < dRelayPeerPcntg)
+            {
+                //then peer count should be based on number of available relay peers
+                _iRelayPeerCount=_iAvailableRelayPeerCount;
+                _iTruePeerCount=(int) ((_iRelayPeerCount*(1-dRelayPeerPcntg))/ dRelayPeerPcntg);
+
+            }
+            else
+            {
+                //then peer count should be based on number of available true peers
+                _iTruePeerCount= iCurrenTruePeerCountinRes;
+                _iRelayPeerCount=(int)((_iTruePeerCount*dRelayPeerPcntg)/(1-dRelayPeerPcntg));
+            }
+        }
+        else
+        {
+            //we have enough relay peers and true peers. so we take the maximum values
+            _iTruePeerCount=iMaxPossibleTruePeers;
+            _iRelayPeerCount= iMaxPossibleRelayPeers;
+
+        }
+    }
+    BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::determinePeerMix",
+            "Relay Peer Percentage ["<<dRelayPeerPcntg<<"] Available True Peer Count ["<<iCurrenTruePeerCountinRes<<
+            "], Available Relay Peer Count["<<_iAvailableRelayPeerCount<<"]. In Response True Peer count ["<<_iTruePeerCount
+            <<"] Relay Peer Count ["<<_iRelayPeerCount<<"]");
 }
 
 

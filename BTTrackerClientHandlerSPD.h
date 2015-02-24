@@ -30,6 +30,9 @@ protected:
     virtual void fillPeersInResponse(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse*, bool, bool);    // selects the peers which will included in the response
     // end of overrides from BTTrackerClientHandlerBase
 
+    virtual void determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes,
+            int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount);
+
 
 };
 
