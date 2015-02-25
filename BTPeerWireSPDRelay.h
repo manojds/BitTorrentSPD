@@ -19,7 +19,7 @@ public:
     virtual ~BTPeerWireSPDRelay();
 
 protected:
-    /* Redefined methods from BTPeerWireBase */
+    /* Redefined methods from BTPeerWireSPD */
     virtual void initialize();
 
     virtual void handleMessage(cMessage *msg);

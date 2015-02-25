@@ -26,8 +26,14 @@ public:
 
 protected:
 
+    virtual void initialize();
+
     virtual void handleSelfMessage(cMessage* msg);
     virtual cMessage * createTrackerCommMsg();
+
+    static int i_CurrentMaliciousNodeCount;
+    bool b_Malicious;
+
 };
 
 #endif /* BTPEERWIRESPD_H_ */
