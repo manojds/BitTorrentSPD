@@ -15,17 +15,26 @@
 
 package inet.applications.BitTorrentSPD;
 
-
-import inet.applications.BitTorrent.BTPeerWireBase;
+import inet.applications.BitTorrent.BTHost;
 import inet.applications.tcpapp.TCPApp;
 
-simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
+module BTHostSPD extends BTHost
 {
     parameters:
-		@class(BTPeerWireSPD); 
-		int	maliciousNodeCount;
-		
-	gates:
-	    output 	threatHandlerOut;	
-
+        @display("bgb=337,472");
+    gates:    
+    
+    submodules:
+        //sub modlue which handles the tracker communication for the relay torrent hash
+        threatHandler: <threatHandlerAppType> like TCPApp {
+            parameters:
+                @display("p=290,80;i=block/app");
+        }
+        
+    connections allowunconnected:
+        peerWire.threatHandlerOut --> {  } --> threatHandler.btorrentIn;
+        
+        threatHandler.tcpOut --> {  } --> tcp.appIn++;
+        threatHandler.tcpIn <-- {  } <-- tcp.appOut++;        
+               
 }
