@@ -33,10 +33,11 @@ public:
     /* inherited methods from TCPGenericCliAppBase */
     virtual void initialize();
     virtual void handleMessage(cMessage*);
+    virtual void handleTimer(cMessage *msg);
     virtual void socketEstablished(int, void*);
-    virtual void socketDataArrived(int, void*, cPacket*, bool);
-    virtual void socketPeerClosed(int, void*);
-    virtual void socketFailure(int, void*, int);
+    //virtual void socketDataArrived(int, void*, cPacket*, bool);
+    //virtual void socketPeerClosed(int, void*);
+    //virtual void socketFailure(int, void*, int);
     // end of the overridden methods
 
     bool isMalicious();

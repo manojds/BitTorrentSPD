@@ -41,6 +41,11 @@ void BTThreatHandler::handleMessage(cMessage *msg)
     }
 }
 
+void BTThreatHandler::handleTimer(cMessage *msg)
+{
+
+}
+
 void BTThreatHandler::socketEstablished(int connId, void *ptr)
 {
     TCPGenericCliAppBase::socketEstablished(connId, ptr);
