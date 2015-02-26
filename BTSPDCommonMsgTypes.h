@@ -1,0 +1,7 @@
+#ifndef __INET_BTSPDCOMMONMSGTYPES_H_
+#define __INET_BTSPDCOMMONMSGTYPES_H_
+
+#define ATTACK_MSG_TYPE 1001
+#define NEW_TCP_ADDR    1002
+
+#endif

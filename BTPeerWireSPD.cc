@@ -36,10 +36,13 @@ void BTPeerWireSPD::initialize()
     int iMaxMaliciousNodes= par("maliciousNodeCount");
 
     if(i_CurrentMaliciousNodeCount < iMaxMaliciousNodes)
+    {
         b_Malicious=true;
+        i_CurrentMaliciousNodeCount++;
+    }
 
     BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::initialize","["<<this->getParentModule()->getFullName()<<"] ***** node initialized. Malicious["<<
-            b_Malicious<<" Current malicious node count ["<<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
+            b_Malicious<<"] Current malicious node count ["<<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
 }
 
 void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
