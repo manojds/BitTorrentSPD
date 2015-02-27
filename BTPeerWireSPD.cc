@@ -45,7 +45,7 @@ void BTPeerWireSPD::initialize()
     BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::initialize","["<<this->getParentModule()->getFullName()<<"] ***** node initialized. Malicious["<<
             b_Malicious<<"] Current malicious node count ["<<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
 
-    p_ThreatHndlr= check_and_cast<BTThreatHandler*>(getParentModule()->getSubmodule("threatHandler"));
+    p_ThreatHndlr= getParentModule()->getSubmodule("threatHandler");
 }
 
 void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
@@ -116,9 +116,12 @@ void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBas
 
 void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
 {
-    char pPort[32];
-    snprintf(pPort, 32, "%ud", peer.peerPort);
-    p_ThreatHndlr->newAddrFound(peer.ipAddress.str(), pPort);
+    if(p_ThreatHndlr)
+    {
+        char pPort[32];
+        snprintf(pPort, 32, "%ud", peer.peerPort);
+        p_ThreatHndlr->newAddrFound(peer.ipAddress.str(), pPort);
+    }
 }
 
 
