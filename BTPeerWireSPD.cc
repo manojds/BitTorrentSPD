@@ -119,7 +119,7 @@ void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
     if(p_ThreatHndlr)
     {
         char pPort[32];
-        snprintf(pPort, 32, "%ud", peer.peerPort);
+        snprintf(pPort, 32, "%u", peer.peerPort);
         p_ThreatHndlr->newAddrFound(peer.ipAddress.str(), pPort);
     }
 }
