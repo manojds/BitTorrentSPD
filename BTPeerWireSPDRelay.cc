@@ -144,6 +144,8 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
             "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - New connection arrived from peer ["<<peer.peerId<<"]");
 
+    BTPeerWireSPD::newConnectionFromPeerEstablished(peer, thread);
+
     bool bInitiateTrackerComm(false);
 
     if(initiatedPeers.size() == 0)
@@ -173,12 +175,16 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
 
         enableTrackerComm();
     }
+
 }
 
 void BTPeerWireSPDRelay::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
+
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionToPeerEstablished",
             "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection Established with peer ["<<peer.peerId<<"]");
+
+    BTPeerWireSPD::newConnectionToPeerEstablished(peer, thread);
 }
 
 void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)

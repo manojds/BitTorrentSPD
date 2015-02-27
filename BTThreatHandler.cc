@@ -14,6 +14,7 @@
 // 
 
 #include "BTThreatHandler.h"
+#include "../BitTorrent/BTLogImpl.h"
 
 Define_Module(BTThreatHandler);
 
@@ -30,9 +31,9 @@ void BTThreatHandler::initialize()
 
 void BTThreatHandler::handleMessage(cMessage *msg)
 {
-    if(msg->isSelfMessage() || msg->arrivedOn("btorrentIn"))
+    if(msg->arrivedOn("btorrentIn"))
     {
-        handleTimer(msg);
+        handleMsgFromBT(msg);
     }
     else
     {
@@ -56,7 +57,16 @@ void BTThreatHandler::socketEstablished(int connId, void *ptr)
 
 void BTThreatHandler::handleMsgFromBT(cMessage* msg)
 {
+    BT_LOG_INFO (btLogSinker,"BTThreatHandler::handleMsgFromBT","["<<getParentModule()->getFullName()<<"]  Message of kind ["<<
+            msg->getKind()<<"] received from PeerWire module");
     //decode the message
     //if attack message go in to malicious mode
     //if new address learned message attack to that node
+}
+
+
+void BTThreatHandler::newAddrFound(const std::string & _sIP, const std::string & _sPort)
+{
+    BT_LOG_INFO(btLogSinker,"BTThreatHandler::newAddrFound","["<<getParentModule()->getFullName()<<"]  New address found ["<<
+            _sIP<<":"<<_sPort<< "]");
 }

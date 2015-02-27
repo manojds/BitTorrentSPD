@@ -26,6 +26,9 @@ class INET_API BTThreatHandler : public TCPGenericCliAppBase
 public:
     BTThreatHandler();
     virtual ~BTThreatHandler();
+
+    virtual void newAddrFound(const std::string & _sIP, const std::string & _sPort);
+
   protected:
 
     virtual void handleMsgFromBT(cMessage*);
@@ -39,6 +42,8 @@ public:
     //virtual void socketPeerClosed(int, void*);
     //virtual void socketFailure(int, void*, int);
     // end of the overridden methods
+
+
 
     bool isMalicious();
 

@@ -17,7 +17,8 @@
 #include "../BitTorrent/BTLogImpl.h"
 #include "../BTTrackerClientBase.h"
 #include "BTHostIntrnlMsgsSPD_m.h"
-
+#include "BTThreatHandler.h"
+#include <string.h>
 Define_Module(BTPeerWireSPD);
 
 int BTPeerWireSPD::i_CurrentMaliciousNodeCount(0);
@@ -43,6 +44,8 @@ void BTPeerWireSPD::initialize()
 
     BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::initialize","["<<this->getParentModule()->getFullName()<<"] ***** node initialized. Malicious["<<
             b_Malicious<<"] Current malicious node count ["<<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
+
+    p_ThreatHndlr= check_and_cast<BTThreatHandler*>(getParentModule()->getSubmodule("threatHandler"));
 }
 
 void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
@@ -98,6 +101,24 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
 
     return pMsg;
 
+}
+
+void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
+{
+    notifyNewAddrToThreatHndlr(peer);
+
+}
+
+void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
+{
+    notifyNewAddrToThreatHndlr(peer);
+}
+
+void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
+{
+    char pPort[32];
+    snprintf(pPort, 32, "%ud", peer.peerPort);
+    p_ThreatHndlr->newAddrFound(peer.ipAddress.str(), pPort);
 }
 
 

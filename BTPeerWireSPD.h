@@ -17,6 +17,8 @@
 #define BTPEERWIRESPD_H_
 #include "../BitTorrent/BTPeerWireBase.h"
 
+class BTThreatHandler;
+
 class INET_API BTPeerWireSPD :public BTPeerWireBase
 {
 public:
@@ -31,8 +33,14 @@ protected:
     virtual void handleSelfMessage(cMessage* msg);
     virtual cMessage * createTrackerCommMsg();
 
-    static int i_CurrentMaliciousNodeCount;
-    bool b_Malicious;
+    virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
+    virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
+
+    virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
+
+    static int          i_CurrentMaliciousNodeCount;
+    bool                b_Malicious;
+    BTThreatHandler*    p_ThreatHndlr;
 
 };
 
