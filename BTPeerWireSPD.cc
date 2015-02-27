@@ -45,7 +45,7 @@ void BTPeerWireSPD::initialize()
     BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::initialize","["<<this->getParentModule()->getFullName()<<"] ***** node initialized. Malicious["<<
             b_Malicious<<"] Current malicious node count ["<<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
 
-    p_ThreatHndlr= getParentModule()->getSubmodule("threatHandler");
+    p_ThreatHndlr= (BTThreatHandler*)(getParentModule()->getSubmodule("threatHandler"));
 }
 
 void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
