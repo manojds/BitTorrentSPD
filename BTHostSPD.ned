@@ -21,6 +21,7 @@ import inet.applications.tcpapp.TCPApp;
 module BTHostSPD extends BTHost
 {
     parameters:
+        string threatHandlerAppType;
         @display("bgb=337,472");
     gates:    
     
