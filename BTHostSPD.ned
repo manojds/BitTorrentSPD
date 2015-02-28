@@ -22,6 +22,7 @@ module BTHostSPD extends BTHost
 {
     parameters:
         string threatHandlerAppType;
+        string plaformType;
         @display("bgb=337,472");
     gates:    
     
