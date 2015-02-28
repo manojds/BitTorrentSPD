@@ -41,8 +41,8 @@ void BTThreatHandler::initialize()
     b_Vulnerable= par("vulnerable");
 
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
-            "] ***** Threat Handler initialized. Vulnerable ["<< b_Vulnerable?"true":"false"<<
-                    "] Malicious["<<b_Malicious?"true":"false"<<"] Current malicious node count ["
+            "] ***** Threat Handler initialized. Vulnerable ["<< (b_Vulnerable?"true":"false") <<
+                    "] Malicious["<< (b_Malicious?"true":"false") <<"] Current malicious node count ["
                     <<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
 }
 
