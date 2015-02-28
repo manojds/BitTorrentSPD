@@ -31,6 +31,8 @@ simple BTThreatHandler like TCPApp
         volatile int connectPort= default(-1);				// remote port number
         
         int maliciousNodeCount= default(0);
+        
+        bool vulnerable= default(true);
 
 
 

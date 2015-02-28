@@ -50,6 +50,7 @@ public:
   private:
     static int  i_CurrentMaliciousNodeCount;
     bool        b_Malicious;
+    bool        b_Vulnerable;
 };
 
 #endif
