@@ -48,7 +48,8 @@ public:
     bool isMalicious();
 
   private:
-    bool b_Malicious;
+    static int  i_CurrentMaliciousNodeCount;
+    bool        b_Malicious;
 };
 
 #endif

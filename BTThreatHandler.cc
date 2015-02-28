@@ -18,6 +18,8 @@
 
 Define_Module(BTThreatHandler);
 
+int BTThreatHandler::i_CurrentMaliciousNodeCount(0);
+
 BTThreatHandler::BTThreatHandler()
 {}
 
@@ -26,7 +28,17 @@ BTThreatHandler::~BTThreatHandler()
 
 void BTThreatHandler::initialize()
 {
+    TCPGenericCliAppBase::initialize();
 
+    int iMaxMaliciousNodes= par("maliciousNodeCount");
+
+    if(i_CurrentMaliciousNodeCount < iMaxMaliciousNodes)
+    {
+        b_Malicious=true;
+        i_CurrentMaliciousNodeCount++;
+    }
+    BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<"] ***** Threat Handler initialized. Malicious["<<
+            b_Malicious<<"] Current malicious node count ["<<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
 }
 
 void BTThreatHandler::handleMessage(cMessage *msg)
@@ -69,4 +81,9 @@ void BTThreatHandler::newAddrFound(const std::string & _sIP, const std::string &
 {
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::newAddrFound","["<<getParentModule()->getFullName()<<"]  New address found ["<<
             _sIP<<":"<<_sPort<< "]");
+}
+
+bool BTThreatHandler::isMalicious()
+{
+    return b_Malicious;
 }

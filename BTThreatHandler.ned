@@ -25,6 +25,8 @@ simple BTThreatHandler like TCPApp
         volatile string connectAddress= default("");		// remote address - on which attack would be launched
 
         volatile int connectPort= default(-1);				// remote port number
+        
+        int maliciousNodeCount= default(0);
 
 
 
