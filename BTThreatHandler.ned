@@ -21,6 +21,10 @@ import inet.applications.tcpapp.TCPApp;
 simple BTThreatHandler like TCPApp
 {
     parameters:
+        
+        volatile string address= default("");				// local address 
+
+        volatile int port= default(-1);						//local port        
 
         volatile string connectAddress= default("");		// remote address - on which attack would be launched
 
