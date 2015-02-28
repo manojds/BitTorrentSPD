@@ -40,17 +40,28 @@ public:
     virtual void socketEstablished(int, void*);
     //virtual void socketDataArrived(int, void*, cPacket*, bool);
     //virtual void socketPeerClosed(int, void*);
-    //virtual void socketFailure(int, void*, int);
+    virtual void socketFailure(int, void*, int);
     // end of the overridden methods
+
+
+    virtual void findAndSetIPAddress();
+    virtual void scheduleNextAttackAt(simtime_t t);
+    virtual void tryNextAttack();
+    virtual void sendAttackMsg();
+    virtual void hasBeenAttacked();
 
 
 
     bool isMalicious();
 
   private:
-    static int  i_CurrentMaliciousNodeCount;
-    bool        b_Malicious;
-    bool        b_Vulnerable;
+    static int          i_CurrentMaliciousNodeCount;
+    bool                b_Malicious;
+    bool                b_Vulnerable;
+    bool                b_AttackIsOngoing;
+    cMessage*           p_ScheduleAttackMsg;
+    simtime_t           t_AttackRetryDelay;
+    std::queue<std::string>  q_LearnedAddrses;
 };
 
 #endif
