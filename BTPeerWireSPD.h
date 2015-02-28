@@ -38,8 +38,6 @@ protected:
 
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
 
-    static int          i_CurrentMaliciousNodeCount;
-    bool                b_Malicious;
     BTThreatHandler*    p_ThreatHndlr;
 
 };

@@ -23,7 +23,6 @@ simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
 {
     parameters:
 		@class(BTPeerWireSPD); 
-		int	maliciousNodeCount;
 		
 	gates:
 	    output 	threatHandlerOut;	
