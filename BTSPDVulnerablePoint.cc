@@ -30,6 +30,7 @@ BTSPDVulnerablePoint::~BTSPDVulnerablePoint()
 
 void BTSPDVulnerablePoint::initialize()
 {
+    TCPSrvHostApp::initialize();
     b_Vulnerable= par("vulnerable");
 }
 
