@@ -91,6 +91,8 @@ void BTThreatHandler::handleMsgFromBT(cMessage* msg)
         break;
 
     }
+
+    delete msg;
 }
 
 

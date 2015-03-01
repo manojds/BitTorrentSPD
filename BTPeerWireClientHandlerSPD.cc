@@ -57,7 +57,7 @@ void BTPeerWireClientHandlerSPD::dataArrived(cMessage* mmsg, bool urgent)
         else
         {
             BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                            << "] Threat Hnalder module is not connected. avoid forwarding the attack message");
+                            << "] Threat Handler module is not connected. avoid forwarding the attack message");
 
         }
 

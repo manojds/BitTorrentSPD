@@ -35,11 +35,11 @@ import inet.applications.tcpapp.TCPApp;
 // Based on StandardHost module created by Markus Mauch, Bernhard Heep
 //
 
-module BTHostRelay extends BTHost
+module BTHostRelay extends BTHostSPD
 {
     parameters:
 		string relayTrackerClientTCPAppType;
-        @display("bgb=337,472");
+        @display("bgb=360,472");
     gates:
 
 
@@ -47,7 +47,7 @@ module BTHostRelay extends BTHost
         //sub modlue which handles the tracker communication for the relay torrent hash
         relay_trackerClient: <relayTrackerClientTCPAppType> like TCPApp {
             parameters:
-                @display("p=290,80;i=block/app");
+                @display("p=50,60;i=block/app");
         }
                 
 
