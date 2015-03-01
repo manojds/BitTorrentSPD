@@ -26,7 +26,7 @@ Define_Module(BTThreatHandler);
 
 #define ATTACK_SCHEDULE_MSG_TYPE    501
 
-int BTThreatHandler::i_CurrentMaliciousNodeCount(0);
+//int BTThreatHandler::i_CurrentMaliciousNodeCount(0);
 
 BTThreatHandler::BTThreatHandler():
         b_Malicious(false),
@@ -47,20 +47,13 @@ void BTThreatHandler::initialize()
 
     findAndSetIPAddress();
 
-    int iMaxMaliciousNodes= par("maliciousNodeCount");
-
-    if(i_CurrentMaliciousNodeCount < iMaxMaliciousNodes)
-    {
-        b_Malicious=true;
-        i_CurrentMaliciousNodeCount++;
-    }
+    b_Malicious= par("malicious");
 
     b_Vulnerable= par("vulnerable");
 
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
             "] ***** Threat Handler initialized. Vulnerable ["<< (b_Vulnerable?"true":"false") <<
-                    "] Malicious["<< (b_Malicious?"true":"false") <<"] Current malicious node count ["
-                    <<i_CurrentMaliciousNodeCount<<"] Max malicious node count ["<<iMaxMaliciousNodes<<"]");
+                    "] Malicious["<< (b_Malicious?"true":"false") <<"] ");
 
     p_ScheduleAttackMsg= new cMessage("BTSPD_ATTACK_SCHEDULE_MSG",ATTACK_SCHEDULE_MSG_TYPE);
 }

@@ -55,7 +55,7 @@ public:
     bool isMalicious();
 
   private:
-    static int          i_CurrentMaliciousNodeCount;
+    //static int          i_CurrentMaliciousNodeCount;
     bool                b_Malicious;
     bool                b_Vulnerable;
     bool                b_AttackIsOngoing;
