@@ -22,6 +22,7 @@ module BTHostSPD extends BTHost
 {
     parameters:
         string threatHandlerAppType;
+        string vulnerbilityAppType;
         string plaformType;
         @display("bgb=337,472");
     gates:    
@@ -33,10 +34,18 @@ module BTHostSPD extends BTHost
                 @display("p=290,80;i=block/app");
         }
         
+        vulnerability: <vulnerbilityAppType> like TCPApp {
+            parameters:
+                @display("p=290,140;i=block/app");
+        }        
+        
     connections allowunconnected:
         peerWire.threatHandlerOut --> {  } --> threatHandler.btorrentIn;
         
         threatHandler.tcpOut --> {  } --> tcp.appIn++;
-        threatHandler.tcpIn <-- {  } <-- tcp.appOut++;        
+        threatHandler.tcpIn <-- {  } <-- tcp.appOut++;  
+        
+        vulnerability.tcpOut --> {  } --> tcp.appIn++;
+        vulnerability.tcpIn <-- {  } <-- tcp.appOut++;               
                
 }
