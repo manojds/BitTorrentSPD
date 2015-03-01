@@ -45,8 +45,6 @@ void BTThreatHandler::initialize()
 {
     TCPGenericCliAppBase::initialize();
 
-    findAndSetIPAddress();
-
     b_Malicious= par("malicious");
 
     b_Vulnerable= par("vulnerable");
@@ -138,6 +136,10 @@ void BTThreatHandler::tryNextAttack()
                     q_LearnedAddrses.front()<<"] to attack...");
 
             //port would be taken from the configuration
+
+
+            findAndSetIPAddress();
+
             connect();
         }
     }
