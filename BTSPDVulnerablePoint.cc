@@ -18,6 +18,7 @@
 #include "BTSPDCommonMsgTypes.h"
 #include "BTThreatHandler.h"
 
+Register_Class(BTSPDVulnerablePClientHndlr);
 Define_Module(BTSPDVulnerablePoint);
 
 BTSPDVulnerablePoint::BTSPDVulnerablePoint()
