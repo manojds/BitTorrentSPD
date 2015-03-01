@@ -29,6 +29,8 @@ public:
 
     virtual void newAddrFound(const std::string & _sIP, const std::string & _sPort);
 
+    virtual void hasBeenAttacked();
+
   protected:
 
     virtual void handleMsgFromBT(cMessage*);
@@ -48,7 +50,7 @@ public:
     virtual void scheduleNextAttackAt(simtime_t t);
     virtual void tryNextAttack();
     virtual void sendAttackMsg();
-    virtual void hasBeenAttacked();
+
 
 
 
