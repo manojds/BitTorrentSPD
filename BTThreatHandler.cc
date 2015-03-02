@@ -27,6 +27,7 @@
 Define_Module(BTThreatHandler);
 
 #define ATTACK_SCHEDULE_MSG_TYPE    501
+#define ACTIVATE_ADVERSRY_MSG_TYPE  502
 
 //int BTThreatHandler::i_CurrentMaliciousNodeCount(0);
 
@@ -106,21 +107,32 @@ void BTThreatHandler::handleTimer(cMessage *msg)
         tryNextAttack();
         break;
 
+    case ACTIVATE_ADVERSRY_MSG_TYPE:
+        break;
+
     default:
         throw cRuntimeError("BTThreatHandler::handleTimer- Unknown message arrived. kind [%d] name [%s]",
                 msg->getKind(),msg->getName() );
         break;
 
     }
+
+    delete msg;
 }
 
 void BTThreatHandler::activateAdversary()
+{
+    scheduleAt(simTime(), new cMessage("ACTIVATE_ADVERSRY", ACTIVATE_ADVERSRY_MSG_TYPE))
+}
+
+void BTThreatHandler::compromised()
 {
     if(b_Malicious == false )
     {
         BT_LOG_INFO (btLogSinker,"BTThreatHandler::activateAdversary","["<<getParentModule()->getFullName()<<
                 "] ******* I have been compromised. Activating the Adversary");
         b_Malicious= true;
+
 
         BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_INFECTED_MSG",BTSPD_INFECTED_MSG_TYPE);
         pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());

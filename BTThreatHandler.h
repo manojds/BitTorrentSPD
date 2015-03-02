@@ -47,9 +47,11 @@ public:
     // end of the overridden methods
 
 
+
     virtual void findAndSetIPAddress();
     virtual void scheduleNextAttackAt(simtime_t t);
     virtual void tryNextAttack();
+    virtual void compromised();
     virtual void sendAttackMsg();
 
 
