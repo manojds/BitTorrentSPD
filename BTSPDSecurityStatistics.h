@@ -17,7 +17,7 @@
 #define __INET_BTSPDSECURITYSTATISTICS_H_
 
 #include <omnetpp.h>
-
+#include <map>
 
 class BTSPDSecurityStatistics : public cSimpleModule
 {
@@ -28,6 +28,13 @@ class BTSPDSecurityStatistics : public cSimpleModule
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
+
+  protected:
+    virtual void nodeInfected(const std::string & _sNodeType);
+    virtual void printInfectedNodeCounts();
+
+
+    std::map<std::string,int>   map_InfectedNodes;
 };
 
 #endif

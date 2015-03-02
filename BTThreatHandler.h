@@ -62,6 +62,7 @@ public:
     bool                b_Malicious;
     bool                b_AttackIsOngoing;
     cMessage*           p_ScheduleAttackMsg;
+    cSimpleModule*      p_SecStatistics;
     simtime_t           t_AttackRetryDelay;
     std::queue<std::string>  q_LearnedAddrses;
 };

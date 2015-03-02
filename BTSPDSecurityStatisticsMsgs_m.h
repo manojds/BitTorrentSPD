@@ -18,10 +18,48 @@
 /**
  * Class generated from <tt>applications/BitTorrentSPD/BTSPDSecurityStatisticsMsgs.msg</tt> by opp_msgc.
  * <pre>
+ * message BTSPDSecurityStatus
+ * {
+ *     @omitGetVerb(true);
+ *     string moduleType;    
+ * }
+ * </pre>
+ */
+class BTSPDSecurityStatus : public ::cMessage
+{
+  protected:
+    opp_string moduleType_var;
+
+  private:
+    void copy(const BTSPDSecurityStatus& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const BTSPDSecurityStatus&);
+
+  public:
+    BTSPDSecurityStatus(const char *name=NULL, int kind=0);
+    BTSPDSecurityStatus(const BTSPDSecurityStatus& other);
+    virtual ~BTSPDSecurityStatus();
+    BTSPDSecurityStatus& operator=(const BTSPDSecurityStatus& other);
+    virtual BTSPDSecurityStatus *dup() const {return new BTSPDSecurityStatus(*this);}
+    virtual void parsimPack(cCommBuffer *b);
+    virtual void parsimUnpack(cCommBuffer *b);
+
+    // field getter/setter methods
+    virtual const char * moduleType() const;
+    virtual void setModuleType(const char * moduleType);
+};
+
+inline void doPacking(cCommBuffer *b, BTSPDSecurityStatus& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, BTSPDSecurityStatus& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>applications/BitTorrentSPD/BTSPDSecurityStatisticsMsgs.msg</tt> by opp_msgc.
+ * <pre>
  * message BTSPDVulnerabilityStatus
  * {
  *     @omitGetVerb(true);
- *     string moduleType;
  * 
  *     
  *     bool vulnerabilityFixed;
@@ -32,7 +70,6 @@
 class BTSPDVulnerabilityStatus : public ::cMessage
 {
   protected:
-    opp_string moduleType_var;
     bool vulnerabilityFixed_var;
 
   private:
@@ -52,8 +89,6 @@ class BTSPDVulnerabilityStatus : public ::cMessage
     virtual void parsimUnpack(cCommBuffer *b);
 
     // field getter/setter methods
-    virtual const char * moduleType() const;
-    virtual void setModuleType(const char * moduleType);
     virtual bool vulnerabilityFixed() const;
     virtual void setVulnerabilityFixed(bool vulnerabilityFixed);
 };

@@ -14,6 +14,9 @@
 // 
 
 #include "BTSPDSecurityStatistics.h"
+#include "BTSPDCommonMsgTypes.h"
+#include "BTSPDSecurityStatisticsMsgs_m.h"
+#include "../BTLogImpl.h"
 
 Define_Module(BTSPDSecurityStatistics);
 
@@ -30,10 +33,47 @@ void BTSPDSecurityStatistics::initialize()
 
 void BTSPDSecurityStatistics::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    BTSPDSecurityStatus * pSecMsg=check_and_cast<BTSPDSecurityStatus *>(msg);
+
+    switch (msg->getKind())
+    {
+    case BTSPD_INFECTED_MSG_TYPE:
+        nodeInfected(pSecMsg->moduleType());
+        break;
+
+    default:
+        throw cRuntimeError("BTSPDSecurityStatistics::handleMessage - unknown message received. kind [%d], name[%s]",
+                msg->getKind(), msg->getName());
+        break;
+
+    }
+
+    delete msg;
+}
+
+void BTSPDSecurityStatistics::nodeInfected(const std::string & _sNodeType)
+{
+    std::map<std::string,int>::iterator itr= map_InfectedNodes.find(_sNodeType);
+    if(itr == map_InfectedNodes.end())
+    {
+        map_InfectedNodes[_sNodeType]=0;
+    }
+
+    map_InfectedNodes[_sNodeType]++;
+}
+
+void BTSPDSecurityStatistics::printInfectedNodeCounts()
+{
+    std::map<std::string,int>::iterator itr= map_InfectedNodes.begin();
+    for(; itr != map_InfectedNodes.end() ; itr++)
+    {
+        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","infected node count ["<< itr->first<<
+                    "]- ["<< itr->second <<"] ");
+    }
+
 }
 
 void BTSPDSecurityStatistics::finish()
 {
-
+    printInfectedNodeCounts();
 }

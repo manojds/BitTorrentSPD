@@ -22,6 +22,7 @@
 #include "../../networklayer/ipv4/IPv4InterfaceData.h"
 #include "../../networklayer/ipv6/IPv6InterfaceData.h"
 #include "../tcpapp/GenericAppMsg_m.h"
+#include "BTSPDSecurityStatisticsMsgs_m.h"
 
 Define_Module(BTThreatHandler);
 
@@ -49,6 +50,11 @@ void BTThreatHandler::initialize()
 
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
             "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"] ");
+
+    const char * pModPath=par("securityStatisticsModulePath").stringValue();
+
+    p_SecStatistics = (cSimpleModule*)simulation.getModuleByPath(pModPath);
+
 
     p_ScheduleAttackMsg= new cMessage("BTSPD_ATTACK_SCHEDULE_MSG",ATTACK_SCHEDULE_MSG_TYPE);
 }
@@ -115,6 +121,11 @@ void BTThreatHandler::activateAdversary()
         BT_LOG_INFO (btLogSinker,"BTThreatHandler::activateAdversary","["<<getParentModule()->getFullName()<<
                 "] ******* I have been compromised. Activating the Adversary");
         b_Malicious= true;
+
+        BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_INFECTED_MSG",BTSPD_INFECTED_MSG_TYPE);
+        pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
+
+        sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
     }
 }
 
