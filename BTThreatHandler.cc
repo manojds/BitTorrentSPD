@@ -107,9 +107,9 @@ void BTThreatHandler::handleTimer(cMessage *msg)
         tryNextAttack();
         break;
 
-    case ACTIVATE_ADVERSRY_MSG_TYPE:
-        compromised();
-        break;
+//    case ACTIVATE_ADVERSRY_MSG_TYPE:
+//        compromised();
+//        break;
 
     default:
         throw cRuntimeError("BTThreatHandler::handleTimer- Unknown message arrived. kind [%d] name [%s]",
@@ -124,7 +124,7 @@ void BTThreatHandler::handleTimer(cMessage *msg)
 void BTThreatHandler::activateAdversary()
 {
     Enter_Method_Silent();
-    scheduleAt(simTime(), new cMessage("ACTIVATE_ADVERSRY", ACTIVATE_ADVERSRY_MSG_TYPE));
+    compromised();
 }
 
 void BTThreatHandler::compromised()
