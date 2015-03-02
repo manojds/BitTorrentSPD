@@ -11,16 +11,27 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
+//
 
-package inet.applications.BitTorrentSPD;
-import oversim.common.IGlobalFunctions;
-
-module BTStatisticsFunctionSPD like IGlobalFunctions
+message BTSPDSecurityStatus
 {
-    submodules:
-        btstatistics: BTStatisticsSPD;
-        btSecurityStatistics: BTSPDSecurityStatistics;
-	connections allowunconnected:
+    @omitGetVerb(true);
+    string moduleType;    
+}
 
+message BTSPDVulnerabilityStatus
+{
+    @omitGetVerb(true);
+
+    //bool vulnerable;
+    bool vulnerabilityFixed;
+
+}
+
+message BTSPDThreatStatus
+{
+    @omitGetVerb(true);
+
+    bool infected;
+    
 }

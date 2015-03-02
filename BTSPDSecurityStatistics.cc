@@ -13,14 +13,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.applications.BitTorrentSPD;
-import oversim.common.IGlobalFunctions;
+#include "BTSPDSecurityStatistics.h"
 
-module BTStatisticsFunctionSPD like IGlobalFunctions
+Define_Module(BTSPDSecurityStatistics);
+
+BTSPDSecurityStatistics::BTSPDSecurityStatistics()
+{}
+
+BTSPDSecurityStatistics::~BTSPDSecurityStatistics()
+{}
+
+void BTSPDSecurityStatistics::initialize()
 {
-    submodules:
-        btstatistics: BTStatisticsSPD;
-        btSecurityStatistics: BTSPDSecurityStatistics;
-	connections allowunconnected:
+
+}
+
+void BTSPDSecurityStatistics::handleMessage(cMessage *msg)
+{
+    // TODO - Generated method body
+}
+
+void BTSPDSecurityStatistics::finish()
+{
 
 }

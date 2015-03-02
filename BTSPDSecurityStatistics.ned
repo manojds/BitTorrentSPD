@@ -14,13 +14,13 @@
 // 
 
 package inet.applications.BitTorrentSPD;
-import oversim.common.IGlobalFunctions;
 
-module BTStatisticsFunctionSPD like IGlobalFunctions
+//
+// TODO auto-generated module
+//
+simple BTSPDSecurityStatistics
 {
-    submodules:
-        btstatistics: BTStatisticsSPD;
-        btSecurityStatistics: BTSPDSecurityStatistics;
-	connections allowunconnected:
-
+    parameters:
+    gates:
+        input direct_in;    
 }

@@ -13,14 +13,21 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.applications.BitTorrentSPD;
-import oversim.common.IGlobalFunctions;
+#ifndef __INET_BTSPDSECURITYSTATISTICS_H_
+#define __INET_BTSPDSECURITYSTATISTICS_H_
 
-module BTStatisticsFunctionSPD like IGlobalFunctions
+#include <omnetpp.h>
+
+
+class BTSPDSecurityStatistics : public cSimpleModule
 {
-    submodules:
-        btstatistics: BTStatisticsSPD;
-        btSecurityStatistics: BTSPDSecurityStatistics;
-	connections allowunconnected:
+  public:
+    BTSPDSecurityStatistics();
+    virtual ~BTSPDSecurityStatistics();
 
-}
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+    virtual void finish();
+};
+
+#endif
