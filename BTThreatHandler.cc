@@ -122,7 +122,7 @@ void BTThreatHandler::handleTimer(cMessage *msg)
 
 void BTThreatHandler::activateAdversary()
 {
-    scheduleAt(simTime(), new cMessage("ACTIVATE_ADVERSRY", ACTIVATE_ADVERSRY_MSG_TYPE))
+    scheduleAt(simTime(), new cMessage("ACTIVATE_ADVERSRY", ACTIVATE_ADVERSRY_MSG_TYPE));
 }
 
 void BTThreatHandler::compromised()
