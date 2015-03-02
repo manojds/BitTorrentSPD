@@ -16,7 +16,7 @@
 package inet.applications.BitTorrentSPD;
 import oversim.common.IGlobalFunctions;
 
-module BTStatisticsRelayFunction like IGlobalFunctions
+module BTStatisticsFunctionSPD like IGlobalFunctions
 {
     submodules:
         btstatistics: BTStatisticsSPD;
