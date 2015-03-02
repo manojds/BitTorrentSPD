@@ -42,6 +42,8 @@ bool BTSPDVulnerablePoint::isVulnerable()
 
 void BTSPDVulnerablePoint::vulnerabilityFixed()
 {
+    BT_LOG_INFO(btLogSinker, "VulnrblPnt::vulnerabilityFixed", "[" << getParentModule()->getFullName()
+                << "] Fixing the vulnerability...");
     b_Vulnerable= false;
 }
 
@@ -54,48 +56,75 @@ BTSPDVulnerablePClientHndlr::~BTSPDVulnerablePClientHndlr()
 
 void BTSPDVulnerablePClientHndlr::established()
 {
-    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePClientHndlr::established",
-            "connection with client[address=" << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "] established");
+    BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::established",
+            "[" << getHostModule()->getParentModule()->getFullName()
+                << "] connection with client[address=" << getSocket()->getRemoteAddress() << 
+                ", port=" << getSocket()->getRemotePort() << "] established");
 }
 
 void BTSPDVulnerablePClientHndlr::dataArrived(cMessage* mmsg, bool)
 {
-    if(mmsg->getKind() == BTSPD_ATTACK_MSG_TYPE)
+    cPacket * PacketMsg = dynamic_cast<cPacket *>(mmsg);
+    if (PacketMsg == NULL)
     {
-        BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                << "] Attack Message received - vulnerability has been exploited........");
-
-
+        opp_error("MJP - Message (%s)%s is not a cPacket -- ",
+                  mmsg->getClassName(), mmsg->getName());
         delete mmsg;
+        return;
+    }
 
-        BTSPDVulnerablePoint * pHostMod=check_and_cast<BTSPDVulnerablePoint*>(getHostModule());
+    cPacket * msg = PacketMsg->decapsulate();
+    delete mmsg;
+        
+    if(msg->getKind() == BTSPD_ATTACK_MSG_TYPE)
+    {
+        delete msg;
 
-        if(pHostMod->isVulnerable())
-        {
+        tryToExploit();
 
-            BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                            << "] I am vulnerable and vulnerability has been exploited........");
-
-            BTThreatHandler* p_ThreatHndlr=
-                    (BTThreatHandler*)(pHostMod->getParentModule()->getSubmodule("threatHandler"));
-
-            p_ThreatHndlr->hasBeenAttacked();
-        }
-        else
-        {
-            BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                                        << "] I am not vulnerable, so no problem........");
-        }
 
     }
     else
     {
-        throw cRuntimeError("BTSPDVulnerablePClientHndlr::dataArrived - unknown message received. kind [%d] name [%s]",
-                mmsg->getKind(), mmsg->getName());
+        throw cRuntimeError("VulnrblClientHndlr::dataArrived - unknown message received. kind [%d] name [%s]",
+                msg->getKind(), msg->getName());
     }
+}
+
+void BTSPDVulnerablePClientHndlr::tryToExploit()
+{
+    BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::tryToExploit", "[" << getHostModule()->getParentModule()->getFullName()
+            << "] Attack Message received - trying to exploit vulnerability...");
+
+
+    BTSPDVulnerablePoint * pHostMod=check_and_cast<BTSPDVulnerablePoint*>(getHostModule());
+
+    if(pHostMod->isVulnerable())
+    {
+
+        BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
+                        << "] I am vulnerable and vulnerability has been exploited........");
+
+        BTThreatHandler* p_ThreatHndlr=
+                (BTThreatHandler*)(pHostMod->getParentModule()->getSubmodule("threatHandler"));
+
+        p_ThreatHndlr->activateAdversary();
+    }
+    else
+    {
+        BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::tryToExploit", "[" << getHostModule()->getParentModule()->getFullName()
+                                    << "] I am not vulnerable, so no problem........");
+    }
+
 }
 
 void BTSPDVulnerablePClientHndlr::timerExpired(cMessage*)
 {
 
+}
+
+void BTSPDVulnerablePClientHndlr::peerClosed()
+{
+    BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::peerClosed", "[" << getHostModule()->getParentModule()->getFullName()
+                                        << "] peer closed....");
 }

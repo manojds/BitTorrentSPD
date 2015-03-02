@@ -48,7 +48,12 @@ protected:
     virtual void established();
     virtual void dataArrived(cMessage*, bool);
     virtual void timerExpired(cMessage*);
-    //virtual void peerClosed();
+    virtual void peerClosed();
+    //end of the redefined methods
+
+    virtual void tryToExploit();
+
+
 };
 
 #endif

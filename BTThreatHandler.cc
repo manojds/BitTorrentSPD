@@ -21,6 +21,7 @@
 #include <InterfaceEntry.h>
 #include "../../networklayer/ipv4/IPv4InterfaceData.h"
 #include "../../networklayer/ipv6/IPv6InterfaceData.h"
+#include "../tcpapp/GenericAppMsg_m.h"
 
 Define_Module(BTThreatHandler);
 
@@ -30,7 +31,6 @@ Define_Module(BTThreatHandler);
 
 BTThreatHandler::BTThreatHandler():
         b_Malicious(false),
-        b_Vulnerable(true),
         b_AttackIsOngoing(false),
         p_ScheduleAttackMsg(NULL),
         t_AttackRetryDelay(60)
@@ -47,11 +47,8 @@ void BTThreatHandler::initialize()
 
     b_Malicious= par("malicious");
 
-    b_Vulnerable= par("vulnerable");
-
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
-            "] ***** Threat Handler initialized. Vulnerable ["<< (b_Vulnerable?"true":"false") <<
-                    "] Malicious["<< (b_Malicious?"true":"false") <<"] ");
+            "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"] ");
 
     p_ScheduleAttackMsg= new cMessage("BTSPD_ATTACK_SCHEDULE_MSG",ATTACK_SCHEDULE_MSG_TYPE);
 }
@@ -80,7 +77,7 @@ void BTThreatHandler::handleMsgFromBT(cMessage* msg)
     {
     case BTSPD_ATTACK_MSG_TYPE:
 
-        hasBeenAttacked();
+        activateAdversary();
         break;
 
     default:
@@ -111,14 +108,28 @@ void BTThreatHandler::handleTimer(cMessage *msg)
     }
 }
 
-void BTThreatHandler::hasBeenAttacked()
+void BTThreatHandler::activateAdversary()
 {
-    if(b_Malicious == false && b_Vulnerable == true)
+    if(b_Malicious == false )
     {
-        BT_LOG_INFO (btLogSinker,"BTThreatHandler::hasBeenAttacked","["<<getParentModule()->getFullName()<<
-                "] ******* I have been compromised");
+        BT_LOG_INFO (btLogSinker,"BTThreatHandler::activateAdversary","["<<getParentModule()->getFullName()<<
+                "] ******* I have been compromised. Activating the Adversary");
         b_Malicious= true;
     }
+}
+
+void BTThreatHandler::cleanAdversary()
+{
+    if(b_Malicious == true )
+    {
+        BT_LOG_INFO (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
+                "]  Adversary neutralized !");
+        b_Malicious= false;
+
+        while(!q_LearnedAddrses.empty())
+            q_LearnedAddrses.pop();
+    }
+
 }
 
 void BTThreatHandler::tryNextAttack()
@@ -179,7 +190,14 @@ void BTThreatHandler::sendAttackMsg()
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::sendAttackMsg","["<<getParentModule()->getFullName()<<"]  attacking on ["<<
             q_LearnedAddrses.front()<<"] ");
 
-    socket.send(new cPacket("BTSPD_ATTACK_MSG",BTSPD_ATTACK_MSG_TYPE) );
+
+    cPacket *msg = new cPacket("BTSPD_ATTACK_MSG", BTSPD_ATTACK_MSG_TYPE);
+    GenericAppMsg* wrapper = new GenericAppMsg(msg->getName(), TCP_I_DATA);
+    wrapper->encapsulate(msg);
+
+    wrapper->setByteLength(1);
+
+    socket.send(wrapper);
 }
 
 

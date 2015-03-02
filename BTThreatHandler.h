@@ -29,7 +29,8 @@ public:
 
     virtual void newAddrFound(const std::string & _sIP, const std::string & _sPort);
 
-    virtual void hasBeenAttacked();
+    virtual void activateAdversary();
+    virtual void cleanAdversary();
 
   protected:
 
@@ -59,7 +60,6 @@ public:
   private:
     //static int          i_CurrentMaliciousNodeCount;
     bool                b_Malicious;
-    bool                b_Vulnerable;
     bool                b_AttackIsOngoing;
     cMessage*           p_ScheduleAttackMsg;
     simtime_t           t_AttackRetryDelay;
