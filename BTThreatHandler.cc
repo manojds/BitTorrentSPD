@@ -118,17 +118,18 @@ void BTThreatHandler::handleTimer(cMessage *msg)
 
     }
 
-    delete msg;
 }
 
 void BTThreatHandler::activateAdversary()
 {
-    Enter_Method_Silent();
+
     compromised();
 }
 
 void BTThreatHandler::compromised()
 {
+    Enter_Method_Silent();
+
     if(b_Malicious == false )
     {
         BT_LOG_INFO (btLogSinker,"BTThreatHandler::activateAdversary","["<<getParentModule()->getFullName()<<
