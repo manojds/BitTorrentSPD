@@ -30,6 +30,8 @@ public:
 
 protected:
     virtual void sendPatchInfo();
+
+    std::string s_PatchPlatform;
 };
 
 #endif /* BTPEERWIRECLIENTHANDLERSPD_H_ */

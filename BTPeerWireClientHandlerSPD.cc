@@ -22,6 +22,8 @@ Register_Class(BTPeerWireClientHandlerSPD)
 
 BTPeerWireClientHandlerSPD::BTPeerWireClientHandlerSPD() {
 
+    s_PatchPlatform= (getHostModule()->getParentModule()->par("plaformType").str());
+
 }
 
 BTPeerWireClientHandlerSPD::~BTPeerWireClientHandlerSPD() {
@@ -74,6 +76,7 @@ void BTPeerWireClientHandlerSPD::sendPatchInfo()
                     << "] sending Patch Platform information response....");
 
     BTSPDPatchInfoMsg * msg=new BTSPDPatchInfoMsg("BTPSPD_PATCH_INFO_RES_MSG",BTPSPD_PATCH_INFO_RES_MSG_TYPE);
+    msg->setPlatform(s_PatchPlatform.c_str());
     sendMessage(msg);
 
 }
