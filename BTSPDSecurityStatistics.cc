@@ -159,4 +159,5 @@ void BTSPDSecurityStatistics::finish()
 {
     printOverallInfectedNodeCounts();
     printVulnerabilityFixedNodeCounts();
+    printFinalInfectedNodeCounts();
 }
