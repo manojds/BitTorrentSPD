@@ -49,8 +49,10 @@ void BTThreatHandler::initialize()
 
     b_Malicious= par("malicious");
 
+    b_ThreatRemovable= par("threatRemoveable");
+
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
-            "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"] ");
+            "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"]  ThreatRemovable["<< (b_ThreatRemovable?"true":"false") <<"] ");
 
     const char * pModPath=par("securityStatisticsModulePath").stringValue();
 
@@ -146,7 +148,7 @@ void BTThreatHandler::compromised()
 
 void BTThreatHandler::cleanAdversary()
 {
-    if(b_Malicious == true )
+    if(b_Malicious == true && b_ThreatRemovable == true)
     {
         Enter_Method_Silent();
 
@@ -161,6 +163,13 @@ void BTThreatHandler::cleanAdversary()
         pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
 
         sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
+    }
+
+    else if (!b_ThreatRemovable)
+    {
+        BT_LOG_INFO (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
+                "]  fail to clean the adversary because this threat cannot be cleaned");
+
     }
 
 }

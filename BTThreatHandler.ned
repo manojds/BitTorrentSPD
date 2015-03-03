@@ -32,6 +32,8 @@ simple BTThreatHandler like TCPApp
         
         bool malicious= default(false);
         
+        bool threatRemoveable;
+        
         string securityStatisticsModulePath;
 
 

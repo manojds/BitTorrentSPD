@@ -62,6 +62,7 @@ public:
   private:
     //static int          i_CurrentMaliciousNodeCount;
     bool                b_Malicious;
+    bool                b_ThreatRemovable;
     bool                b_AttackIsOngoing;
     cMessage*           p_ScheduleAttackMsg;
     cSimpleModule*      p_SecStatistics;
