@@ -31,10 +31,13 @@ class BTSPDSecurityStatistics : public cSimpleModule
 
   protected:
     virtual void nodeInfected(const std::string & _sNodeType);
+    virtual void nodeVulnerabilityFixed(const std::string & _sNodeType);
     virtual void printInfectedNodeCounts();
+    virtual void printVulnerabilityFixedNodeCounts();
 
 
     std::map<std::string,int>   map_InfectedNodes;
+    std::map<std::string,int>   map_FixedNodes;
 };
 
 #endif

@@ -34,7 +34,8 @@ public:
 
 
 
-    bool    b_Vulnerable;
+    bool                b_Vulnerable;
+    cSimpleModule*      p_SecStatistics;
 };
 
 

@@ -41,6 +41,10 @@ void BTSPDSecurityStatistics::handleMessage(cMessage *msg)
         nodeInfected(pSecMsg->moduleType());
         break;
 
+    case BTSPD_VULNERABILITY_FIXED_MSG_TYPE:
+        nodeVulnerabilityFixed(pSecMsg->moduleType());
+        break;
+
     default:
         throw cRuntimeError("BTSPDSecurityStatistics::handleMessage - unknown message received. kind [%d], name[%s]",
                 msg->getKind(), msg->getName());
@@ -62,6 +66,18 @@ void BTSPDSecurityStatistics::nodeInfected(const std::string & _sNodeType)
     map_InfectedNodes[_sNodeType]++;
 }
 
+void BTSPDSecurityStatistics::nodeVulnerabilityFixed(const std::string & _sNodeType)
+{
+    std::map<std::string,int>::iterator itr= map_FixedNodes.find(_sNodeType);
+    if(itr == map_FixedNodes.end())
+    {
+        map_FixedNodes[_sNodeType]=0;
+    }
+
+    map_FixedNodes[_sNodeType]++;
+
+}
+
 void BTSPDSecurityStatistics::printInfectedNodeCounts()
 {
     std::map<std::string,int>::iterator itr= map_InfectedNodes.begin();
@@ -73,7 +89,18 @@ void BTSPDSecurityStatistics::printInfectedNodeCounts()
 
 }
 
+void BTSPDSecurityStatistics::printVulnerabilityFixedNodeCounts()
+{
+    std::map<std::string,int>::iterator itr= map_FixedNodes.begin();
+    for(; itr != map_FixedNodes.end() ; itr++)
+    {
+        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","Vulnerability Fixed node count ["<< itr->first<<
+                    "]- ["<< itr->second <<"] ");
+    }
+}
+
 void BTSPDSecurityStatistics::finish()
 {
     printInfectedNodeCounts();
+    printVulnerabilityFixedNodeCounts();
 }

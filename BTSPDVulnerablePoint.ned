@@ -28,6 +28,8 @@ simple BTSPDVulnerablePoint like TCPApp
         string serverThreadClass;	// class name of "thread" objects to launch on incoming  connections
         
         bool vulnerable= default(true);
+        
+        string securityStatisticsModulePath;
     gates:
         input tcpIn;
         output tcpOut;

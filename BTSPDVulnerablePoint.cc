@@ -17,6 +17,7 @@
 #include "../BTLogImpl.h"
 #include "BTSPDCommonMsgTypes.h"
 #include "BTThreatHandler.h"
+#include "BTSPDSecurityStatisticsMsgs_m.h"
 
 Register_Class(BTSPDVulnerablePClientHndlr);
 Define_Module(BTSPDVulnerablePoint);
@@ -32,6 +33,10 @@ void BTSPDVulnerablePoint::initialize()
 {
     TCPSrvHostApp::initialize();
     b_Vulnerable= par("vulnerable");
+
+    const char * pModPath=par("securityStatisticsModulePath").stringValue();
+
+    p_SecStatistics = (cSimpleModule*)simulation.getModuleByPath(pModPath);
 }
 
 bool BTSPDVulnerablePoint::isVulnerable()
@@ -45,6 +50,11 @@ void BTSPDVulnerablePoint::vulnerabilityFixed()
     BT_LOG_INFO(btLogSinker, "VulnrblPnt::vulnerabilityFixed", "[" << getParentModule()->getFullName()
                 << "] Fixing the vulnerability...");
     b_Vulnerable= false;
+
+    BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_VULNERABILITY_FIXED_MSG",BTSPD_VULNERABILITY_FIXED_MSG_TYPE);
+    pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
+
+    sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
 }
 
 
