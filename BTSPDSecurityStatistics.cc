@@ -124,15 +124,25 @@ void BTSPDSecurityStatistics::nodeVulnerabilityFixed(const std::string & _sNodeT
 
 }
 
-void BTSPDSecurityStatistics::printInfectedNodeCounts()
+void BTSPDSecurityStatistics::printOverallInfectedNodeCounts()
 {
     std::map<std::string,int>::iterator itr= map_InfectedNodes.begin();
     for(; itr != map_InfectedNodes.end() ; itr++)
     {
-        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","infected node count ["<< itr->first<<
+        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","Overall infected node count ["<< itr->first<<
                     "]- ["<< itr->second <<"] ");
     }
 
+}
+
+void BTSPDSecurityStatistics::printFinalInfectedNodeCounts()
+{
+    std::map<std::string,int>::iterator itr= map_FinalInfectedNodes.begin();
+    for(; itr != map_FinalInfectedNodes.end() ; itr++)
+    {
+        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","Final infected node count ["<< itr->first<<
+                    "]- ["<< itr->second <<"] ");
+    }
 }
 
 void BTSPDSecurityStatistics::printVulnerabilityFixedNodeCounts()
@@ -147,6 +157,6 @@ void BTSPDSecurityStatistics::printVulnerabilityFixedNodeCounts()
 
 void BTSPDSecurityStatistics::finish()
 {
-    printInfectedNodeCounts();
+    printOverallInfectedNodeCounts();
     printVulnerabilityFixedNodeCounts();
 }
