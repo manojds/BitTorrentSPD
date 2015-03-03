@@ -49,6 +49,8 @@ void BTSPDVulnerablePoint::vulnerabilityFixed()
 {
     if(b_Vulnerable)
     {
+        Enter_Method_Silent();
+
         BT_LOG_INFO(btLogSinker, "VulnrblPnt::vulnerabilityFixed", "[" << getParentModule()->getFullName()
                     << "] Fixing the vulnerability...");
         b_Vulnerable= false;

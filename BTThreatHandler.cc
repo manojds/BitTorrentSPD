@@ -148,6 +148,8 @@ void BTThreatHandler::cleanAdversary()
 {
     if(b_Malicious == true )
     {
+        Enter_Method_Silent();
+
         BT_LOG_INFO (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
                 "]  Adversary neutralized !");
         b_Malicious= false;
