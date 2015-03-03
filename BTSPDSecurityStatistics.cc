@@ -45,6 +45,10 @@ void BTSPDSecurityStatistics::handleMessage(cMessage *msg)
         nodeVulnerabilityFixed(pSecMsg->moduleType());
         break;
 
+    case BTSPD_INFECTION_CLEANED_MSG_TYPE:
+        nodeInfectionCleaned(pSecMsg->moduleType());
+        break;
+
     default:
         throw cRuntimeError("BTSPDSecurityStatistics::handleMessage - unknown message received. kind [%d], name[%s]",
                 msg->getKind(), msg->getName());
@@ -57,6 +61,24 @@ void BTSPDSecurityStatistics::handleMessage(cMessage *msg)
 
 void BTSPDSecurityStatistics::nodeInfected(const std::string & _sNodeType)
 {
+    increaseOverallInfectedNodeCount(_sNodeType);
+
+
+    increaseCurrentInfectedNodeCount(_sNodeType);
+
+}
+
+
+
+void BTSPDSecurityStatistics::nodeInfectionCleaned(const std::string & _sNodeType)
+{
+
+    decreaseCurrentInfectedNodeCount(_sNodeType);
+
+}
+
+void BTSPDSecurityStatistics::increaseOverallInfectedNodeCount(const std::string & _sNodeType)
+{
     std::map<std::string,int>::iterator itr= map_InfectedNodes.find(_sNodeType);
     if(itr == map_InfectedNodes.end())
     {
@@ -64,6 +86,30 @@ void BTSPDSecurityStatistics::nodeInfected(const std::string & _sNodeType)
     }
 
     map_InfectedNodes[_sNodeType]++;
+}
+
+void BTSPDSecurityStatistics::increaseCurrentInfectedNodeCount(const std::string & _sNodeType)
+{
+    std::map<std::string,int>::iterator itr= map_FinalInfectedNodes.find(_sNodeType);
+    if(itr == map_FinalInfectedNodes.end())
+    {
+        map_FinalInfectedNodes[_sNodeType]=0;
+    }
+
+    map_FinalInfectedNodes[_sNodeType]++;
+
+}
+
+void BTSPDSecurityStatistics::decreaseCurrentInfectedNodeCount(const std::string & _sNodeType)
+{
+    std::map<std::string,int>::iterator itr=  map_FinalInfectedNodes.find(_sNodeType);
+    if(itr == map_FinalInfectedNodes.end())
+    {
+        map_FinalInfectedNodes[_sNodeType]=0;
+    }
+
+    map_FinalInfectedNodes[_sNodeType]--;
+
 }
 
 void BTSPDSecurityStatistics::nodeVulnerabilityFixed(const std::string & _sNodeType)

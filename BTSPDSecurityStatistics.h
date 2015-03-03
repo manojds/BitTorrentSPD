@@ -32,11 +32,18 @@ class BTSPDSecurityStatistics : public cSimpleModule
   protected:
     virtual void nodeInfected(const std::string & _sNodeType);
     virtual void nodeVulnerabilityFixed(const std::string & _sNodeType);
+    virtual void nodeInfectionCleaned(const std::string & _sNodeType);
     virtual void printInfectedNodeCounts();
     virtual void printVulnerabilityFixedNodeCounts();
 
+    void increaseOverallInfectedNodeCount(const std::string & _sNodeType);
+    void increaseCurrentInfectedNodeCount(const std::string & _sNodeType);
+    void decreaseCurrentInfectedNodeCount(const std::string & _sNodeType);
+
+
 
     std::map<std::string,int>   map_InfectedNodes;
+    std::map<std::string,int>   map_FinalInfectedNodes;
     std::map<std::string,int>   map_FixedNodes;
 };
 

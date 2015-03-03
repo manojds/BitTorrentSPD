@@ -156,6 +156,11 @@ void BTThreatHandler::cleanAdversary()
 
         while(!q_LearnedAddrses.empty())
             q_LearnedAddrses.pop();
+
+        BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_INFECTION_CLEANED_MSG",BTSPD_INFECTION_CLEANED_MSG_TYPE);
+        pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
+
+        sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
     }
 
 }
