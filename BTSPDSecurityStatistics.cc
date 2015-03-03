@@ -61,10 +61,7 @@ void BTSPDSecurityStatistics::handleMessage(cMessage *msg)
 
 void BTSPDSecurityStatistics::nodeInfected(const std::string & _sNodeType)
 {
-    increaseOverallInfectedNodeCount(_sNodeType);
-
-
-    increaseCurrentInfectedNodeCount(_sNodeType);
+    increaseInfectedNodeCount(_sNodeType);
 
 }
 
@@ -73,11 +70,11 @@ void BTSPDSecurityStatistics::nodeInfected(const std::string & _sNodeType)
 void BTSPDSecurityStatistics::nodeInfectionCleaned(const std::string & _sNodeType)
 {
 
-    decreaseCurrentInfectedNodeCount(_sNodeType);
+    increaseInfectionCleanedNodeCount(_sNodeType);
 
 }
 
-void BTSPDSecurityStatistics::increaseOverallInfectedNodeCount(const std::string & _sNodeType)
+void BTSPDSecurityStatistics::increaseInfectedNodeCount(const std::string & _sNodeType)
 {
     std::map<std::string,int>::iterator itr= map_InfectedNodes.find(_sNodeType);
     if(itr == map_InfectedNodes.end())
@@ -88,27 +85,17 @@ void BTSPDSecurityStatistics::increaseOverallInfectedNodeCount(const std::string
     map_InfectedNodes[_sNodeType]++;
 }
 
-void BTSPDSecurityStatistics::increaseCurrentInfectedNodeCount(const std::string & _sNodeType)
+
+
+void BTSPDSecurityStatistics::increaseInfectionCleanedNodeCount(const std::string & _sNodeType)
 {
-    std::map<std::string,int>::iterator itr= map_FinalInfectedNodes.find(_sNodeType);
-    if(itr == map_FinalInfectedNodes.end())
+    std::map<std::string,int>::iterator itr=  map_InfectionCleanedNodes.find(_sNodeType);
+    if(itr == map_InfectionCleanedNodes.end())
     {
-        map_FinalInfectedNodes[_sNodeType]=0;
+        map_InfectionCleanedNodes[_sNodeType]=0;
     }
 
-    map_FinalInfectedNodes[_sNodeType]++;
-
-}
-
-void BTSPDSecurityStatistics::decreaseCurrentInfectedNodeCount(const std::string & _sNodeType)
-{
-    std::map<std::string,int>::iterator itr=  map_FinalInfectedNodes.find(_sNodeType);
-    if(itr == map_FinalInfectedNodes.end())
-    {
-        map_FinalInfectedNodes[_sNodeType]=0;
-    }
-
-    map_FinalInfectedNodes[_sNodeType]--;
+    map_InfectionCleanedNodes[_sNodeType]++;
 
 }
 
@@ -124,7 +111,7 @@ void BTSPDSecurityStatistics::nodeVulnerabilityFixed(const std::string & _sNodeT
 
 }
 
-void BTSPDSecurityStatistics::printOverallInfectedNodeCounts()
+void BTSPDSecurityStatistics::printInfectedNodeCounts()
 {
     std::map<std::string,int>::iterator itr= map_InfectedNodes.begin();
     for(; itr != map_InfectedNodes.end() ; itr++)
@@ -135,12 +122,12 @@ void BTSPDSecurityStatistics::printOverallInfectedNodeCounts()
 
 }
 
-void BTSPDSecurityStatistics::printFinalInfectedNodeCounts()
+void BTSPDSecurityStatistics::printInfectionCleanedNodeCounts()
 {
-    std::map<std::string,int>::iterator itr= map_FinalInfectedNodes.begin();
-    for(; itr != map_FinalInfectedNodes.end() ; itr++)
+    std::map<std::string,int>::iterator itr= map_InfectionCleanedNodes.begin();
+    for(; itr != map_InfectionCleanedNodes.end() ; itr++)
     {
-        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","Final infected node count ["<< itr->first<<
+        BT_LOG_INFO(btLogSinker,"BTSPDSecurityStatistics","Infection Cleaned node count ["<< itr->first<<
                     "]- ["<< itr->second <<"] ");
     }
 }
@@ -157,7 +144,7 @@ void BTSPDSecurityStatistics::printVulnerabilityFixedNodeCounts()
 
 void BTSPDSecurityStatistics::finish()
 {
-    printOverallInfectedNodeCounts();
+    printInfectedNodeCounts();
     printVulnerabilityFixedNodeCounts();
-    printFinalInfectedNodeCounts();
+    printInfectionCleanedNodeCounts();
 }
