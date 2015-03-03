@@ -11,25 +11,9 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
-
-#ifndef BTPEERWIRECLIENTHANDLERSPD_H_
-#define BTPEERWIRECLIENTHANDLERSPD_H_
-
-#include "../BitTorrent/BTPeerWireClientHandlerBase.h"
-
-class INET_API BTPeerWireClientHandlerSPD:public BTPeerWireClientHandlerBase
+//
+packet BTSPDPatchInfoMsg
 {
-public:
-    BTPeerWireClientHandlerSPD();
-    virtual ~BTPeerWireClientHandlerSPD();
-
-
-    //Redefined methods from BTPeerWireClientHandlerBase
-    virtual void dataArrived(cMessage*, bool);
-
-protected:
-    virtual void sendPatchInfo();
-};
-
-#endif /* BTPEERWIRECLIENTHANDLERSPD_H_ */
+    @omitGetVerb(true);
+    string platform;    
+}

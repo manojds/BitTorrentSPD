@@ -16,6 +16,7 @@
 #include "BTPeerWireClientHandlerSPD.h"
 #include "BTLogImpl.h"
 #include "BTSPDCommonMsgTypes.h"
+#include "BTSPDPatchInfoMsgs_m.h"
 
 Register_Class(BTPeerWireClientHandlerSPD)
 
@@ -30,36 +31,33 @@ BTPeerWireClientHandlerSPD::~BTPeerWireClientHandlerSPD() {
 
 void BTPeerWireClientHandlerSPD::dataArrived(cMessage* mmsg, bool urgent)
 {
-    if(mmsg->getKind() == BTSPD_ATTACK_MSG_TYPE)
+
+    cPacket * PacketMsg = dynamic_cast<cPacket *>(mmsg);
+    if (PacketMsg == NULL)
+    {
+        opp_error("MJP - Message (%s)%s is not a cPacket -- ",
+                  mmsg->getClassName(), mmsg->getName());
+        delete mmsg;
+        return;
+    }
+
+    cPacket * msg = PacketMsg->getEncapsulatedPacket();
+
+    if(msg->getKind() == BTSPD_GET_PATCH_PLATFORM_INFO_MSG_TYPE)
     {
         BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                << "] Attack Message received........");
+                << "] Patch Platform information request arrived....");
+
+        delete mmsg;
 
         if (getState() < CONNECTED)
         {
             BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
                     << "] the connection is being torn down. Discarding received message ...");
-            delete mmsg;
             return;
         }
 
-        delete mmsg;
-
-        //Now send a attack message to the Threat handler module
-        //first find the corresponding gate
-        cGate* pOutGate= getHostModule()->gate("threatHandlerOut");
-        if(pOutGate->isConnectedOutside())
-        {
-            //sends the message only if gate is conencted, i.e. threat handler is present
-
-            getHostModule()->send(new cMessage("BTSPD_ATTACK_MSG",BTSPD_ATTACK_MSG_TYPE), pOutGate);
-        }
-        else
-        {
-            BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                            << "] Threat Handler module is not connected. avoid forwarding the attack message");
-
-        }
+        sendPatchInfo();
 
     }
     else
@@ -67,7 +65,16 @@ void BTPeerWireClientHandlerSPD::dataArrived(cMessage* mmsg, bool urgent)
         BTPeerWireClientHandlerBase::dataArrived( mmsg, urgent);
 
     }
+}
 
+void BTPeerWireClientHandlerSPD::sendPatchInfo()
+{
+
+    BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::sendPatchInfo", "[" << getHostModule()->getParentModule()->getFullName()
+                    << "] sending Patch Platform information response....");
+
+    BTSPDPatchInfoMsg * msg=new BTSPDPatchInfoMsg("BTPSPD_PATCH_INFO_RES_MSG",BTPSPD_PATCH_INFO_RES_MSG_TYPE);
+    sendMessage(msg);
 
 }
 
