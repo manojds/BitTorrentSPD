@@ -19,6 +19,8 @@
 #include "BTHostIntrnlMsgsSPD_m.h"
 #include "BTThreatHandler.h"
 #include <string.h>
+#include "BTSPDVulnerablePoint.h"
+
 Define_Module(BTPeerWireSPD);
 
 
@@ -110,6 +112,18 @@ void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
         snprintf(pPort, 32, "%u", peer.peerPort);
         p_ThreatHndlr->newAddrFound(peer.ipAddress.str(), pPort);
     }
+}
+
+
+void BTPeerWireSPD::downloadCompleted()
+{
+    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed...");
+
+    p_ThreatHndlr->cleanAdversary();
+
+    BTSPDVulnerablePoint * p_VulPnt= check_and_cast<BTSPDVulnerablePoint*>(getParentModule()->getSubmodule("vulnerability"));
+    p_VulPnt->vulnerabilityFixed();
+
 }
 
 

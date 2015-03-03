@@ -47,14 +47,17 @@ bool BTSPDVulnerablePoint::isVulnerable()
 
 void BTSPDVulnerablePoint::vulnerabilityFixed()
 {
-    BT_LOG_INFO(btLogSinker, "VulnrblPnt::vulnerabilityFixed", "[" << getParentModule()->getFullName()
-                << "] Fixing the vulnerability...");
-    b_Vulnerable= false;
+    if(b_Vulnerable)
+    {
+        BT_LOG_INFO(btLogSinker, "VulnrblPnt::vulnerabilityFixed", "[" << getParentModule()->getFullName()
+                    << "] Fixing the vulnerability...");
+        b_Vulnerable= false;
 
-    BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_VULNERABILITY_FIXED_MSG",BTSPD_VULNERABILITY_FIXED_MSG_TYPE);
-    pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
+        BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_VULNERABILITY_FIXED_MSG",BTSPD_VULNERABILITY_FIXED_MSG_TYPE);
+        pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
 
-    sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
+        sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
+    }
 }
 
 

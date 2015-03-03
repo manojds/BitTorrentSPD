@@ -38,6 +38,8 @@ protected:
 
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
 
+    virtual void downloadCompleted();
+
     BTThreatHandler*    p_ThreatHndlr;
 
 };
