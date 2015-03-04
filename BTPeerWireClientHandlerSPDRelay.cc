@@ -86,6 +86,8 @@ void BTPeerWireClientHandlerSPDRelay::patchInfoReceived(cPacket * msg)
 
     decideToBeDownloaderOrNot();
 
+    pPWSPD->startActiveParticipationInSwarm();
+
     delete msg;
 
 }
@@ -104,11 +106,20 @@ void BTPeerWireClientHandlerSPDRelay::decideToBeDownloaderOrNot()
 
 void BTPeerWireClientHandlerSPDRelay::sendGetPatchInfoRequest()
 {
-    BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::sendGetPatchInfoRequest", "[" << getHostModule()->getParentModule()->getFullName()
-                        << "] sending patch info request ...");
+    BTPeerWireSPDRelay* pPWHost= check_and_cast<BTPeerWireSPDRelay*>(peerWireBase);
+    if(pPWHost->isPatchInfoAvailable() == false)
+    {
+        BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::sendGetPatchInfoRequest", "[" << getHostModule()->getParentModule()->getFullName()
+                            << "] sending patch info request ...");
 
-    cPacket * msg=new cPacket("BTSPD_GET_PATCH_PLATFORM_INFO_MSG",BTSPD_GET_PATCH_PLATFORM_INFO_MSG_TYPE);
-    msg->setByteLength(1);
-    sendMessage(msg);
+        cPacket * msg=new cPacket("BTSPD_GET_PATCH_PLATFORM_INFO_MSG",BTSPD_GET_PATCH_PLATFORM_INFO_MSG_TYPE);
+        msg->setByteLength(1);
+        sendMessage(msg);
+    }
+    else
+    {
+        BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::sendGetPatchInfoRequest", "[" << getHostModule()->getParentModule()->getFullName()
+                            << "] Patch information is available as ["<<pPWHost->getPatchInfo()<<"]. Avoid sending patch info request");
+    }
 
 }

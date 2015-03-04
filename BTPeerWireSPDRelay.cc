@@ -152,10 +152,10 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
 
     BTPeerWireSPD::newConnectionFromPeerEstablished(peer, thread);
 
-    bool bInitiateTrackerComm(false);
-
-    if(initiatedPeers.size() == 0)
-        bInitiateTrackerComm=true;
+//    bool bInitiateTrackerComm(false);
+//
+//    if(initiatedPeers.size() == 0)
+//        bInitiateTrackerComm=true;
 
     std::map<IPvXAddress, PEER>::iterator itr = initiatedPeers.find(peer.ipAddress);
     if(itr == initiatedPeers.end())
@@ -174,13 +174,32 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
         throw cRuntimeError(ss.str().c_str());
     }
 
-    if(bInitiateTrackerComm)
-    {
-        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
-                "Starting to act as Relay. Initiating TRacker Communication for true hash");
+//    if(bInitiateTrackerComm)
+//    {
+//        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
+//                "Starting to act as Relay. Initiating TRacker Communication for true hash");
+//
+//        enableTrackerComm();
+//    }
 
-        enableTrackerComm();
-    }
+}
+
+void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
+{
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm",
+            "startActiveParticipationInSwarm - Starting to act as Relay. ");
+
+    enableTrackerComm();
+
+}
+
+void BTPeerWireSPDRelay::stopParticipationInSwarm()
+{
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::stopParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
+            "Stopping participating in swarm");
+    disableTrackerComm();
+    pauseChokingAlgos();
+    closeAllConnections();
 
 }
 
@@ -204,12 +223,7 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)
 
     if(initiatedPeers.size() == 0)
     {
-        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::connectionLostFromPeer","["<<this->getParentModule()->getFullName()<<"]"
-                "There is no more connections to act as Relay. Stopping participating in swarm");
-        disableTrackerComm();
-        pauseChokingAlgos();
-        closeAllConnections();
-
+        stopParticipationInSwarm();
     }
 }
 
@@ -220,6 +234,11 @@ void BTPeerWireSPDRelay::beADownloader()
 
     b_Downloader=true;
 
+}
+void BTPeerWireSPDRelay::setPatchInfo(const std::string & _sPatchInfo)
+{
+    s_PatchInfo= _sPatchInfo;
+    b_PatchInfoAvailable=true;
 }
 
 void BTPeerWireSPDRelay::pauseChokingAlgos()

@@ -21,8 +21,11 @@ public:
     virtual ~BTPeerWireSPDRelay();
 
     virtual void beADownloader();
-    virtual void setPatchInfo(const std::string & _sPatchInfo) {s_PatchInfo= _sPatchInfo; }
+    virtual void setPatchInfo(const std::string & _sPatchInfo);
     bool    isPatchInfoAvailable() {return b_PatchInfoAvailable; }
+
+    virtual void startActiveParticipationInSwarm();
+    virtual void stopParticipationInSwarm();
 
 
 protected:
@@ -41,8 +44,7 @@ protected:
     virtual void connectionLostFromPeer(PEER peer);
     /* End of redefined methods from BTPeerWireBase */
 
-//    virtual void startActiveParticipationInSwarm();
-//    virtual void stopPArticipationInSwarm();
+
 
 
 
