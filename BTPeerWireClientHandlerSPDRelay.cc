@@ -92,7 +92,7 @@ void BTPeerWireClientHandlerSPDRelay::decideToBeDownloaderOrNot()
 
     if(s_PatchPlatform == _sMyPlatformInfo)
     {
-        BTPeerWireSPDRelay * pPWHost= check_and_cast<BTPeerWireSPDRelay *>(getHostModule()->getParentModule());
+        BTPeerWireSPDRelay * pPWHost= check_and_cast<BTPeerWireSPDRelay *>(getHostModule());
         pPWHost->beADownloader();
     }
 
