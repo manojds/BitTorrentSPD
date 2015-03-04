@@ -45,7 +45,7 @@ void BTPeerWireClientHandlerSPDRelay::dataArrived(cMessage* mmsg, bool urgent)
 
     if(msg->getKind() == BTPSPD_PATCH_INFO_RES_MSG_TYPE)
     {
-        BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
+        BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
                 << "] Patch Platform information reponse arrived....");
 
         msg=PacketMsg->decapsulate();
@@ -53,7 +53,7 @@ void BTPeerWireClientHandlerSPDRelay::dataArrived(cMessage* mmsg, bool urgent)
 
         if (getState() < CONNECTED)
         {
-            BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
+            BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
                     << "] the connection is being torn down. Discarding received message ...");
             delete msg;
             return;
@@ -64,7 +64,12 @@ void BTPeerWireClientHandlerSPDRelay::dataArrived(cMessage* mmsg, bool urgent)
     }
     else
     {
+        if(msg->getKind() == HANDSHAKE_MSG)
+        {
+            sendGetPatchInfoRequest();
+        }
         BTPeerWireClientHandlerSPD::dataArrived( mmsg, urgent);
+
 
     }
 }
@@ -73,7 +78,7 @@ void BTPeerWireClientHandlerSPDRelay::patchInfoReceived(cPacket * msg)
 {
     BTSPDPatchInfoMsg * pPatchInfoMsg= check_and_cast<BTSPDPatchInfoMsg *>(msg);
     s_PatchPlatform=pPatchInfoMsg->platform();
-    BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
+    BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::patchInfoReceived", "[" << getHostModule()->getParentModule()->getFullName()
                         << "] Patch platform received as ["<< s_PatchPlatform<<"]");
 
     decideToBeDownloaderOrNot();
@@ -93,3 +98,12 @@ void BTPeerWireClientHandlerSPDRelay::decideToBeDownloaderOrNot()
 
 }
 
+void BTPeerWireClientHandlerSPDRelay::sendGetPatchInfoRequest()
+{
+    BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::sendGetPatchInfoRequest", "[" << getHostModule()->getParentModule()->getFullName()
+                        << "] sending patch info request ...");
+
+    cPacket * msg=new cPacket("BTSPD_GET_PATCH_PLATFORM_INFO_MSG",BTSPD_GET_PATCH_PLATFORM_INFO_MSG_TYPE);
+    sendMessage(msg);
+
+}

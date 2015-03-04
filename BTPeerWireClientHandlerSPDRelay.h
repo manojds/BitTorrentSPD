@@ -30,6 +30,7 @@ public:
 protected:
     virtual void patchInfoReceived(cPacket * msg);
     virtual void decideToBeDownloaderOrNot();
+    virtual void sendGetPatchInfoRequest();
 
 
 };
