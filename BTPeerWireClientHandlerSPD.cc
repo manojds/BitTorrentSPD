@@ -50,7 +50,8 @@ void BTPeerWireClientHandlerSPD::dataArrived(cMessage* mmsg, bool urgent)
         BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
                 << "] Patch Platform information request arrived....");
 
-        delete mmsg;
+        delete PacketMsg;
+
 
         if (getState() < CONNECTED)
         {

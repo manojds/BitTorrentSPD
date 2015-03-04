@@ -18,6 +18,8 @@ public:
     BTPeerWireSPDRelay();
     virtual ~BTPeerWireSPDRelay();
 
+    virtual void beADownloader();
+
 protected:
     /* Redefined methods from BTPeerWireSPD */
     virtual void initialize();
@@ -34,6 +36,8 @@ protected:
     virtual void connectionLostFromPeer(PEER peer);
     /* End of redefined methods from BTPeerWireBase */
 
+
+
     virtual void pauseChokingAlgos();
 
     virtual void enableTrackerComm();
@@ -48,6 +52,7 @@ private:
 
 
     bool                    b_TrackerCommIsEnbled;
+    bool                    b_Downloader;
     cMessage*               evtRelayTrackerComm;   //Timer to schedule communication with the Tracker for Relay purposes
     std::map<IPvXAddress, PEER>   initiatedPeers;     //Peer who initiated connections to this relay peer
 

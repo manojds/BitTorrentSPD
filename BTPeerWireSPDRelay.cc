@@ -14,9 +14,9 @@
 Define_Module(BTPeerWireSPDRelay);
 
 BTPeerWireSPDRelay::BTPeerWireSPDRelay():
-        b_TrackerCommIsEnbled(false)
+        b_TrackerCommIsEnbled(false),
+        b_Downloader(false)
 {
-    // TODO Auto-generated constructor stub
 
 }
 
@@ -126,7 +126,7 @@ cMessage * BTPeerWireSPDRelay::createTrackerCommMsg()
 
     BTRequestTrackerCommSPD * pTrackerCommMsg=check_and_cast<BTRequestTrackerCommSPD *>(pMsg);
 
-    pTrackerCommMsg->setDownloader(false);
+    pTrackerCommMsg->setDownloader(b_Downloader);
     return pTrackerCommMsg;
 }
 
@@ -205,6 +205,15 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)
         closeAllConnections();
 
     }
+}
+
+void BTPeerWireSPDRelay::beADownloader()
+{
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::pauseChokingAlgos","["<<this->getParentModule()->getFullName()<<"]"
+            "Switching to downloader mode....");
+
+    b_Downloader=true;
+
 }
 
 void BTPeerWireSPDRelay::pauseChokingAlgos()
