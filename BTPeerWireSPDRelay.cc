@@ -15,7 +15,8 @@ Define_Module(BTPeerWireSPDRelay);
 
 BTPeerWireSPDRelay::BTPeerWireSPDRelay():
         b_TrackerCommIsEnbled(false),
-        b_Downloader(false)
+        b_Downloader(false),
+        b_PatchInfoAvailable(false)
 {
 
 }
@@ -27,6 +28,11 @@ BTPeerWireSPDRelay::~BTPeerWireSPDRelay() {
 void BTPeerWireSPDRelay::initialize()
 {
     BTPeerWireSPD::initialize();
+
+    //we set patch info to nothing, bcz patch info is not same as our platform
+    //patch info can be learned from other peers.
+    s_PatchInfo="";
+    b_PatchInfoAvailable=false;
     evtRelayTrackerComm = new cMessage(toString(INTERNAL_TRACKER_REALY_COM_MSG), INTERNAL_TRACKER_REALY_COM_MSG);
     //TODO :: uncomment this to enble communication with tracker as relay peer
     //          after respective modifications done in the tracker.

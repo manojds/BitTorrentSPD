@@ -36,6 +36,10 @@ void BTPeerWireSPD::initialize()
     BTPeerWireBase::initialize();
 
     p_ThreatHndlr= (BTThreatHandler*)(getParentModule()->getSubmodule("threatHandler"));
+
+    s_PlatFormType= (getParentModule()->par("plaformType").str());
+    //patch information is same as the platform type
+    s_PatchInfo=s_PlatFormType;
 }
 
 void BTPeerWireSPD::handleSelfMessage(cMessage* msg)

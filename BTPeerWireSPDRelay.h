@@ -21,6 +21,9 @@ public:
     virtual ~BTPeerWireSPDRelay();
 
     virtual void beADownloader();
+    virtual void setPatchInfo(const std::string & _sPatchInfo) {s_PatchInfo= _sPatchInfo; }
+    bool    isPatchInfoAvailable() {return b_PatchInfoAvailable; }
+
 
 protected:
     /* Redefined methods from BTPeerWireSPD */
@@ -37,6 +40,9 @@ protected:
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void connectionLostFromPeer(PEER peer);
     /* End of redefined methods from BTPeerWireBase */
+
+    virtual void startActiveParticipationInSwarm();
+    virtual void stopPArticipationInSwarm();
 
 
 
@@ -55,6 +61,7 @@ private:
 
     bool                    b_TrackerCommIsEnbled;
     bool                    b_Downloader;
+    bool                    b_PatchInfoAvailable;
     cMessage*               evtRelayTrackerComm;   //Timer to schedule communication with the Tracker for Relay purposes
     std::map<IPvXAddress, PEER>   initiatedPeers;     //Peer who initiated connections to this relay peer
 

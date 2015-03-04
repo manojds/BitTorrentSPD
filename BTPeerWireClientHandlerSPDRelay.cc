@@ -77,22 +77,26 @@ void BTPeerWireClientHandlerSPDRelay::dataArrived(cMessage* mmsg, bool urgent)
 void BTPeerWireClientHandlerSPDRelay::patchInfoReceived(cPacket * msg)
 {
     BTSPDPatchInfoMsg * pPatchInfoMsg= check_and_cast<BTSPDPatchInfoMsg *>(msg);
-    s_PatchPlatform=pPatchInfoMsg->platform();
+
+    BTPeerWireSPDRelay* pPWSPD= check_and_cast<BTPeerWireSPDRelay*>(peerWireBase);
+    pPWSPD->setPatchInfo(pPatchInfoMsg->platform());
+
     BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::patchInfoReceived", "[" << getHostModule()->getParentModule()->getFullName()
-                        << "] Patch platform received as ["<< s_PatchPlatform<<"]");
+                        << "] Patch platform received as ["<< pPatchInfoMsg->platform()<<"]");
 
     decideToBeDownloaderOrNot();
+
+    delete msg;
 
 }
 
 void BTPeerWireClientHandlerSPDRelay::decideToBeDownloaderOrNot()
 {
     //first retrieve my platform
-    std::string _sMyPlatformInfo= (getHostModule()->getParentModule()->par("plaformType").str());
+    BTPeerWireSPDRelay* pPWHost= check_and_cast<BTPeerWireSPDRelay*>(peerWireBase);
 
-    if(s_PatchPlatform == _sMyPlatformInfo)
+    if(pPWHost->getPlatFormType() == pPWHost->getPatchInfo())
     {
-        BTPeerWireSPDRelay * pPWHost= check_and_cast<BTPeerWireSPDRelay *>(getHostModule());
         pPWHost->beADownloader();
     }
 

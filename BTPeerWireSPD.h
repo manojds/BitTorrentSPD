@@ -25,6 +25,8 @@ public:
     BTPeerWireSPD();
     virtual ~BTPeerWireSPD();
 
+    const std::string & getPatchInfo(){return s_PatchInfo;}
+    const std::string & getPlatFormType(){ return s_PlatFormType; }
 
 protected:
 
@@ -40,7 +42,11 @@ protected:
 
     virtual void downloadCompleted();
 
+
+
     BTThreatHandler*    p_ThreatHndlr;
+    std::string         s_PlatFormType;
+    std::string         s_PatchInfo;
 
 };
 

@@ -27,13 +27,7 @@ BTPeerWireClientHandlerSPD::BTPeerWireClientHandlerSPD() {
 
 }
 
-void BTPeerWireClientHandlerSPD::init(TCPSrvHostApp *hostmodule, TCPSocket *socket)
-{
-    BTPeerWireClientHandlerBase::init(hostmodule, socket);
 
-    s_PatchPlatform= (getHostModule()->getParentModule()->par("plaformType").str());
-
-}
 
 BTPeerWireClientHandlerSPD::~BTPeerWireClientHandlerSPD() {
 
@@ -81,13 +75,14 @@ void BTPeerWireClientHandlerSPD::dataArrived(cMessage* mmsg, bool urgent)
 
 void BTPeerWireClientHandlerSPD::sendPatchInfo()
 {
+    BTPeerWireSPD* pPWSPD= check_and_cast<BTPeerWireSPD*>(peerWireBase);
 
     BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::sendPatchInfo", "[" << getHostModule()->getParentModule()->getFullName()
-                    << "] sending Patch Platform information response. Patch platform is ["<<s_PatchPlatform<<"]");
+                    << "] sending Patch Platform information response. Patch platform is ["<<pPWSPD->getPatchInfo()<<"]");
 
     BTSPDPatchInfoMsg * msg=new BTSPDPatchInfoMsg("BTPSPD_PATCH_INFO_RES_MSG",BTPSPD_PATCH_INFO_RES_MSG_TYPE);
-    msg->setPlatform(s_PatchPlatform.c_str());
-    msg->setByteLength(s_PatchPlatform.size());
+    msg->setPlatform(pPWSPD->getPatchInfo().c_str());
+    msg->setByteLength(pPWSPD->getPatchInfo().size());
     sendMessage(msg);
 
 }

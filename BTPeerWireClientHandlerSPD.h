@@ -25,8 +25,6 @@ public:
     BTPeerWireClientHandlerSPD();
     virtual ~BTPeerWireClientHandlerSPD();
 
-    virtual void init(TCPSrvHostApp *hostmodule, TCPSocket *socket);
-
 
     //Redefined methods from BTPeerWireClientHandlerBase
     virtual void dataArrived(cMessage*, bool);
@@ -34,7 +32,6 @@ public:
 protected:
     virtual void sendPatchInfo();
 
-    std::string s_PatchPlatform;
 };
 
 #endif /* BTPEERWIRECLIENTHANDLERSPD_H_ */
