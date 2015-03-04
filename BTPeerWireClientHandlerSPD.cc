@@ -87,6 +87,7 @@ void BTPeerWireClientHandlerSPD::sendPatchInfo()
 
     BTSPDPatchInfoMsg * msg=new BTSPDPatchInfoMsg("BTPSPD_PATCH_INFO_RES_MSG",BTPSPD_PATCH_INFO_RES_MSG_TYPE);
     msg->setPlatform(s_PatchPlatform.c_str());
+    msg->setByteLength(s_PatchPlatform.size());
     sendMessage(msg);
 
 }
