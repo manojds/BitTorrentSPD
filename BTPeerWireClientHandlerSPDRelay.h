@@ -31,7 +31,7 @@ protected:
     virtual void patchInfoReceived(cPacket * msg);
     virtual void decideToBeDownloaderOrNot();
 
-    std::string s_MyPlatformInfo;
+
 };
 
 #endif /* BTPEERWIRECLIENTHANDLERSPDRELAY_H_ */

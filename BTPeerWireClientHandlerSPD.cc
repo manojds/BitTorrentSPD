@@ -17,10 +17,19 @@
 #include "BTLogImpl.h"
 #include "BTSPDCommonMsgTypes.h"
 #include "BTSPDPatchInfoMsgs_m.h"
+#include "BTPeerWireSPD.h"
 
 Register_Class(BTPeerWireClientHandlerSPD)
 
 BTPeerWireClientHandlerSPD::BTPeerWireClientHandlerSPD() {
+
+
+
+}
+
+void BTPeerWireClientHandlerSPD::init(TCPSrvHostApp *hostmodule, TCPSocket *socket)
+{
+    BTPeerWireClientHandlerBase::init(hostmodule, socket);
 
     s_PatchPlatform= (getHostModule()->getParentModule()->par("plaformType").str());
 
@@ -74,11 +83,13 @@ void BTPeerWireClientHandlerSPD::sendPatchInfo()
 {
 
     BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::sendPatchInfo", "[" << getHostModule()->getParentModule()->getFullName()
-                    << "] sending Patch Platform information response....");
+                    << "] sending Patch Platform information response. Patch platform is ["<<s_PatchPlatform<<"]");
 
     BTSPDPatchInfoMsg * msg=new BTSPDPatchInfoMsg("BTPSPD_PATCH_INFO_RES_MSG",BTPSPD_PATCH_INFO_RES_MSG_TYPE);
     msg->setPlatform(s_PatchPlatform.c_str());
     sendMessage(msg);
 
 }
+
+
 

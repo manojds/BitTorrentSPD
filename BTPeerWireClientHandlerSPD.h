@@ -17,12 +17,15 @@
 #define BTPEERWIRECLIENTHANDLERSPD_H_
 
 #include "../BitTorrent/BTPeerWireClientHandlerBase.h"
+#include "BTPeerWireSPD.h"
 
 class INET_API BTPeerWireClientHandlerSPD:public BTPeerWireClientHandlerBase
 {
 public:
     BTPeerWireClientHandlerSPD();
     virtual ~BTPeerWireClientHandlerSPD();
+
+    virtual void init(TCPSrvHostApp *hostmodule, TCPSocket *socket);
 
 
     //Redefined methods from BTPeerWireClientHandlerBase

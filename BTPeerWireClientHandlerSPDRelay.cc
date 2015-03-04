@@ -24,13 +24,6 @@ Register_Class(BTPeerWireClientHandlerSPD);
 
 BTPeerWireClientHandlerSPDRelay::BTPeerWireClientHandlerSPDRelay()
 {
-    s_MyPlatformInfo= (getHostModule()->getParentModule()->par("plaformType").str());
-    //super class may have set the my platform type as patch platform, but
-    //since I am acting as a relay that is not true.
-    //So my platform type is not the patch platform type.
-    //I will retrieve the patch platform type from other peers and update is accordingly.
-    s_PatchPlatform="Unknown";
-
 }
 
 BTPeerWireClientHandlerSPDRelay::~BTPeerWireClientHandlerSPDRelay() {
@@ -89,7 +82,10 @@ void BTPeerWireClientHandlerSPDRelay::patchInfoReceived(cPacket * msg)
 
 void BTPeerWireClientHandlerSPDRelay::decideToBeDownloaderOrNot()
 {
-    if(s_PatchPlatform == s_MyPlatformInfo)
+    //first retrieve my platform
+    std::string _sMyPlatformInfo= (getHostModule()->getParentModule()->par("plaformType").str());
+
+    if(s_PatchPlatform == _sMyPlatformInfo)
     {
         BTPeerWireSPDRelay * pPWHost= check_and_cast<BTPeerWireSPDRelay *>(getHostModule()->getParentModule());
         pPWHost->beADownloader();
