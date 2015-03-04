@@ -41,8 +41,8 @@ protected:
     virtual void connectionLostFromPeer(PEER peer);
     /* End of redefined methods from BTPeerWireBase */
 
-    virtual void startActiveParticipationInSwarm();
-    virtual void stopPArticipationInSwarm();
+//    virtual void startActiveParticipationInSwarm();
+//    virtual void stopPArticipationInSwarm();
 
 
 
