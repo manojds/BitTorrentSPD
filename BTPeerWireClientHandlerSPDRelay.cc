@@ -20,7 +20,7 @@
 #include "BTPeerWireSPDRelay.h"
 
 
-Register_Class(BTPeerWireClientHandlerSPD);
+Register_Class(BTPeerWireClientHandlerSPDRelay);
 
 BTPeerWireClientHandlerSPDRelay::BTPeerWireClientHandlerSPDRelay()
 {
