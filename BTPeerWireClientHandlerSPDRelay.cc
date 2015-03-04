@@ -104,6 +104,7 @@ void BTPeerWireClientHandlerSPDRelay::sendGetPatchInfoRequest()
                         << "] sending patch info request ...");
 
     cPacket * msg=new cPacket("BTSPD_GET_PATCH_PLATFORM_INFO_MSG",BTSPD_GET_PATCH_PLATFORM_INFO_MSG_TYPE);
+    msg->setByteLength(1);
     sendMessage(msg);
 
 }
