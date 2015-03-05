@@ -307,28 +307,29 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         }
 
 
+        fillPeersinToMsg(rmsg, iMaxTruePeerCount, added_peers, relayPeers, no_peer_id);
 
-        rmsg->setPeersArraySize(iMaxTruePeerCount+added_peers.size());
-
-        set<int>::iterator it= added_peers.begin();
-        int i=0;
-        for( ; it != added_peers.end(); it++, i++)
-        {
-            // get the peer from the pool
-            tpeer = (BTTrackerStructBase*)relayPeers[*it];
-
-
-            // copy some fields/values
-            if(!no_peer_id)
-            {
-                ttpeer.peerId       = tpeer->peerId().c_str();
-            }
-            ttpeer.peerPort     = tpeer->peerPort();
-            ttpeer.ipAddress    = tpeer->ipAddress();
-
-            // insert the peer to the response
-            rmsg->setPeers(iMaxTruePeerCount+i, ttpeer);
-        }
+//        rmsg->setPeersArraySize(iMaxTruePeerCount+added_peers.size());
+//
+//        set<int>::iterator it= added_peers.begin();
+//        int i=0;
+//        for( ; it != added_peers.end(); it++, i++)
+//        {
+//            // get the peer from the pool
+//            tpeer = (BTTrackerStructBase*)relayPeers[*it];
+//
+//
+//            // copy some fields/values
+//            if(!no_peer_id)
+//            {
+//                ttpeer.peerId       = tpeer->peerId().c_str();
+//            }
+//            ttpeer.peerPort     = tpeer->peerPort();
+//            ttpeer.ipAddress    = tpeer->ipAddress();
+//
+//            // insert the peer to the response
+//            rmsg->setPeers(iMaxTruePeerCount+i, ttpeer);
+//        }
     }
 }
 
@@ -415,5 +416,123 @@ void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcnt
             <<"] Relay Peer Count ["<<_iRelayPeerCount<<"]");
 }
 
+void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id)
+{
+    // get the peers pool
+    cArray& peers               = getHostModule()->peers();
+    int iSeedCount              = getHostModule()->seeds();
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
+            "filling peers, current number of available seeders ["<< iSeedCount<<"]");
+    // peers added
+    set<int> added_peers            = set<int>();
+    // iterator for the added_peers
+    set<int>::iterator it;
+    // the number of peers in the reply
+    size_t max_peers            = 0;
+    // temporary peer from the peers pool
+    BTTrackerStructBase* tpeer;
+    // temporary peer to add to the response
+    PEER ttpeer;
+    // random peer
+    int rndpeer             = -1;
 
+    if(seed) // response to a seed
+    {
+        return;
+
+    }
+    else // response to a normal peer
+    {
+        // how many peers we have to add
+        if(iSeedCount > 1)
+        {
+            max_peers = (iSeedCount <= getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
+        }
+        else // no available peers
+        {
+            return;
+        }
+    }
+
+    // random selection
+    while(added_peers.size() < max_peers)
+    {
+        // get a random peer
+        rndpeer = intrand(peers.size());
+
+        // the random peer is the peer that made the announce, ignore
+        if(rndpeer == cPeer)
+        {
+            continue;
+        }
+        // the random peer is already added, ignore
+        if(added_peers.find(rndpeer) != added_peers.end())
+        {
+            continue;
+        }
+        // only add seeders, i.e. if it is not a seeder do not add
+        if( (BTTrackerStructBase*)peers[rndpeer] && (((BTTrackerStructBase*)peers[rndpeer])->isSeed() ==false ))
+        {
+            continue;
+        }
+
+        // add the peer to the "added peers" pool
+        if((BTTrackerStructBase*)peers[rndpeer])
+        {
+            added_peers.insert(rndpeer);
+        }
+    }
+
+    // traverse the set and fill the response
+    rmsg->setPeersArraySize(added_peers.size());
+    for(it = added_peers.begin(); it != added_peers.end(); it++)
+    {
+        // get the peer from the pool
+        tpeer = (BTTrackerStructBase*)peers[*it];
+
+        // copy some fields/values
+        if(!no_peer_id)
+        {
+            ttpeer.peerId       = tpeer->peerId().c_str();
+        }
+        ttpeer.peerPort     = tpeer->peerPort();
+        ttpeer.ipAddress    = tpeer->ipAddress();
+
+        // insert the peer to the response
+        rmsg->setPeers(--max_peers, ttpeer);
+    }
+
+}
+
+
+void BTTrackerClientHandlerSPD::fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int _iStartIndex,
+        const std::set<int> & added_peers, const cArray & peerPool, bool no_peer_id)
+{
+    // temporary peer from the peers pool
+    BTTrackerStructBase* tpeer;
+    // temporary peer to add to the response
+    PEER ttpeer;
+
+    rmsg->setPeersArraySize(_iStartIndex+added_peers.size());
+    set<int>::iterator it= added_peers.begin();
+    int i=0;
+    for( ; it != added_peers.end(); it++, i++)
+    {
+        // get the peer from the pool
+        tpeer = (BTTrackerStructBase*)peerPool[*it];
+
+
+        // copy some fields/values
+        if(!no_peer_id)
+        {
+            ttpeer.peerId       = tpeer->peerId().c_str();
+        }
+        ttpeer.peerPort     = tpeer->peerPort();
+        ttpeer.ipAddress    = tpeer->ipAddress();
+
+        // insert the peer to the response
+        rmsg->setPeers(_iStartIndex+i, ttpeer);
+    }
+
+}
 

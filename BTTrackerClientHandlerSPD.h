@@ -29,9 +29,13 @@ protected:
     virtual int processAnnounce(BTTrackerMsgAnnounce*);
     virtual void fillPeersInResponse(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse*, bool, bool);    // selects the peers which will included in the response
     // end of overrides from BTTrackerClientHandlerBase
+    virtual void fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse*, bool, bool);
 
     virtual void determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes,
             int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount);
+
+    virtual void fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int _iStartIndex,
+            const std::set<int> & added_peers, const cArray & peerPool, bool no_peer_id);
 
 
 };
