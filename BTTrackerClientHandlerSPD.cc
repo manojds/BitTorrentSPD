@@ -236,8 +236,16 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         return;
     }
 
-    //first let super class to fill true peer on its will
-    BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
+    if(getHostModule()->sendSeersOnly() == true)
+    {
+        fillOnlySeeders(amsg, rmsg, seed, no_peer_id);
+    }
+    else
+    {
+        // let super class to fill true peers on its will
+        BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
+
+    }
 
 
     //then we start our work
@@ -484,23 +492,25 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     }
 
     // traverse the set and fill the response
-    rmsg->setPeersArraySize(added_peers.size());
-    for(it = added_peers.begin(); it != added_peers.end(); it++)
-    {
-        // get the peer from the pool
-        tpeer = (BTTrackerStructBase*)peers[*it];
+    fillPeersinToMsg(rmsg, 0, added_peers, peers, no_peer_id);
 
-        // copy some fields/values
-        if(!no_peer_id)
-        {
-            ttpeer.peerId       = tpeer->peerId().c_str();
-        }
-        ttpeer.peerPort     = tpeer->peerPort();
-        ttpeer.ipAddress    = tpeer->ipAddress();
-
-        // insert the peer to the response
-        rmsg->setPeers(--max_peers, ttpeer);
-    }
+//    rmsg->setPeersArraySize(added_peers.size());
+//    for(it = added_peers.begin(); it != added_peers.end(); it++)
+//    {
+//        // get the peer from the pool
+//        tpeer = (BTTrackerStructBase*)peers[*it];
+//
+//        // copy some fields/values
+//        if(!no_peer_id)
+//        {
+//            ttpeer.peerId       = tpeer->peerId().c_str();
+//        }
+//        ttpeer.peerPort     = tpeer->peerPort();
+//        ttpeer.ipAddress    = tpeer->ipAddress();
+//
+//        // insert the peer to the response
+//        rmsg->setPeers(--max_peers, ttpeer);
+//    }
 
 }
 

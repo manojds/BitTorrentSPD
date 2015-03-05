@@ -25,5 +25,6 @@ simple BTTrackerSPD extends BTTrackerBase like TCPApp , UDPApp
         @class(BTTrackerSPD);
         double 	relayPeerPropotionInReply= default(0.5);
         bool	useRelayPropotioninRequest= default(false);
+        bool	sendSeedersOnly= default(false);
         string 	realyInfoHash;		// the SHA-1 (20 bytes) hash value of realy torrent
 }

@@ -17,7 +17,9 @@
 
 Define_Module(BTTrackerSPD);
 
-BTTrackerSPD::BTTrackerSPD() {
+BTTrackerSPD::BTTrackerSPD():
+        sendSeedersOnly_var(false)
+{
     // TODO Auto-generated constructor stub
 
 }
@@ -32,6 +34,7 @@ void BTTrackerSPD::initialize()
 
     relayPeerPropotionInReply_var   = (double)par("relayPeerPropotionInReply");
     useRelayPropotioninRequest_var  = par("useRelayPropotioninRequest");
+    sendSeedersOnly_var             = par("sendSeedersOnly");
     realyIfoHash                    = par("realyInfoHash").stdstringValue ();
 
 
@@ -90,6 +93,12 @@ void BTTrackerSPD::setRelayPeerPropotionInReply(double relayPeerPropotionInReply
 bool BTTrackerSPD::useRelayPropotioninRequest() const
 {
     return useRelayPropotioninRequest_var;
+}
+
+bool BTTrackerSPD::sendSeersOnly() const
+{
+    return sendSeedersOnly_var;
+
 }
 
 /**
