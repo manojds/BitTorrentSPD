@@ -22,6 +22,7 @@
  * {
  *     @omitGetVerb(true);
  *     bool downloader= true;
+ *     bool seeder= false;
  * }
  * </pre>
  */
@@ -29,6 +30,7 @@ class BTRequestTrackerCommSPD : public ::cMessage
 {
   protected:
     bool downloader_var;
+    bool seeder_var;
 
   private:
     void copy(const BTRequestTrackerCommSPD& other);
@@ -49,6 +51,8 @@ class BTRequestTrackerCommSPD : public ::cMessage
     // field getter/setter methods
     virtual bool downloader() const;
     virtual void setDownloader(bool downloader);
+    virtual bool seeder() const;
+    virtual void setSeeder(bool seeder);
 };
 
 inline void doPacking(cCommBuffer *b, BTRequestTrackerCommSPD& obj) {obj.parsimPack(b);}

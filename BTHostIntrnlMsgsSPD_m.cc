@@ -35,6 +35,7 @@ Register_Class(BTRequestTrackerCommSPD);
 BTRequestTrackerCommSPD::BTRequestTrackerCommSPD(const char *name, int kind) : cMessage(name,kind)
 {
     this->downloader_var = true;
+    this->seeder_var = false;
 }
 
 BTRequestTrackerCommSPD::BTRequestTrackerCommSPD(const BTRequestTrackerCommSPD& other) : cMessage(other)
@@ -57,18 +58,21 @@ BTRequestTrackerCommSPD& BTRequestTrackerCommSPD::operator=(const BTRequestTrack
 void BTRequestTrackerCommSPD::copy(const BTRequestTrackerCommSPD& other)
 {
     this->downloader_var = other.downloader_var;
+    this->seeder_var = other.seeder_var;
 }
 
 void BTRequestTrackerCommSPD::parsimPack(cCommBuffer *b)
 {
     cMessage::parsimPack(b);
     doPacking(b,this->downloader_var);
+    doPacking(b,this->seeder_var);
 }
 
 void BTRequestTrackerCommSPD::parsimUnpack(cCommBuffer *b)
 {
     cMessage::parsimUnpack(b);
     doUnpacking(b,this->downloader_var);
+    doUnpacking(b,this->seeder_var);
 }
 
 bool BTRequestTrackerCommSPD::downloader() const
@@ -79,6 +83,16 @@ bool BTRequestTrackerCommSPD::downloader() const
 void BTRequestTrackerCommSPD::setDownloader(bool downloader)
 {
     this->downloader_var = downloader;
+}
+
+bool BTRequestTrackerCommSPD::seeder() const
+{
+    return seeder_var;
+}
+
+void BTRequestTrackerCommSPD::setSeeder(bool seeder)
+{
+    this->seeder_var = seeder;
 }
 
 class BTRequestTrackerCommSPDDescriptor : public cClassDescriptor
@@ -129,7 +143,7 @@ const char *BTRequestTrackerCommSPDDescriptor::getProperty(const char *propertyn
 int BTRequestTrackerCommSPDDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 1+basedesc->getFieldCount(object) : 1;
+    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
 }
 
 unsigned int BTRequestTrackerCommSPDDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -142,8 +156,9 @@ unsigned int BTRequestTrackerCommSPDDescriptor::getFieldTypeFlags(void *object, 
     }
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
 }
 
 const char *BTRequestTrackerCommSPDDescriptor::getFieldName(void *object, int field) const
@@ -156,8 +171,9 @@ const char *BTRequestTrackerCommSPDDescriptor::getFieldName(void *object, int fi
     }
     static const char *fieldNames[] = {
         "downloader",
+        "seeder",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : NULL;
+    return (field>=0 && field<2) ? fieldNames[field] : NULL;
 }
 
 int BTRequestTrackerCommSPDDescriptor::findField(void *object, const char *fieldName) const
@@ -165,6 +181,7 @@ int BTRequestTrackerCommSPDDescriptor::findField(void *object, const char *field
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='d' && strcmp(fieldName, "downloader")==0) return base+0;
+    if (fieldName[0]=='s' && strcmp(fieldName, "seeder")==0) return base+1;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -178,8 +195,9 @@ const char *BTRequestTrackerCommSPDDescriptor::getFieldTypeString(void *object, 
     }
     static const char *fieldTypeStrings[] = {
         "bool",
+        "bool",
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *BTRequestTrackerCommSPDDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -220,6 +238,7 @@ std::string BTRequestTrackerCommSPDDescriptor::getFieldAsString(void *object, in
     BTRequestTrackerCommSPD *pp = (BTRequestTrackerCommSPD *)object; (void)pp;
     switch (field) {
         case 0: return bool2string(pp->downloader());
+        case 1: return bool2string(pp->seeder());
         default: return "";
     }
 }
@@ -235,6 +254,7 @@ bool BTRequestTrackerCommSPDDescriptor::setFieldAsString(void *object, int field
     BTRequestTrackerCommSPD *pp = (BTRequestTrackerCommSPD *)object; (void)pp;
     switch (field) {
         case 0: pp->setDownloader(string2bool(value)); return true;
+        case 1: pp->setSeeder(string2bool(value)); return true;
         default: return false;
     }
 }
@@ -249,8 +269,9 @@ const char *BTRequestTrackerCommSPDDescriptor::getFieldStructName(void *object, 
     }
     static const char *fieldStructNames[] = {
         NULL,
+        NULL,
     };
-    return (field>=0 && field<1) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
 }
 
 void *BTRequestTrackerCommSPDDescriptor::getFieldStructPointer(void *object, int field, int i) const

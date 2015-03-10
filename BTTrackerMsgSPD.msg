@@ -23,5 +23,7 @@ packet BTTrackerMsgAnnounce;
 packet BTTrackerMsgAnnounceSPD extends BTTrackerMsgAnnounce
 {
     @omitGetVerb(true);
-    double relayPeerRatio;
+    double 	relayPeerRatio;
+    bool	seeder;	//falg which indicate the client is seeder or not . it is used for hide leacher from others
+    				//the EVT_COMP event cannot be used since it is not sent to the tracker if the client is a seeder from the begining.
 }

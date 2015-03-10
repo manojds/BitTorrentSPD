@@ -29,7 +29,8 @@ protected:
 
     virtual BTTrackerMsgAnnounce * createAnnounceMsg();
 
-    bool    b_Downloader;
+    bool    b_Downloader;   //flag to indicate that this client is a downloader or a relay
+    bool    b_IsSeeder;     //flag to indicate whether this client is a seeder
     double  d_DownloaderRelayPeerRatio;
     double  d_Relay_RelayPeerRatio;
 };

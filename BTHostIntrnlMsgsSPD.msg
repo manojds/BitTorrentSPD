@@ -16,4 +16,5 @@ message BTRequestTrackerCommSPD extends cMessage
 {
     @omitGetVerb(true);
     bool downloader= true;
+    bool seeder= false;
 }

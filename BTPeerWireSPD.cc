@@ -65,7 +65,7 @@ void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
 
 cMessage * BTPeerWireSPD::createTrackerCommMsg()
 {
-    cMessage * pMsg(NULL);
+    BTRequestTrackerCommSPD * pMsg(NULL);
 
     switch (getState())
     {
@@ -74,6 +74,8 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         case SEEDER:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
+            //this seeder flag is to hide the leachers from exposing to others
+            pMsg->setSeeder(true);
 
             break;
         }
@@ -81,6 +83,8 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         case SEEDING:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_COMP),EVT_COMP);
+            //this seeder flag is to hide the leachers from exposing to others
+            pMsg->setSeeder(true);
             break;
         }
         case EXITING:

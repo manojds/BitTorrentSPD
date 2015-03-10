@@ -21,7 +21,8 @@
 Define_Module(BTTrackerClientSPD);
 
 BTTrackerClientSPD::BTTrackerClientSPD():
-b_Downloader(true)
+b_Downloader(true),
+b_IsSeeder(false)
 {
 
 
@@ -47,7 +48,10 @@ void BTTrackerClientSPD::handleMessage(cMessage* msg)
         BTRequestTrackerCommSPD * pTrackerCommReq=dynamic_cast<BTRequestTrackerCommSPD *>(msg);
 
         if ( pTrackerCommReq != NULL)
+        {
             b_Downloader=pTrackerCommReq->downloader();
+            b_IsSeeder=pTrackerCommReq->seeder();
+        }
         else
         {
             BT_LOG_INFO(btLogSinker,"BTTrackerClientSPD::handleMessage","["<<this->getParentModule()->getFullName()<<
@@ -56,6 +60,7 @@ void BTTrackerClientSPD::handleMessage(cMessage* msg)
             throw cRuntimeError("[%s] - BTTrackerClientSPD - received a message from PeerWireModule which is not a BTRequestTrackerCommSPD message",this->getParentModule()->getFullName());
             //default case
             b_Downloader=true;
+            b_IsSeeder=false;
         }
     }
 
@@ -81,6 +86,7 @@ BTTrackerMsgAnnounce * BTTrackerClientSPD::createAnnounceMsg()
             "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<"]");
 
     pMsg->setRelayPeerRatio(dRelayPeerRatio);
+    pMsg->setSeeder(b_IsSeeder);
 
     return pMsg;
 

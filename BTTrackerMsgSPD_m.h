@@ -25,7 +25,9 @@
  * packet BTTrackerMsgAnnounceSPD extends BTTrackerMsgAnnounce
  * {
  *     @omitGetVerb(true);
- *     double relayPeerRatio;
+ *     double 	relayPeerRatio;
+ *     bool	seeder;	
+ *     				
  * }
  * </pre>
  */
@@ -33,6 +35,7 @@ class BTTrackerMsgAnnounceSPD : public ::BTTrackerMsgAnnounce
 {
   protected:
     double relayPeerRatio_var;
+    bool seeder_var;
 
   private:
     void copy(const BTTrackerMsgAnnounceSPD& other);
@@ -53,6 +56,8 @@ class BTTrackerMsgAnnounceSPD : public ::BTTrackerMsgAnnounce
     // field getter/setter methods
     virtual double relayPeerRatio() const;
     virtual void setRelayPeerRatio(double relayPeerRatio);
+    virtual bool seeder() const;
+    virtual void setSeeder(bool seeder);
 };
 
 inline void doPacking(cCommBuffer *b, BTTrackerMsgAnnounceSPD& obj) {obj.parsimPack(b);}
