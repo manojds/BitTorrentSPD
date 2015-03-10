@@ -39,7 +39,7 @@ BTTrackerSPD* BTTrackerClientHandlerSPD::getHostModule()
 
 
 /**
- * Handle an announce for a relay Hash.
+ * Handle an announce for a relay Hash. And marks clients as a seeder if it is a seeder. (for hiding leachers from others)
  * Returns the status of the process (i.e., a constant value which indicates what should the tracker reply with).
  */
 int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
@@ -218,7 +218,33 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
     }
     else
     {
-        return BTTrackerClientHandlerBase::processAnnounce( amsg);
+        //let the super class to handle the normal announce procedure
+        int iRetCode= BTTrackerClientHandlerBase::processAnnounce( amsg);
+
+        //after that mark if this client as seeder if it is a seeder.
+
+        if(cPeer != -1 && iRetCode < A_INVALID_EVENT)
+        {
+            BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
+
+
+            //get the corresponding peer
+
+            BTTrackerStructBase* peer=(BTTrackerStructBase*)getHostModule()->peers()[cPeer];
+
+            if(pSPDMsg->seeder())
+            {
+                // update the peer's status and the seeds' count only if it is not marked as a seed already
+                if(!peer->isSeed())
+                {
+                    peer->setIsSeed(true);
+                    getHostModule()->setSeeds(getHostModule()->seeds() + 1);
+                }
+            }
+        }
+
+        return iRetCode;
+
     }
 }
 
