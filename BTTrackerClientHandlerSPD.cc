@@ -262,9 +262,18 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         return;
     }
 
+    //This message should be a BTTrackerMsgAnnounceSPD message
+    BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
+    if(pSPDMsg == NULL)
+    {
+        throw cRuntimeError
+            ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
+    }
+
+
     if(getHostModule()->sendSeersOnly() == true)
     {
-        fillOnlySeeders(amsg, rmsg, seed, no_peer_id);
+        fillOnlySeeders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
     }
     else
     {
@@ -275,13 +284,7 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
 
 
     //then we start our work
-    //This message should be a BTTrackerMsgAnnounceSPD message
-    BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
-    if(pSPDMsg == NULL)
-    {
-        throw cRuntimeError
-            ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
-    }
+
 
     cArray& relayPeers=getHostModule()->relayPeers();
 
@@ -456,7 +459,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     cArray& peers               = getHostModule()->peers();
     int iSeedCount              = getHostModule()->seeds();
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
-            "filling peers, current number of available seeders ["<< iSeedCount<<"]");
+            "filling peers, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()<<"]");
     // peers added
     set<int> added_peers            = set<int>();
     // iterator for the added_peers
@@ -470,22 +473,27 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     // random peer
     int rndpeer             = -1;
 
-    if(seed) // response to a seed
-    {
+    if ( iSeedCount < 1 )//no seeds to add
         return;
+    else if(seed) // response to a seed
+    {
+        //return;
+        //we are not supposed to add any peers. but to activate seeders (to activate their choking algorithm)
+        //we need to send some peers in the response.
+        //so we will send one seeder.
+
+        if(iSeedCount > 1)
+        {
+            max_peers=1;
+        }
+        else//there is only one seed. that is this peer
+            return;
 
     }
     else // response to a normal peer
     {
         // how many peers we have to add
-        if(iSeedCount > 1)
-        {
-            max_peers = (iSeedCount <= getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
-        }
-        else // no available peers
-        {
-            return;
-        }
+        max_peers = (iSeedCount <= getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
     }
 
     // random selection

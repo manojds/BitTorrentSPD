@@ -83,7 +83,7 @@ BTTrackerMsgAnnounce * BTTrackerClientSPD::createAnnounceMsg()
 
 
     BT_LOG_DETAIL(btLogSinker,"BTTrackerClientSPD::handleMessage","["<<this->getParentModule()->getFullName()<<
-            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<"]");
+            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<"] seeder flag ["<<b_IsSeeder<<"]");
 
     pMsg->setRelayPeerRatio(dRelayPeerRatio);
     pMsg->setSeeder(b_IsSeeder);

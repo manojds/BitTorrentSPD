@@ -71,6 +71,8 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
     {
         case NORMAL:
         case ENDGAME:
+            pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
+            break;
         case SEEDER:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
