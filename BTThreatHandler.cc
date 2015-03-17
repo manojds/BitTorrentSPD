@@ -124,7 +124,6 @@ void BTThreatHandler::handleTimer(cMessage *msg)
 
 void BTThreatHandler::activateAdversary()
 {
-
     compromised();
 }
 

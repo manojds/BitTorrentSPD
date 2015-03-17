@@ -62,6 +62,35 @@ void BTSPDVulnerablePoint::vulnerabilityFixed()
     }
 }
 
+void BTSPDVulnerablePoint::tryToExploit()
+{
+    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
+            << "] Attack Message received - trying to exploit vulnerability...");
+
+
+    if(isVulnerable())
+    {
+        exploit();
+    }
+    else
+    {
+        BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
+                                    << "] I am not vulnerable, so no problem........");
+    }
+}
+
+void BTSPDVulnerablePoint::exploit()
+{
+    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::dataArrived", "[" << getParentModule()->getFullName()
+                    << "] I am vulnerable and vulnerability has been exploited........");
+
+
+    BTThreatHandler* p_ThreatHndlr=
+            (BTThreatHandler*)(getParentModule()->getSubmodule("threatHandler"));
+
+    p_ThreatHndlr->activateAdversary();
+}
+
 
 BTSPDVulnerablePClientHndlr::BTSPDVulnerablePClientHndlr()
 {}
@@ -113,25 +142,12 @@ void BTSPDVulnerablePClientHndlr::tryToExploit()
 
 
     BTSPDVulnerablePoint * pHostMod=check_and_cast<BTSPDVulnerablePoint*>(getHostModule());
+    pHostMod->tryToExploit();
 
-    if(pHostMod->isVulnerable())
-    {
 
-        BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                        << "] I am vulnerable and vulnerability has been exploited........");
-
-        BTThreatHandler* p_ThreatHndlr=
-                (BTThreatHandler*)(pHostMod->getParentModule()->getSubmodule("threatHandler"));
-
-        p_ThreatHndlr->activateAdversary();
-    }
-    else
-    {
-        BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::tryToExploit", "[" << getHostModule()->getParentModule()->getFullName()
-                                    << "] I am not vulnerable, so no problem........");
-    }
 
 }
+
 
 void BTSPDVulnerablePClientHndlr::timerExpired(cMessage*)
 {

@@ -26,8 +26,12 @@ public:
     virtual ~BTSPDVulnerablePoint();
 
     bool isVulnerable();
+
     void vulnerabilityFixed();
 
+    virtual void tryToExploit();
+
+    virtual void exploit();
 
   protected:
     virtual void initialize();
@@ -44,6 +48,9 @@ class INET_API BTSPDVulnerablePClientHndlr : public TCPServerThreadBase
 public:
     BTSPDVulnerablePClientHndlr();
     virtual ~BTSPDVulnerablePClientHndlr();
+
+    virtual void tryToExploit();
+
 protected:
     /* Redefined methods from TCPServerThreadBase */
     virtual void established();
@@ -52,7 +59,7 @@ protected:
     virtual void peerClosed();
     //end of the redefined methods
 
-    virtual void tryToExploit();
+
 
 
 };
