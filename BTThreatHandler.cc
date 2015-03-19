@@ -122,14 +122,16 @@ void BTThreatHandler::handleTimer(cMessage *msg)
 
 }
 
-void BTThreatHandler::activateAdversary()
+bool BTThreatHandler::activateAdversary()
 {
-    compromised();
+    return compromised();
 }
 
-void BTThreatHandler::compromised()
+bool BTThreatHandler::compromised()
 {
     Enter_Method_Silent();
+
+    bool bRet(false);
 
     if(b_Malicious == false )
     {
@@ -142,7 +144,10 @@ void BTThreatHandler::compromised()
         pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
 
         sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
+        bRet=true;
     }
+
+    return bRet;
 }
 
 void BTThreatHandler::cleanAdversary()

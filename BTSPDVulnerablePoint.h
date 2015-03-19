@@ -29,9 +29,9 @@ public:
 
     void vulnerabilityFixed();
 
-    virtual void tryToExploit();
+    virtual bool tryToExploit();
 
-    virtual void exploit();
+    virtual bool exploit();
 
   protected:
     virtual void initialize();

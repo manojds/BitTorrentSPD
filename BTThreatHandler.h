@@ -29,7 +29,7 @@ public:
 
     virtual void newAddrFound(const std::string & _sIP, const std::string & _sPort);
 
-    virtual void activateAdversary();
+    virtual bool activateAdversary();
     virtual void cleanAdversary();
 
   protected:
@@ -51,7 +51,7 @@ public:
     virtual void findAndSetIPAddress();
     virtual void scheduleNextAttackAt(simtime_t t);
     virtual void tryNextAttack();
-    virtual void compromised();
+    virtual bool compromised();
     virtual void sendAttackMsg();
 
 

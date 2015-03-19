@@ -62,24 +62,27 @@ void BTSPDVulnerablePoint::vulnerabilityFixed()
     }
 }
 
-void BTSPDVulnerablePoint::tryToExploit()
+bool BTSPDVulnerablePoint::tryToExploit()
 {
     BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
             << "]  trying to exploit vulnerability...");
 
-
+    bool bRet(false);
     if(isVulnerable())
     {
         exploit();
+        bRet=true;
     }
     else
     {
         BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
                                     << "] I am not vulnerable, so no problem........");
     }
+
+    return bRet;
 }
 
-void BTSPDVulnerablePoint::exploit()
+bool BTSPDVulnerablePoint::exploit()
 {
     BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::exploit", "[" << getParentModule()->getFullName()
                     << "] I have been exploited........");
@@ -88,7 +91,7 @@ void BTSPDVulnerablePoint::exploit()
     BTThreatHandler* p_ThreatHndlr=
             (BTThreatHandler*)(getParentModule()->getSubmodule("threatHandler"));
 
-    p_ThreatHndlr->activateAdversary();
+    return p_ThreatHndlr->activateAdversary();
 }
 
 
