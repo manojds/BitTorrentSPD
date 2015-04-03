@@ -64,14 +64,21 @@ void BTSPDVulnerablePoint::vulnerabilityFixed()
 
 bool BTSPDVulnerablePoint::tryToExploit()
 {
-    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
-            << "]  trying to exploit vulnerability...");
+//    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
+//            << "]  trying to exploit vulnerability...");
 
     bool bRet(false);
     if(isVulnerable())
     {
-        exploit();
-        bRet=true;
+        bRet= exploit();
+
+//        if(bRet)
+//        {
+//            BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
+//                        << "]  trying to exploit vulnerability...");
+//
+//        }
+
     }
     else
     {
@@ -84,8 +91,8 @@ bool BTSPDVulnerablePoint::tryToExploit()
 
 bool BTSPDVulnerablePoint::exploit()
 {
-    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::exploit", "[" << getParentModule()->getFullName()
-                    << "] I have been exploited........");
+//    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::exploit", "[" << getParentModule()->getFullName()
+//                    << "] I have been exploited........");
 
 
     BTThreatHandler* p_ThreatHndlr=
@@ -128,7 +135,8 @@ void BTSPDVulnerablePClientHndlr::dataArrived(cMessage* mmsg, bool)
         delete msg;
 
         BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                << "] Attack Message received - trying to exploit vulnerability...");
+                << "] Attack Message received - from ["<<  getSocket()->getRemoteAddress() <<"]");
+
 
         tryToExploit();
 

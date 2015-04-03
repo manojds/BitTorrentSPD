@@ -135,7 +135,7 @@ bool BTThreatHandler::compromised()
 
     if(b_Malicious == false )
     {
-        BT_LOG_INFO (btLogSinker,"BTThreatHandler::activateAdversary","["<<getParentModule()->getFullName()<<
+        BT_LOG_INFO (btLogSinker,"BTThreatHandler::compromised","["<<getParentModule()->getFullName()<<
                 "] ******* I have been compromised. Activating the Adversary");
         b_Malicious= true;
 
@@ -145,6 +145,12 @@ bool BTThreatHandler::compromised()
 
         sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
         bRet=true;
+    }
+    else
+    {
+        BT_LOG_INFO (btLogSinker,"BTThreatHandler::compromised","["<<getParentModule()->getFullName()<<
+                "]  I am already malicious, nothing to activate ");
+
     }
 
     return bRet;
