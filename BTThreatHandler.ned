@@ -35,6 +35,8 @@ simple BTThreatHandler like TCPApp
         bool threatRemoveable;
         
         string securityStatisticsModulePath;
+        
+        double attackingProbability  = default(1.0);
 
 
 

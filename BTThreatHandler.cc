@@ -51,10 +51,13 @@ void BTThreatHandler::initialize()
 
     b_ThreatRemovable= par("threatRemoveable");
 
+    d_AttackingPorbability= par("attackingProbability");
+
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
             "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"]  ThreatRemovable["<< (b_ThreatRemovable?"true":"false") <<"] ");
 
     const char * pModPath=par("securityStatisticsModulePath").stringValue();
+
 
     p_SecStatistics = (cSimpleModule*)simulation.getModuleByPath(pModPath);
 
@@ -190,20 +193,39 @@ void BTThreatHandler::tryNextAttack()
     {
         if(q_LearnedAddrses.size() > 0)
         {
-            b_AttackIsOngoing= true;
-            //set the address on which we are attacking
-            std::string sHostIP=q_LearnedAddrses.front();
-            par("connectAddress")= sHostIP.c_str();
+            bool bAttack(false);
 
-            BT_LOG_INFO(btLogSinker,"BTThreatHandler::tryNextAttack","["<<getParentModule()->getFullName()<<"]  connecting to ["<<
-                    q_LearnedAddrses.front()<<"] to attack...");
+            if(d_AttackingPorbability >= 1 )
+                bAttack=true;
 
-            //port would be taken from the configuration
+            else if ( 0 < d_AttackingPorbability &&  d_AttackingPorbability <1 )
+            {
+                int iRand = intrand(100);
+                int iProb = d_AttackingPorbability*100;
+
+                if( iRand <= iProb)
+                    bAttack=true;
+
+            }
+
+            if(bAttack)
+            {
+
+                b_AttackIsOngoing= true;
+                //set the address on which we are attacking
+                std::string sHostIP=q_LearnedAddrses.front();
+                par("connectAddress")= sHostIP.c_str();
+
+                BT_LOG_INFO(btLogSinker,"BTThreatHandler::tryNextAttack","["<<getParentModule()->getFullName()<<"]  connecting to ["<<
+                        q_LearnedAddrses.front()<<"] to attack...");
+
+                //port would be taken from the configuration
 
 
-            findAndSetIPAddress();
+                findAndSetIPAddress();
 
-            connect();
+                connect();
+            }
         }
     }
     else

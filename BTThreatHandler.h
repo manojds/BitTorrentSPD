@@ -67,6 +67,7 @@ public:
     cMessage*           p_ScheduleAttackMsg;
     cSimpleModule*      p_SecStatistics;
     simtime_t           t_AttackRetryDelay;
+    double              d_AttackingPorbability;
     std::queue<std::string>  q_LearnedAddrses;
 };
 
