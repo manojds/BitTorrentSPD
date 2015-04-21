@@ -257,7 +257,7 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     //if it is relay hash we don't fill peers.
     if(strcmp(amsg->infoHash(), getHostModule()->relayInfoHash().c_str()) == 0)
     {
-        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "Avoiding filling peers for relay hash announce. "
+        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers for relay hash announce. "
                 "Client details [address="<< getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "]");
         return;
     }
@@ -459,7 +459,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     cArray& peers               = getHostModule()->peers();
     int iSeedCount              = getHostModule()->seeds();
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
-            "filling peers, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()<<"]");
+            "filling only seeders, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()<<"]");
     // peers added
     set<int> added_peers            = set<int>();
     // iterator for the added_peers
