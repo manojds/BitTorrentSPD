@@ -18,8 +18,13 @@ package inet.applications.BitTorrentSPD;
 simple BTSPDConnTracker 
 {
     parameters:
-        string OutPutFile;   
-        int		dumpingInterval = default(1000);     
+        string 	OutPutFile;   
+        int		dumpingInterval = default(1000);  
+        int		terminalTypeCount= default(0);
+        string 	overlayTerminal0;
+        string 	overlayTerminal1;
+        string 	overlayTerminal2;
+        string 	overlayTerminal3;  
     gates:
         input direct_in;    
 }

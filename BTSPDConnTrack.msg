@@ -34,6 +34,7 @@ message BTSPDConnTrackNodeCreationMsg
 {
     @omitGetVerb(true);
     string myName;
+    string myIP;
     double creationTime;    
 }
 

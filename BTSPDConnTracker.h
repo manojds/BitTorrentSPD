@@ -32,14 +32,23 @@ public:
 
   protected:
     virtual void initialize();
+    virtual void finish();
     virtual void handleMessage(cMessage *msg);
     virtual void handleSelfMessage(cMessage* msg);
 
   private:
 
-    void dumpConnectionsToFile();
-    void storeIPtoNameMapping(cMessage* _pMsg);
-    void storeConnMap(cMessage* _pMsg);
+    virtual void dumpConnectionsToFile();
+    virtual void handleNewNodeCreationMsg(cMessage* _pMsg);
+    virtual void handleNewConnectionMsg(cMessage* _pMsg);
+    virtual void handleConnectionLostMsg(cMessage* _pMsg);
+    virtual void handleDwlCompleteMsg(cMessage* _pMsg);
+
+    void constructTerminalNameMapping();
+    std::string getNodeNameWithTErminalType(const std::string & _sNodeName);
+    void dumpConnMapToFile(std::map<std::string, std::set<std::string> > & _mapConnMap,
+            const std::string & _sFileName);
+
     void splitStringByCommas(const char * _pStr, std::vector<std::string>& _vector);
     void writeConnsToFile();
 
@@ -47,14 +56,17 @@ public:
 
   protected:
 
+    int         i_DumpingInterval;
+    int         i_LastConnDumpFileIndex;
+    cMessage*   evt_DumpToFile;
+
     std::string s_FileName;
 
     std::map<std::string, std::set<std::string> > map_CurrentConnections;
     std::map<std::string, std::set<std::string> > map_AllConnections;
     std::map<std::string, std::string>            map_IPtoName;
+    std::map<std::string, std::string>            map_TerminalNames;
 
-    cMessage*   evt_DumpToFile;
-    int         i_DumpingInterval;
 
 
 };

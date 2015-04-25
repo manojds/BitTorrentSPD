@@ -551,6 +551,7 @@ Register_Class(BTSPDConnTrackNodeCreationMsg);
 BTSPDConnTrackNodeCreationMsg::BTSPDConnTrackNodeCreationMsg(const char *name, int kind) : cMessage(name,kind)
 {
     this->myName_var = 0;
+    this->myIP_var = 0;
     this->creationTime_var = 0;
 }
 
@@ -574,6 +575,7 @@ BTSPDConnTrackNodeCreationMsg& BTSPDConnTrackNodeCreationMsg::operator=(const BT
 void BTSPDConnTrackNodeCreationMsg::copy(const BTSPDConnTrackNodeCreationMsg& other)
 {
     this->myName_var = other.myName_var;
+    this->myIP_var = other.myIP_var;
     this->creationTime_var = other.creationTime_var;
 }
 
@@ -581,6 +583,7 @@ void BTSPDConnTrackNodeCreationMsg::parsimPack(cCommBuffer *b)
 {
     cMessage::parsimPack(b);
     doPacking(b,this->myName_var);
+    doPacking(b,this->myIP_var);
     doPacking(b,this->creationTime_var);
 }
 
@@ -588,6 +591,7 @@ void BTSPDConnTrackNodeCreationMsg::parsimUnpack(cCommBuffer *b)
 {
     cMessage::parsimUnpack(b);
     doUnpacking(b,this->myName_var);
+    doUnpacking(b,this->myIP_var);
     doUnpacking(b,this->creationTime_var);
 }
 
@@ -599,6 +603,16 @@ const char * BTSPDConnTrackNodeCreationMsg::myName() const
 void BTSPDConnTrackNodeCreationMsg::setMyName(const char * myName)
 {
     this->myName_var = myName;
+}
+
+const char * BTSPDConnTrackNodeCreationMsg::myIP() const
+{
+    return myIP_var.c_str();
+}
+
+void BTSPDConnTrackNodeCreationMsg::setMyIP(const char * myIP)
+{
+    this->myIP_var = myIP;
 }
 
 double BTSPDConnTrackNodeCreationMsg::creationTime() const
@@ -659,7 +673,7 @@ const char *BTSPDConnTrackNodeCreationMsgDescriptor::getProperty(const char *pro
 int BTSPDConnTrackNodeCreationMsgDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
 }
 
 unsigned int BTSPDConnTrackNodeCreationMsgDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -673,8 +687,9 @@ unsigned int BTSPDConnTrackNodeCreationMsgDescriptor::getFieldTypeFlags(void *ob
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldName(void *object, int field) const
@@ -687,9 +702,10 @@ const char *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldName(void *object, 
     }
     static const char *fieldNames[] = {
         "myName",
+        "myIP",
         "creationTime",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldNames[field] : NULL;
 }
 
 int BTSPDConnTrackNodeCreationMsgDescriptor::findField(void *object, const char *fieldName) const
@@ -697,7 +713,8 @@ int BTSPDConnTrackNodeCreationMsgDescriptor::findField(void *object, const char 
     cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='m' && strcmp(fieldName, "myName")==0) return base+0;
-    if (fieldName[0]=='c' && strcmp(fieldName, "creationTime")==0) return base+1;
+    if (fieldName[0]=='m' && strcmp(fieldName, "myIP")==0) return base+1;
+    if (fieldName[0]=='c' && strcmp(fieldName, "creationTime")==0) return base+2;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -711,9 +728,10 @@ const char *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldTypeString(void *ob
     }
     static const char *fieldTypeStrings[] = {
         "string",
+        "string",
         "double",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -754,7 +772,8 @@ std::string BTSPDConnTrackNodeCreationMsgDescriptor::getFieldAsString(void *obje
     BTSPDConnTrackNodeCreationMsg *pp = (BTSPDConnTrackNodeCreationMsg *)object; (void)pp;
     switch (field) {
         case 0: return oppstring2string(pp->myName());
-        case 1: return double2string(pp->creationTime());
+        case 1: return oppstring2string(pp->myIP());
+        case 2: return double2string(pp->creationTime());
         default: return "";
     }
 }
@@ -770,7 +789,8 @@ bool BTSPDConnTrackNodeCreationMsgDescriptor::setFieldAsString(void *object, int
     BTSPDConnTrackNodeCreationMsg *pp = (BTSPDConnTrackNodeCreationMsg *)object; (void)pp;
     switch (field) {
         case 0: pp->setMyName((value)); return true;
-        case 1: pp->setCreationTime(string2double(value)); return true;
+        case 1: pp->setMyIP((value)); return true;
+        case 2: pp->setCreationTime(string2double(value)); return true;
         default: return false;
     }
 }
@@ -786,8 +806,9 @@ const char *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldStructName(void *ob
     static const char *fieldStructNames[] = {
         NULL,
         NULL,
+        NULL,
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const

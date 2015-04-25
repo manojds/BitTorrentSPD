@@ -108,6 +108,7 @@ inline void doUnpacking(cCommBuffer *b, BTSPDConnTrackConnDropMsg& obj) {obj.par
  * {
  *     @omitGetVerb(true);
  *     string myName;
+ *     string myIP;
  *     double creationTime;    
  * }
  * </pre>
@@ -116,6 +117,7 @@ class BTSPDConnTrackNodeCreationMsg : public ::cMessage
 {
   protected:
     opp_string myName_var;
+    opp_string myIP_var;
     double creationTime_var;
 
   private:
@@ -137,6 +139,8 @@ class BTSPDConnTrackNodeCreationMsg : public ::cMessage
     // field getter/setter methods
     virtual const char * myName() const;
     virtual void setMyName(const char * myName);
+    virtual const char * myIP() const;
+    virtual void setMyIP(const char * myIP);
     virtual double creationTime() const;
     virtual void setCreationTime(double creationTime);
 };

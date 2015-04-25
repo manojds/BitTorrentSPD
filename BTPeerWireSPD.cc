@@ -123,6 +123,19 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
 
 }
 
+void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
+{
+    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed...");
+
+    p_ThreatHndlr->cleanAdversary();
+
+    BTSPDVulnerablePoint * p_VulPnt= check_and_cast<BTSPDVulnerablePoint*>(getParentModule()->getSubmodule("vulnerability"));
+    p_VulPnt->vulnerabilityFixed();
+
+    notifyDwlCompleteToConnMapper(_tDuration);
+
+}
+
 void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
     notifyNewAddrToThreatHndlr(peer);
@@ -137,7 +150,7 @@ void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBas
 
 void BTPeerWireSPD::connectionLostFromPeer(PEER peer)
 {
-
+    notifyConnDropToConnMapper(peer);
 }
 
 void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
@@ -162,6 +175,26 @@ void BTPeerWireSPD::handleNodeCreationEvent()
     }
 }
 
+void BTPeerWireSPD::notifyNodeCreationToConnMapper()
+{
+    if ( b_enableConnMapDumping)
+    {
+        IPvXAddress ipAddr = getMyIPAddr();
+        BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()
+                <<"] myIP is ["<<ipAddr.str()<<"]");
+
+        BTSPDConnTrackNodeCreationMsg* msgNodeCreation =
+                new BTSPDConnTrackNodeCreationMsg("BTSPD_CONN_TRACK_NODE_CREATION_MSG_TYPE",
+                        BTSPD_CONN_TRACK_NODE_CREATION_MSG_TYPE);
+
+        msgNodeCreation->setMyName(this->getParentModule()->getFullName());
+        msgNodeCreation->setMyIP(ipAddr.str().c_str());
+        msgNodeCreation->setCreationTime(simTime().dbl());
+
+        sendDirect(msgNodeCreation,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
 void BTPeerWireSPD::notifyNewConnToConnMapper(const PEER & peer)
 {
     if ( b_enableConnMapDumping)
@@ -171,6 +204,7 @@ void BTPeerWireSPD::notifyNewConnToConnMapper(const PEER & peer)
         BTSPDConnTrackNewConnMsg* newConnMsg =
                 new BTSPDConnTrackNewConnMsg("BTSPD_CONN_TRACK_NEWCONN_MSG_TYPE",
                         BTSPD_CONN_TRACK_NEWCONN_MSG_TYPE);
+
         newConnMsg->setMyName(this->getParentModule()->getFullName());
         newConnMsg->setRemoteIP(peer.ipAddress.str().c_str());
         sendDirect(newConnMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
@@ -186,6 +220,7 @@ void BTPeerWireSPD::notifyConnDropToConnMapper(const PEER & peer)
         BTSPDConnTrackConnDropMsg* connDropMsg =
                 new BTSPDConnTrackConnDropMsg("BTSPD_CONN_TRACK_CONN_DROP_MSG_TYPE",
                         BTSPD_CONN_TRACK_CONN_DROP_MSG_TYPE);
+
         connDropMsg->setMyName(this->getParentModule()->getFullName());
         connDropMsg->setRemoteIP(peer.ipAddress.str().c_str());
 
@@ -193,24 +228,7 @@ void BTPeerWireSPD::notifyConnDropToConnMapper(const PEER & peer)
     }
 }
 
-void BTPeerWireSPD::notifyNodeCreationToConnMapper()
-{
-    if ( b_enableConnMapDumping)
-    {
-        IPvXAddress ipAddr = getMyIPAddr();
-        BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()
-                <<"] myIP is ["<<ipAddr.str()<<"]");
 
-        BTSPDConnTrackNodeCreationMsg* msgNodeCreation =
-                new BTSPDConnTrackNodeCreationMsg("BTSPD_CONN_TRACK_CONN_NODE_CREATION_MSG_TYPE",
-                        BTSPD_CONN_TRACK_CONN_NODE_CREATION_MSG_TYPE);
-        msgNodeCreation->setMyName(this->getParentModule()->getFullName());
-        msgNodeCreation->setCreationTime(simTime().dbl());
-
-
-        sendDirect(msgNodeCreation,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
-    }
-}
 
 void BTPeerWireSPD::notifyDwlCompleteToConnMapper(simtime_t _tDuration)
 {
@@ -221,6 +239,7 @@ void BTPeerWireSPD::notifyDwlCompleteToConnMapper(simtime_t _tDuration)
         BTSPDConnTrackDwlCompeteMsg* msgDWL =
                 new BTSPDConnTrackDwlCompeteMsg("BTSPD_CONN_TRACK_CONN_DWL_COMPLETE_MSG_TYPE",
                         BTSPD_CONN_TRACK_CONN_DWL_COMPLETE_MSG_TYPE);
+
         msgDWL->setMyName(this->getParentModule()->getFullName());
         msgDWL->setCompletionTime(simTime().dbl());
         msgDWL->setDuration(_tDuration.dbl());
@@ -230,18 +249,7 @@ void BTPeerWireSPD::notifyDwlCompleteToConnMapper(simtime_t _tDuration)
 }
 
 
-void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
-{
-    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed...");
 
-    p_ThreatHndlr->cleanAdversary();
-
-    BTSPDVulnerablePoint * p_VulPnt= check_and_cast<BTSPDVulnerablePoint*>(getParentModule()->getSubmodule("vulnerability"));
-    p_VulPnt->vulnerabilityFixed();
-
-    notifyDwlCompleteToConnMapper(_tDuration);
-
-}
 
 IPvXAddress BTPeerWireSPD::getMyIPAddr()
 {
