@@ -14,21 +14,11 @@
 // 
 
 package inet.applications.BitTorrentSPD;
+import oversim.common.IGlobalFunctions;
 
-
-import inet.applications.BitTorrent.BTPeerWireBase;
-import inet.applications.tcpapp.TCPApp;
-
-simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
+module BTSPDConnTrackerFunc like IGlobalFunctions
 {
-    parameters:
-		@class(BTPeerWireSPD);
-		 
-        bool enableConnMapDumping = default(false);	
-
-        string connTrackerModulePath = default("");		
-		
-	gates:
-	    output 	threatHandlerOut;	
-
+    submodules:
+        connTracker: BTSPDConnTracker;
+	connections allowunconnected:    
 }

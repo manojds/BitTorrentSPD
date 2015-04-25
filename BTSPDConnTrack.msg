@@ -13,22 +13,43 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.applications.BitTorrentSPD;
-
-
-import inet.applications.BitTorrent.BTPeerWireBase;
-import inet.applications.tcpapp.TCPApp;
-
-simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
+//
+// TODO generated message class
+//
+message BTSPDConnTrackNewConnMsg
 {
-    parameters:
-		@class(BTPeerWireSPD);
-		 
-        bool enableConnMapDumping = default(false);	
+    @omitGetVerb(true);
+    string myName;
+    string remoteIP;    
+}
 
-        string connTrackerModulePath = default("");		
-		
-	gates:
-	    output 	threatHandlerOut;	
+message BTSPDConnTrackConnDropMsg
+{
+    @omitGetVerb(true);
+    string myName;
+    string remoteIP;    
+}
 
+message BTSPDConnTrackNodeCreationMsg
+{
+    @omitGetVerb(true);
+    string myName;
+    double creationTime;    
+}
+
+message BTSPDConnTrackDwlCompeteMsg
+{
+    @omitGetVerb(true);
+    string myName;
+    double completionTime;
+    double duration;    
+}
+
+
+
+message BTSPDConnTrackIPtoNameMapMsg
+{
+    @omitGetVerb(true);
+    string myIP;
+    string myName;    
 }

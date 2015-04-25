@@ -20,15 +20,24 @@
 #include "BTThreatHandler.h"
 #include <string.h>
 #include "BTSPDVulnerablePoint.h"
+#include "BTSPDConnTrack_m.h"
+#include "BTSPDCommonMsgTypes.h"
 
 Define_Module(BTPeerWireSPD);
 
+#define INTERNAL_NODE_CREATION_MSG_TYPE  298
 
-BTPeerWireSPD::BTPeerWireSPD() {
+
+BTPeerWireSPD::BTPeerWireSPD() :
+        p_NotifyNodeCreation(NULL)
+{
 
 }
 
-BTPeerWireSPD::~BTPeerWireSPD() {
+BTPeerWireSPD::~BTPeerWireSPD()
+{
+    if( p_NotifyNodeCreation != NULL )
+        cancelAndDelete(p_NotifyNodeCreation);
 }
 
 void BTPeerWireSPD::initialize()
@@ -40,6 +49,14 @@ void BTPeerWireSPD::initialize()
     s_PlatFormType= (getParentModule()->par("plaformType").str());
     //patch information is same as the platform type
     s_PatchInfo=s_PlatFormType;
+
+    b_enableConnMapDumping = par("enableConnMapDumping");
+
+    p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
+            INTERNAL_NODE_CREATION_MSG_TYPE);
+
+    scheduleAt(simTime(), p_NotifyNodeCreation);;
+
 }
 
 void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
@@ -56,6 +73,9 @@ void BTPeerWireSPD::handleSelfMessage(cMessage* msg)
 
             break;
         }
+        case INTERNAL_NODE_CREATION_MSG_TYPE:
+            handleNodeCreationEvent();
+            break;
         default:
             BTPeerWireBase::handleSelfMessage(msg);
             break;
@@ -106,12 +126,18 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
 void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
     notifyNewAddrToThreatHndlr(peer);
-
+    notifyNewConnToConnMapper(peer);
 }
 
 void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
     notifyNewAddrToThreatHndlr(peer);
+    notifyNewConnToConnMapper(peer);
+}
+
+void BTPeerWireSPD::connectionLostFromPeer(PEER peer)
+{
+
 }
 
 void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
@@ -124,8 +150,87 @@ void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
     }
 }
 
+void BTPeerWireSPD::handleNodeCreationEvent()
+{
+    if ( b_enableConnMapDumping)
+    {
+        const char * pModPath=par("connTrackerModulePath").stringValue();
+        //BT_LOG_INFO(btLogSinker, " BTSPDConnTrackerFunc::initialize","connTrackerModulePath is ["<<pModPath <<"]\n");
+        p_ConnTracker = (cSimpleModule*)simulation.getModuleByPath(pModPath);
 
-void BTPeerWireSPD::downloadCompleted()
+        notifyNodeCreationToConnMapper();
+    }
+}
+
+void BTPeerWireSPD::notifyNewConnToConnMapper(const PEER & peer)
+{
+    if ( b_enableConnMapDumping)
+    {
+        //BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()<<"] sending Connection map update...");
+
+        BTSPDConnTrackNewConnMsg* newConnMsg =
+                new BTSPDConnTrackNewConnMsg("BTSPD_CONN_TRACK_NEWCONN_MSG_TYPE",
+                        BTSPD_CONN_TRACK_NEWCONN_MSG_TYPE);
+        newConnMsg->setMyName(this->getParentModule()->getFullName());
+        newConnMsg->setRemoteIP(peer.ipAddress.str().c_str());
+        sendDirect(newConnMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
+void BTPeerWireSPD::notifyConnDropToConnMapper(const PEER & peer)
+{
+    if ( b_enableConnMapDumping)
+    {
+        //BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()<<"] sending Connection map update...");
+
+        BTSPDConnTrackConnDropMsg* connDropMsg =
+                new BTSPDConnTrackConnDropMsg("BTSPD_CONN_TRACK_CONN_DROP_MSG_TYPE",
+                        BTSPD_CONN_TRACK_CONN_DROP_MSG_TYPE);
+        connDropMsg->setMyName(this->getParentModule()->getFullName());
+        connDropMsg->setRemoteIP(peer.ipAddress.str().c_str());
+
+        sendDirect(connDropMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
+void BTPeerWireSPD::notifyNodeCreationToConnMapper()
+{
+    if ( b_enableConnMapDumping)
+    {
+        IPvXAddress ipAddr = getMyIPAddr();
+        BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()
+                <<"] myIP is ["<<ipAddr.str()<<"]");
+
+        BTSPDConnTrackNodeCreationMsg* msgNodeCreation =
+                new BTSPDConnTrackNodeCreationMsg("BTSPD_CONN_TRACK_CONN_NODE_CREATION_MSG_TYPE",
+                        BTSPD_CONN_TRACK_CONN_NODE_CREATION_MSG_TYPE);
+        msgNodeCreation->setMyName(this->getParentModule()->getFullName());
+        msgNodeCreation->setCreationTime(simTime().dbl());
+
+
+        sendDirect(msgNodeCreation,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
+void BTPeerWireSPD::notifyDwlCompleteToConnMapper(simtime_t _tDuration)
+{
+    if ( b_enableConnMapDumping)
+    {
+        //BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()<<"] sending Connection map update...");
+
+        BTSPDConnTrackDwlCompeteMsg* msgDWL =
+                new BTSPDConnTrackDwlCompeteMsg("BTSPD_CONN_TRACK_CONN_DWL_COMPLETE_MSG_TYPE",
+                        BTSPD_CONN_TRACK_CONN_DWL_COMPLETE_MSG_TYPE);
+        msgDWL->setMyName(this->getParentModule()->getFullName());
+        msgDWL->setCompletionTime(simTime().dbl());
+        msgDWL->setDuration(_tDuration.dbl());
+
+        sendDirect(msgDWL,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
+
+void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
 {
     BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed...");
 
@@ -134,6 +239,51 @@ void BTPeerWireSPD::downloadCompleted()
     BTSPDVulnerablePoint * p_VulPnt= check_and_cast<BTSPDVulnerablePoint*>(getParentModule()->getSubmodule("vulnerability"));
     p_VulPnt->vulnerabilityFixed();
 
+    notifyDwlCompleteToConnMapper(_tDuration);
+
+}
+
+IPvXAddress BTPeerWireSPD::getMyIPAddr()
+{
+    IPvXAddress ipaddress_var;
+    IInterfaceTable* ift    = NULL;
+    InterfaceEntry* iff = NULL;
+    cModule* mod        = this;
+
+    // traverse the hierarchy to grab the interface table
+    while((ift = IPAddressResolver().findInterfaceTableOf(mod)) == NULL)
+        mod = mod->getParentModule();
+
+    // no interface table found? -- something nasty is happening here
+    if(ift == NULL)
+        // report the error
+        error("%s:%d at %s() self-address resolution failed\n", __FILE__, __LINE__, __func__);
+
+    // traverse the interface table and grab the appropriate IP address
+    for(int i=0; i<ift->getNumInterfaces(); i++)
+    {
+        iff = ift->getInterface(i);
+
+        // ignore loopbacks
+        if(iff->isLoopback())
+            continue;
+
+        // if the interface has an IPv4 address then use it
+        if(iff->ipv4Data() != NULL)
+        {
+            // update the address value
+            ipaddress_var = IPvXAddress(iff->ipv4Data()->getIPAddress().str().c_str());
+            break;
+        }
+        // try with IPv6
+        else
+        {
+            // update the address value
+            ipaddress_var = IPvXAddress(iff->ipv6Data()->getPreferredAddress().str().c_str());
+            break;
+        }
+    }
+    return ipaddress_var;
 }
 
 

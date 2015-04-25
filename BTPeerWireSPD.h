@@ -35,16 +35,28 @@ protected:
     virtual void handleSelfMessage(cMessage* msg);
     virtual cMessage * createTrackerCommMsg();
 
+    virtual IPvXAddress getMyIPAddr();
+
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
+    virtual void connectionLostFromPeer(PEER peer);
 
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
 
-    virtual void downloadCompleted();
+    virtual void handleNodeCreationEvent();
+    virtual void notifyNewConnToConnMapper(const PEER & peer);
+    virtual void notifyConnDropToConnMapper(const PEER & peer);
+    virtual void notifyDwlCompleteToConnMapper(simtime_t _tDuration);
+    virtual void notifyNodeCreationToConnMapper();
+
+    virtual void downloadCompleted(simtime_t _tDuration);
 
 
 
     BTThreatHandler*    p_ThreatHndlr;
+    cSimpleModule*      p_ConnTracker;
+    cMessage*           p_NotifyNodeCreation;
+    bool                b_enableConnMapDumping;
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;
 

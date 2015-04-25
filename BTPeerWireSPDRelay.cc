@@ -16,7 +16,8 @@ Define_Module(BTPeerWireSPDRelay);
 BTPeerWireSPDRelay::BTPeerWireSPDRelay():
         b_TrackerCommIsEnbled(false),
         b_Downloader(false),
-        b_PatchInfoAvailable(false)
+        b_PatchInfoAvailable(false),
+        evtRelayTrackerComm(NULL)
 {
 
 }

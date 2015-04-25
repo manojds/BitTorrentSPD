@@ -15,20 +15,11 @@
 
 package inet.applications.BitTorrentSPD;
 
-
-import inet.applications.BitTorrent.BTPeerWireBase;
-import inet.applications.tcpapp.TCPApp;
-
-simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
+simple BTSPDConnTracker 
 {
     parameters:
-		@class(BTPeerWireSPD);
-		 
-        bool enableConnMapDumping = default(false);	
-
-        string connTrackerModulePath = default("");		
-		
-	gates:
-	    output 	threatHandlerOut;	
-
+        string OutPutFile;   
+        int		dumpingInterval = default(1000);     
+    gates:
+        input direct_in;    
 }
