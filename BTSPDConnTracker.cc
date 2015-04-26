@@ -47,10 +47,16 @@ void BTSPDConnTracker::initialize()
     i_DumpingInterval = par("dumpingInterval");
     s_FileName = par("OutPutFile").stringValue();
 
+    b_enableConnMapDumping = par("enableConnMapDumping");
+
+
     constructTerminalNameMapping();
 
-    evt_DumpToFile = new cMessage("WRITE_CONN_MAP_TO_FILE_MSG_TYPE", WRITE_CONN_MAP_TO_FILE_MSG_TYPE);
-    scheduleAt(simTime()+i_DumpingInterval, evt_DumpToFile);
+    if(b_enableConnMapDumping)
+    {
+        evt_DumpToFile = new cMessage("WRITE_CONN_MAP_TO_FILE_MSG_TYPE", WRITE_CONN_MAP_TO_FILE_MSG_TYPE);
+        scheduleAt(simTime()+i_DumpingInterval, evt_DumpToFile);
+    }
 }
 
 void BTSPDConnTracker::constructTerminalNameMapping()
@@ -74,7 +80,8 @@ void BTSPDConnTracker::constructTerminalNameMapping()
 
 void BTSPDConnTracker::finish()
 {
-    dumpConnMapToFile(map_AllConnections, s_FileName+".txt");
+    if (b_enableConnMapDumping)
+        dumpConnMapToFile(map_AllConnections, s_FileName+".txt");
 }
 
 void BTSPDConnTracker::handleMessage(cMessage *msg)
@@ -169,6 +176,7 @@ void BTSPDConnTracker::handleConnectionLostMsg(cMessage* _pMsg)
     BTSPDConnTrackConnDropMsg* pMsg = check_and_cast<BTSPDConnTrackConnDropMsg*>(_pMsg);
 
     std::set<std::string> & setConns = map_CurrentConnections[pMsg->myName()];
+
     setConns.erase(pMsg->remoteIP());
 }
 
@@ -215,23 +223,26 @@ void BTSPDConnTracker::dumpConnMapToFile(std::map<std::string, std::set<std::str
         set<string> & setConns= itrConnMap->second;
 
         set<string>::iterator itrConns = setConns.begin();
-        for ( ; itrConns != setConns.end() ; itrConns++)
+        int iConnCount=0;
+        for ( ; itrConns != setConns.end() ; itrConns++ )
         {
             std::map<std::string, std::string>::iterator itrIP2Name =
                     map_IPtoName.find(*itrConns);
 
             if ( itrIP2Name == map_IPtoName.end())
             {
-                strm<< getNodeNameWithTErminalType(*itrConns);
+                strm<< (*itrConns);
             }
             else
             {
                 strm<< getNodeNameWithTErminalType(itrIP2Name->second);
+                iConnCount++;
 
             }
             strm<<", ";
 
         }
+        strm<<"ConnectionCount-"<<iConnCount<<", ";
         strm<<endl<<endl;
 
         //cout<<strm.str();

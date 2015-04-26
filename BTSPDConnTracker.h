@@ -56,6 +56,7 @@ public:
 
   protected:
 
+    bool        b_enableConnMapDumping;
     int         i_DumpingInterval;
     int         i_LastConnDumpFileIndex;
     cMessage*   evt_DumpToFile;

@@ -55,7 +55,7 @@ void BTPeerWireSPD::initialize()
     p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
             INTERNAL_NODE_CREATION_MSG_TYPE);
 
-    scheduleAt(simTime(), p_NotifyNodeCreation);;
+    scheduleAt(simTime(), p_NotifyNodeCreation);
 
 }
 

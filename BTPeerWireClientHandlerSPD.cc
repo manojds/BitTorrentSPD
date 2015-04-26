@@ -73,6 +73,14 @@ void BTPeerWireClientHandlerSPD::dataArrived(cMessage* mmsg, bool urgent)
     }
 }
 
+void BTPeerWireClientHandlerSPD::failure(int _iCode)
+{
+    BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPD::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()<<"]"
+            "Connection failed to ["<<getRemotePeerID()<<"]");
+    BTPeerWireClientHandlerBase::failure(_iCode);
+
+}
+
 void BTPeerWireClientHandlerSPD::sendPatchInfo()
 {
     BTPeerWireSPD* pPWSPD= check_and_cast<BTPeerWireSPD*>(peerWireBase);

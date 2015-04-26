@@ -18,6 +18,7 @@
 Define_Module(BTTrackerSPD);
 
 BTTrackerSPD::BTTrackerSPD():
+        i_NextIndexToFill(0),
         sendSeedersOnly_var(false)
 {
     // TODO Auto-generated constructor stub
@@ -152,5 +153,19 @@ void BTTrackerSPD::cleanRemoveRelayPeer(int index)
         delete peer;
     }
     else
-        opp_error("Cannnot delete peer entry. Indicated peer not found in the set.");
+        opp_error("Cannot delete peer entry. Indicated peer not found in the set.");
+}
+
+int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
+{
+    int iRet(i_NextIndexToFill);
+
+    i_NextIndexToFill = i_NextIndexToFill + intrand(5) + 1 ;
+
+    if ( i_NextIndexToFill >= relayPeers_var.size() )
+    {
+        i_NextIndexToFill = 0;
+    }
+
+    return iRet;
 }

@@ -34,6 +34,7 @@ public:
     bool    useRelayPropotioninRequest() const;
     bool    sendSeersOnly() const;
     void    cleanRemoveRelayPeer(int);
+    int     getNextIndexOfRelayPeerToFill();
 protected:
     virtual void initialize();
 
@@ -41,6 +42,7 @@ protected:
 
 
 
+    int     i_NextIndexToFill;
     size_t  realyPeersNum_var;    // relay peers counter
     double  relayPeerPropotionInReply_var;
     bool    useRelayPropotioninRequest_var;

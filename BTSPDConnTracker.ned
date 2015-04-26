@@ -19,12 +19,14 @@ simple BTSPDConnTracker
 {
     parameters:
         string 	OutPutFile;   
+        bool 	enableConnMapDumping = default(false);	
         int		dumpingInterval = default(1000);  
         int		terminalTypeCount= default(0);
         string 	overlayTerminal0;
         string 	overlayTerminal1;
         string 	overlayTerminal2;
         string 	overlayTerminal3;  
+        string 	overlayTerminal4;
     gates:
         input direct_in;    
 }

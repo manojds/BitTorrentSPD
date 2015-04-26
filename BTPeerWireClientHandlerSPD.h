@@ -28,6 +28,7 @@ public:
 
     //Redefined methods from BTPeerWireClientHandlerBase
     virtual void dataArrived(cMessage*, bool);
+    virtual void failure(int  _iCode);
 
 protected:
     virtual void sendPatchInfo();
