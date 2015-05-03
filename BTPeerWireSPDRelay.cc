@@ -153,11 +153,6 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
 
     BTPeerWireSPD::newConnectionFromPeerEstablished(peer, thread);
 
-//    bool bInitiateTrackerComm(false);
-//
-//    if(initiatedPeers.size() == 0)
-//        bInitiateTrackerComm=true;
-
     std::map<IPvXAddress, PEER>::iterator itr = initiatedPeers.find(peer.ipAddress);
     if(itr == initiatedPeers.end())
     {
@@ -174,15 +169,6 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
 
         throw cRuntimeError(ss.str().c_str());
     }
-
-//    if(bInitiateTrackerComm)
-//    {
-//        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
-//                "Starting to act as Relay. Initiating TRacker Communication for true hash");
-//
-//        enableTrackerComm();
-//    }
-
 }
 
 void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
@@ -226,6 +212,8 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)
     {
         stopParticipationInSwarm();
     }
+
+    BTPeerWireSPD::connectionLostFromPeer(peer);
 }
 
 void BTPeerWireSPDRelay::beADownloader()

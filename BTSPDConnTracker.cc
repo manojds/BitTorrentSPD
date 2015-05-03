@@ -81,7 +81,7 @@ void BTSPDConnTracker::constructTerminalNameMapping()
 void BTSPDConnTracker::finish()
 {
     if (b_enableConnMapDumping)
-        dumpConnMapToFile(map_AllConnections, s_FileName+".txt");
+        dumpConnMapToFile(map_AllConnections, s_FileName+"_Last_All.txt");
 }
 
 void BTSPDConnTracker::handleMessage(cMessage *msg)
@@ -138,10 +138,10 @@ void BTSPDConnTracker::dumpConnectionsToFile()
 
     i_LastConnDumpFileIndex++;
     stringstream strm;
-    strm<<s_FileName<<"_"<<i_LastConnDumpFileIndex<<".txt";
+    strm<<s_FileName<<"_"<<i_LastConnDumpFileIndex;
 
-    dumpConnMapToFile(map_CurrentConnections, strm.str());
-    dumpConnMapToFile(map_AllConnections, s_FileName+".txt");
+    dumpConnMapToFile(map_CurrentConnections, strm.str()+".txt");
+    dumpConnMapToFile(map_AllConnections, strm.str()+"_All.txt");
 }
 
 void BTSPDConnTracker::handleNewNodeCreationMsg(cMessage* _pMsg)
