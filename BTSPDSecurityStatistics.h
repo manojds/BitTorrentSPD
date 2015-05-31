@@ -18,6 +18,7 @@
 
 #include <omnetpp.h>
 #include <map>
+#include <string>
 
 class BTSPDSecurityStatistics : public cSimpleModule
 {
@@ -30,6 +31,9 @@ class BTSPDSecurityStatistics : public cSimpleModule
     virtual void finish();
 
   protected:
+    virtual void handleSelfMsg(cMessage *msg);
+    virtual void statPrintTimerExpired(cMessage *msg);
+    virtual void printStats();
     virtual void nodeInfected(const std::string & _sNodeType);
     virtual void nodeVulnerabilityFixed(const std::string & _sNodeType);
     virtual void nodeInfectionCleaned(const std::string & _sNodeType);
@@ -40,11 +44,20 @@ class BTSPDSecurityStatistics : public cSimpleModule
     void increaseInfectedNodeCount(const std::string & _sNodeType);
     void increaseInfectionCleanedNodeCount(const std::string & _sNodeType);
 
+    int                         i_StatPrintInterval;
+    cMessage*                   p_PrintStatTimer;
 
+    bool                        b_PrintStatsToFile;
+    std::string                 s_StatFileName;
+
+    int                         i_TotalInfectedNodeCount;
+    int                         i_InfectionCleanedNOdeCount;
+    int                         i_FixedNodeCount;
 
     std::map<std::string,int>   map_InfectedNodes;
     std::map<std::string,int>   map_InfectionCleanedNodes;
     std::map<std::string,int>   map_FixedNodes;
+
 };
 
 #endif

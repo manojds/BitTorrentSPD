@@ -53,8 +53,8 @@ void BTThreatHandler::initialize()
 
     d_AttackingPorbability= par("attackingProbability");
 
-    BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
-            "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"]  ThreatRemovable["<< (b_ThreatRemovable?"true":"false") <<"] ");
+//    BT_LOG_INFO(btLogSinker,"BTThreatHandler::initialize","["<<this->getParentModule()->getFullName()<<
+//            "] Threat Handler initialized.  Malicious["<< (b_Malicious?"true":"false") <<"]  ThreatRemovable["<< (b_ThreatRemovable?"true":"false") <<"] ");
 
     const char * pModPath=par("securityStatisticsModulePath").stringValue();
 

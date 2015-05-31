@@ -21,6 +21,9 @@ package inet.applications.BitTorrentSPD;
 simple BTSPDSecurityStatistics
 {
     parameters:
+        int		statPrintInterval 	= default(50);
+        bool	printStatsToFile	= default(false);
+        string	statFileName		= default("NO_NAME");
     gates:
         input direct_in;    
 }
