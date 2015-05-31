@@ -115,7 +115,12 @@ void BTPeerWireSPDRelay::handleSelfMessage(cMessage* msg)
 
     case INTERNAL_EXIT_SAFE_MSG:
     {
-        cancelAndDelete(evtRelayTrackerComm);
+        if ( evtRelayTrackerComm != NULL)
+        {
+            cancelAndDelete(evtRelayTrackerComm);
+            evtRelayTrackerComm = NULL;
+        }
+
         BTPeerWireSPD::handleSelfMessage(msg);
         break;
     }
