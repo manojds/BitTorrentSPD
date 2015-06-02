@@ -189,6 +189,11 @@ void BTSPDConnTracker::handleDwlCompleteMsg(cMessage* _pMsg)
     strm<<"z2 DownloadCompletionTime["<<pMsg->completionTime()<<"], "<<
             "DownloaDuration["<<pMsg->duration()<<"]";
     setConns.insert(strm.str());
+    //also insert in to the current conn map such that  download completion is visible on current conn file
+
+    std::set<std::string> & setCurrConns = map_CurrentConnections[pMsg->myName()];
+    setCurrConns.insert(strm.str());
+
 }
 
 void BTSPDConnTracker::dumpConnMapToFile(std::map<std::string, std::set<std::string> > & _mapConnMap,
