@@ -40,7 +40,8 @@ BTThreatHandler::BTThreatHandler():
 
 BTThreatHandler::~BTThreatHandler()
 {
-    delete p_ScheduleAttackMsg;
+    //delete p_ScheduleAttackMsg;
+    cancelAndDelete(p_ScheduleAttackMsg);
 }
 
 void BTThreatHandler::initialize()
