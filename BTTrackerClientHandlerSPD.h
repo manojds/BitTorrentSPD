@@ -37,6 +37,8 @@ protected:
     virtual void fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int _iStartIndex,
             const std::set<int> & added_peers, const cArray & peerPool, bool no_peer_id);
 
+    virtual int processRelayAnnounce(BTTrackerMsgAnnounce*);
+
 
 };
 
