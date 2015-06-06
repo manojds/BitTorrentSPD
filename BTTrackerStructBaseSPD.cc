@@ -11,13 +11,25 @@
 // 
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see http://www.gnu.org/licenses/.
-//
-message BTRequestTrackerCommSPD extends cMessage
+// 
+
+#include "BTTrackerStructBaseSPD.h"
+
+BTTrackerStructBaseSPD::BTTrackerStructBaseSPD(const IPvXAddress& ipAddress, const string& peerId, size_t peerPort,
+        const string& key, simtime_t lastAnnounce, bool isSeed):
+BTTrackerStructBase(ipAddress, peerId, peerPort, key, lastAnnounce, isSeed),
+b_PublishInPeerList(true)
 {
-    @omitGetVerb(true);
-    bool downloader= true;
-    bool seeder= false;
-    
-    //flag to indicate whether to pusblish this node by ther tracker in the peerlist
-    bool	publishInPeerList;
+
 }
+
+bool BTTrackerStructBaseSPD::isPublishInPeerList() const
+{
+    return b_PublishInPeerList;
+}
+
+void BTTrackerStructBaseSPD::setPublishInPeerList(bool publishInPeerList)
+{
+    b_PublishInPeerList = publishInPeerList;
+}
+

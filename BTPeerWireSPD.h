@@ -57,6 +57,7 @@ protected:
     cSimpleModule*      p_ConnTracker;
     cMessage*           p_NotifyNodeCreation;
     bool                b_enableConnMapDumping;
+    bool                b_PublishMeByTracker;
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;
 

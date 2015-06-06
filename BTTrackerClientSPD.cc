@@ -22,7 +22,7 @@ Define_Module(BTTrackerClientSPD);
 
 BTTrackerClientSPD::BTTrackerClientSPD():
 b_Downloader(true),
-b_IsSeeder(false)
+b_PublishMeInPeerList(true)
 {
 
 
@@ -50,7 +50,7 @@ void BTTrackerClientSPD::handleMessage(cMessage* msg)
         if ( pTrackerCommReq != NULL)
         {
             b_Downloader=pTrackerCommReq->downloader();
-            b_IsSeeder=pTrackerCommReq->seeder();
+            b_PublishMeInPeerList = pTrackerCommReq->publishInPeerList();
         }
         else
         {
@@ -60,7 +60,7 @@ void BTTrackerClientSPD::handleMessage(cMessage* msg)
             throw cRuntimeError("[%s] - BTTrackerClientSPD - received a message from PeerWireModule which is not a BTRequestTrackerCommSPD message",this->getParentModule()->getFullName());
             //default case
             b_Downloader=true;
-            b_IsSeeder=false;
+            b_PublishMeInPeerList = true;
         }
     }
 
@@ -83,10 +83,11 @@ BTTrackerMsgAnnounce * BTTrackerClientSPD::createAnnounceMsg()
 
 
     BT_LOG_DETAIL(btLogSinker,"BTTrackerClientSPD::handleMessage","["<<this->getParentModule()->getFullName()<<
-            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<"] seeder flag ["<<b_IsSeeder<<"]");
+            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<
+            "] publish in peer list flag ["<<b_PublishMeInPeerList<<"]");
 
     pMsg->setRelayPeerRatio(dRelayPeerRatio);
-    pMsg->setSeeder(b_IsSeeder);
+    pMsg->setPublishInPeerList(b_PublishMeInPeerList);
 
     return pMsg;
 

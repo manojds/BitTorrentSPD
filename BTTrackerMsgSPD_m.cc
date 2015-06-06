@@ -36,6 +36,7 @@ BTTrackerMsgAnnounceSPD::BTTrackerMsgAnnounceSPD(const char *name, int kind) : B
 {
     this->relayPeerRatio_var = 0;
     this->seeder_var = 0;
+    this->publishInPeerList_var = 0;
 }
 
 BTTrackerMsgAnnounceSPD::BTTrackerMsgAnnounceSPD(const BTTrackerMsgAnnounceSPD& other) : BTTrackerMsgAnnounce(other)
@@ -59,6 +60,7 @@ void BTTrackerMsgAnnounceSPD::copy(const BTTrackerMsgAnnounceSPD& other)
 {
     this->relayPeerRatio_var = other.relayPeerRatio_var;
     this->seeder_var = other.seeder_var;
+    this->publishInPeerList_var = other.publishInPeerList_var;
 }
 
 void BTTrackerMsgAnnounceSPD::parsimPack(cCommBuffer *b)
@@ -66,6 +68,7 @@ void BTTrackerMsgAnnounceSPD::parsimPack(cCommBuffer *b)
     BTTrackerMsgAnnounce::parsimPack(b);
     doPacking(b,this->relayPeerRatio_var);
     doPacking(b,this->seeder_var);
+    doPacking(b,this->publishInPeerList_var);
 }
 
 void BTTrackerMsgAnnounceSPD::parsimUnpack(cCommBuffer *b)
@@ -73,6 +76,7 @@ void BTTrackerMsgAnnounceSPD::parsimUnpack(cCommBuffer *b)
     BTTrackerMsgAnnounce::parsimUnpack(b);
     doUnpacking(b,this->relayPeerRatio_var);
     doUnpacking(b,this->seeder_var);
+    doUnpacking(b,this->publishInPeerList_var);
 }
 
 double BTTrackerMsgAnnounceSPD::relayPeerRatio() const
@@ -93,6 +97,16 @@ bool BTTrackerMsgAnnounceSPD::seeder() const
 void BTTrackerMsgAnnounceSPD::setSeeder(bool seeder)
 {
     this->seeder_var = seeder;
+}
+
+bool BTTrackerMsgAnnounceSPD::publishInPeerList() const
+{
+    return publishInPeerList_var;
+}
+
+void BTTrackerMsgAnnounceSPD::setPublishInPeerList(bool publishInPeerList)
+{
+    this->publishInPeerList_var = publishInPeerList;
 }
 
 class BTTrackerMsgAnnounceSPDDescriptor : public cClassDescriptor
@@ -143,7 +157,7 @@ const char *BTTrackerMsgAnnounceSPDDescriptor::getProperty(const char *propertyn
 int BTTrackerMsgAnnounceSPDDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
 }
 
 unsigned int BTTrackerMsgAnnounceSPDDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -157,8 +171,9 @@ unsigned int BTTrackerMsgAnnounceSPDDescriptor::getFieldTypeFlags(void *object, 
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *BTTrackerMsgAnnounceSPDDescriptor::getFieldName(void *object, int field) const
@@ -172,8 +187,9 @@ const char *BTTrackerMsgAnnounceSPDDescriptor::getFieldName(void *object, int fi
     static const char *fieldNames[] = {
         "relayPeerRatio",
         "seeder",
+        "publishInPeerList",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldNames[field] : NULL;
 }
 
 int BTTrackerMsgAnnounceSPDDescriptor::findField(void *object, const char *fieldName) const
@@ -182,6 +198,7 @@ int BTTrackerMsgAnnounceSPDDescriptor::findField(void *object, const char *field
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='r' && strcmp(fieldName, "relayPeerRatio")==0) return base+0;
     if (fieldName[0]=='s' && strcmp(fieldName, "seeder")==0) return base+1;
+    if (fieldName[0]=='p' && strcmp(fieldName, "publishInPeerList")==0) return base+2;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -196,8 +213,9 @@ const char *BTTrackerMsgAnnounceSPDDescriptor::getFieldTypeString(void *object, 
     static const char *fieldTypeStrings[] = {
         "double",
         "bool",
+        "bool",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *BTTrackerMsgAnnounceSPDDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -239,6 +257,7 @@ std::string BTTrackerMsgAnnounceSPDDescriptor::getFieldAsString(void *object, in
     switch (field) {
         case 0: return double2string(pp->relayPeerRatio());
         case 1: return bool2string(pp->seeder());
+        case 2: return bool2string(pp->publishInPeerList());
         default: return "";
     }
 }
@@ -255,6 +274,7 @@ bool BTTrackerMsgAnnounceSPDDescriptor::setFieldAsString(void *object, int field
     switch (field) {
         case 0: pp->setRelayPeerRatio(string2double(value)); return true;
         case 1: pp->setSeeder(string2bool(value)); return true;
+        case 2: pp->setPublishInPeerList(string2bool(value)); return true;
         default: return false;
     }
 }
@@ -270,8 +290,9 @@ const char *BTTrackerMsgAnnounceSPDDescriptor::getFieldStructName(void *object, 
     static const char *fieldStructNames[] = {
         NULL,
         NULL,
+        NULL,
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *BTTrackerMsgAnnounceSPDDescriptor::getFieldStructPointer(void *object, int field, int i) const

@@ -39,6 +39,8 @@ protected:
 
     virtual int processRelayAnnounce(BTTrackerMsgAnnounce*);
 
+    virtual BTTrackerStructBase * createTrackerStructObj(BTTrackerMsgAnnounce* amsg);
+
 
 };
 

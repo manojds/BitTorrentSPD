@@ -28,6 +28,9 @@
  *     double 	relayPeerRatio;
  *     bool	seeder;	
  *     				
+ * 
+ * 	
+ * 	bool	publishInPeerList;    				
  * }
  * </pre>
  */
@@ -36,6 +39,7 @@ class BTTrackerMsgAnnounceSPD : public ::BTTrackerMsgAnnounce
   protected:
     double relayPeerRatio_var;
     bool seeder_var;
+    bool publishInPeerList_var;
 
   private:
     void copy(const BTTrackerMsgAnnounceSPD& other);
@@ -58,6 +62,8 @@ class BTTrackerMsgAnnounceSPD : public ::BTTrackerMsgAnnounce
     virtual void setRelayPeerRatio(double relayPeerRatio);
     virtual bool seeder() const;
     virtual void setSeeder(bool seeder);
+    virtual bool publishInPeerList() const;
+    virtual void setPublishInPeerList(bool publishInPeerList);
 };
 
 inline void doPacking(cCommBuffer *b, BTTrackerMsgAnnounceSPD& obj) {obj.parsimPack(b);}

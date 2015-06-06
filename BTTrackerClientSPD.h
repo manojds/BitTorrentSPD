@@ -30,7 +30,8 @@ protected:
     virtual BTTrackerMsgAnnounce * createAnnounceMsg();
 
     bool    b_Downloader;   //flag to indicate that this client is a downloader or a relay
-    bool    b_IsSeeder;     //flag to indicate whether this client is a seeder
+    //whether to publish this node by the tracker in peer list
+    bool    b_PublishMeInPeerList;
     double  d_DownloaderRelayPeerRatio;
     double  d_Relay_RelayPeerRatio;
 };

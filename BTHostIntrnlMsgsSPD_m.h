@@ -23,6 +23,9 @@
  *     @omitGetVerb(true);
  *     bool downloader= true;
  *     bool seeder= false;
+ *     
+ *     
+ *     bool	publishInPeerList;
  * }
  * </pre>
  */
@@ -31,6 +34,7 @@ class BTRequestTrackerCommSPD : public ::cMessage
   protected:
     bool downloader_var;
     bool seeder_var;
+    bool publishInPeerList_var;
 
   private:
     void copy(const BTRequestTrackerCommSPD& other);
@@ -53,6 +57,8 @@ class BTRequestTrackerCommSPD : public ::cMessage
     virtual void setDownloader(bool downloader);
     virtual bool seeder() const;
     virtual void setSeeder(bool seeder);
+    virtual bool publishInPeerList() const;
+    virtual void setPublishInPeerList(bool publishInPeerList);
 };
 
 inline void doPacking(cCommBuffer *b, BTRequestTrackerCommSPD& obj) {obj.parsimPack(b);}

@@ -29,7 +29,11 @@ Define_Module(BTPeerWireSPD);
 
 
 BTPeerWireSPD::BTPeerWireSPD() :
-        p_NotifyNodeCreation(NULL)
+        p_ThreatHndlr(NULL),
+        p_ConnTracker(NULL),
+        p_NotifyNodeCreation(NULL),
+        b_enableConnMapDumping(false),
+        b_PublishMeByTracker(true)
 {
 
 }
@@ -51,6 +55,8 @@ void BTPeerWireSPD::initialize()
     s_PatchInfo=s_PlatFormType;
 
     b_enableConnMapDumping = par("enableConnMapDumping");
+
+    b_PublishMeByTracker = par("publishMeByTracker");
 
     p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
             INTERNAL_NODE_CREATION_MSG_TYPE);
@@ -96,8 +102,6 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         case SEEDER:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
-            //this seeder flag is to hide the leachers from exposing to others
-            pMsg->setSeeder(true);
 
             break;
         }
@@ -105,8 +109,6 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         case SEEDING:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_COMP),EVT_COMP);
-            //this seeder flag is to hide the leachers from exposing to others
-            pMsg->setSeeder(true);
             break;
         }
         case EXITING:
@@ -117,6 +119,10 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         default:
             error("%s:%d at %s() Invalid client state (STATE = %d). \n", __FILE__, __LINE__, __func__,getState());
 
+    }
+    if(pMsg)
+    {
+        pMsg->setPublishInPeerList(b_PublishMeByTracker);
     }
 
     return pMsg;
@@ -131,6 +137,9 @@ void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
 
     BTSPDVulnerablePoint * p_VulPnt= check_and_cast<BTSPDVulnerablePoint*>(getParentModule()->getSubmodule("vulnerability"));
     p_VulPnt->vulnerabilityFixed();
+
+    //now I can safely publish my self in peerlist because I am not vulnerable anymore
+    b_PublishMeByTracker = true;
 
     notifyDwlCompleteToConnMapper(_tDuration);
 

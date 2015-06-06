@@ -16,6 +16,7 @@
 #include "BTTrackerClientHandlerSPD.h"
 #include "../BitTorrent/BTLogImpl.h"
 #include "BTTrackerMsgSPD_m.h"
+#include "BTTrackerStructBaseSPD.h"
 
 Register_Class(BTTrackerClientHandlerSPD);
 
@@ -60,24 +61,16 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
 
         if(cPeer != -1 && iRetCode < A_INVALID_EVENT)
         {
-            BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
-
+            BTTrackerMsgAnnounceSPD* pSPDMsg= check_and_cast<BTTrackerMsgAnnounceSPD*>(amsg);
 
             //get the corresponding peer
 
-            BTTrackerStructBase* peer=(BTTrackerStructBase*)getHostModule()->peers()[cPeer];
+            BTTrackerStructBase* peerTemp=(BTTrackerStructBase*)getHostModule()->peers()[cPeer];
 
-            if(pSPDMsg->seeder())
-            {
-                // update the peer's status and the seeds' count only if it is not marked as a seed already
-                if(!peer->isSeed())
-                {
-                    peer->setIsSeed(true);
-                    getHostModule()->setSeeds(getHostModule()->seeds() + 1);
-                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
-                            "marking a seed. Current Seed Count ["<<getHostModule()->seeds()<<"]");
-                }
-            }
+            BTTrackerStructBaseSPD * peer = check_and_cast<BTTrackerStructBaseSPD *>(peerTemp);
+
+            peer->setPublishInPeerList(pSPDMsg->publishInPeerList());
+
         }
         return iRetCode;
     }
@@ -108,10 +101,7 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
     }
 
     // init the temp peer struct
-    tpeer = new BTTrackerStructBase(
-            IPvXAddress(getSocket()->getRemoteAddress()),
-            string(amsg->peerId()), amsg->peerPort(), string(amsg->key()),
-            simTime(), (amsg->event() == A_COMPLETED) ? true : false);
+    tpeer = createTrackerStructObj(amsg);
 
     // search to find if the peer exists in the pool or not
     cPeer = getHostModule()->containsRelay(tpeer);
@@ -463,88 +453,51 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
             <<"] is seed ["<<seed<<"]");
     // peers added
     set<int> added_peers            = set<int>();
-    // iterator for the added_peers
-    set<int>::iterator it;
-    // the number of peers in the reply
-    size_t max_peers            = 0;
 
-    // temporary peer to add to the response
-    PEER ttpeer;
-    // random peer
-    int rndpeer             = -1;
 
-    if ( iSeedCount < 1 )//no seeds to add
-        return;
-    else if(seed) // response to a seed
+
+    int iStart = intrand(peers.size());
+    int iLimit = peers.size() - 1;
+
+    for (int iCurrentIndex = iStart ; iCurrentIndex != iStart ; iCurrentIndex++)
     {
-        //return;
-        //we are not supposed to add any peers. but to activate seeders (to activate their choking algorithm)
-        //we need to send some peers in the response.
-        //so we will send one seeder.
+        if (iCurrentIndex >= iLimit)//if we reached the end go the beginning
+            iCurrentIndex = 0;
 
-        if(iSeedCount > 1)
-        {
-            max_peers=1;
-        }
-        else//there is only one seed. that is this peer
-            return;
-
-    }
-    else // response to a normal peer
-    {
-        // how many peers we have to add
-        max_peers = (iSeedCount <= getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
-    }
-
-    // random selection
-    while(added_peers.size() < max_peers)
-    {
-        // get a random peer
-        rndpeer = intrand(peers.size());
-
-        // the random peer is the peer that made the announce, ignore
-        if(rndpeer == cPeer)
+        // the selected peer is the peer that made the announce, ignore
+        if(iCurrentIndex == cPeer)
         {
             continue;
         }
-        // the random peer is already added, ignore
-        if(added_peers.find(rndpeer) != added_peers.end())
+
+        BTTrackerStructBaseSPD* pPeerStruct = check_and_cast<BTTrackerStructBaseSPD*>(peers[iCurrentIndex]);
+        // whether this peer is like to be published in the peer list
+        //if it don't like don't add
+        if ( pPeerStruct->isPublishInPeerList() == false )
         {
+            BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
+                    "peer doesn't like to published. ignoring");
             continue;
         }
-        // only add seeders, i.e. if it is not a seeder do not add
-        if( (BTTrackerStructBase*)peers[rndpeer] && (((BTTrackerStructBase*)peers[rndpeer])->isSeed() ==false ))
+
+        // the response is returned to a seed (i.e., do not include seeds in the response)
+        if(seed && (BTTrackerStructBase*)peers[iCurrentIndex] && ((BTTrackerStructBase*)peers[iCurrentIndex])->isSeed())
         {
             continue;
         }
 
         // add the peer to the "added peers" pool
-        if((BTTrackerStructBase*)peers[rndpeer])
+        if((BTTrackerStructBase*)peers[iCurrentIndex])
         {
-            added_peers.insert(rndpeer);
+            added_peers.insert(iCurrentIndex);
         }
     }
 
-    // traverse the set and fill the response
-    fillPeersinToMsg(rmsg, 0, added_peers, peers, no_peer_id);
-
-//    rmsg->setPeersArraySize(added_peers.size());
-//    for(it = added_peers.begin(); it != added_peers.end(); it++)
-//    {
-//        // get the peer from the pool
-//        tpeer = (BTTrackerStructBase*)peers[*it];
-//
-//        // copy some fields/values
-//        if(!no_peer_id)
-//        {
-//            ttpeer.peerId       = tpeer->peerId().c_str();
-//        }
-//        ttpeer.peerPort     = tpeer->peerPort();
-//        ttpeer.ipAddress    = tpeer->ipAddress();
-//
-//        // insert the peer to the response
-//        rmsg->setPeers(--max_peers, ttpeer);
-//    }
+    if (added_peers.size() > 0)
+    {
+        // traverse the set and fill the response
+        fillPeersinToMsg(rmsg, 0, added_peers, peers, no_peer_id);
+    }
 
 }
 
@@ -580,3 +533,12 @@ void BTTrackerClientHandlerSPD::fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int
 
 }
 
+
+BTTrackerStructBase * BTTrackerClientHandlerSPD::createTrackerStructObj(BTTrackerMsgAnnounce* amsg)
+{
+
+    BTTrackerStructBase * pRet = new BTTrackerStructBaseSPD(IPvXAddress(getSocket()->getRemoteAddress()), string(amsg->peerId()),
+            amsg->peerPort(), string(amsg->key()), simTime(), (amsg->event() == A_COMPLETED) ? true : false);
+
+    return pRet;
+}
