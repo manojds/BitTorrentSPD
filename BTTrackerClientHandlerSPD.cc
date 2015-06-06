@@ -74,6 +74,8 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
                 {
                     peer->setIsSeed(true);
                     getHostModule()->setSeeds(getHostModule()->seeds() + 1);
+                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
+                            "marking a seed. Current Seed Count ["<<getHostModule()->seeds()<<"]");
                 }
             }
         }
@@ -275,6 +277,9 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
             ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
     }
 
+//    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "Is seed ["<<seed<<"] current true peer count ["<<
+//            getHostModule()->peers().size()<<"] seed count ["<<);
+
     if(getHostModule()->sendSeersOnly() == true)
     {
         fillOnlySeeders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
@@ -454,7 +459,8 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     cArray& peers               = getHostModule()->peers();
     int iSeedCount              = getHostModule()->seeds();
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
-            "filling only seeders, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()<<"]");
+            "filling only seeders, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()
+            <<"] is seed ["<<seed<<"]");
     // peers added
     set<int> added_peers            = set<int>();
     // iterator for the added_peers
