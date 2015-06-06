@@ -63,9 +63,9 @@ void BTStatisticsSPD::handleMessage(cMessage* msg)
                 dwSuccess_Relay_vec.record(dwTime);
 
                 BT_LOG_INFO(btLogSinker, "BTStatisticsSPD::handleMessage",
-                        "Download success count is now ["<<dwSuccess->getCount()<<
+                        "Download success count is now ["<<dwSuccess_Relay->getCount()<<
                         "] just completed node ["<<msg->getSenderModule()->getParentModule()->getFullName()<<"] Current average ["
-                        <<dwSuccess->getMean()<<"] just completed value ["<<dwTime <<"]");
+                        <<dwSuccess_Relay->getMean()<<"] just completed value ["<<dwTime <<"]");
             }
             else
             {

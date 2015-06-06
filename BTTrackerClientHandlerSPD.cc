@@ -486,8 +486,8 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
         //if it don't like don't add
         if ( pPeerStruct->isPublishInPeerList() == false )
         {
-            BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
-                    "peer doesn't like to published. ignoring");
+//            BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
+//                    "peer doesn't like to published. ignoring");
             continue;
         }
 
