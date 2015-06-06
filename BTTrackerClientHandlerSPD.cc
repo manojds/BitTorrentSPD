@@ -472,6 +472,10 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
         {
             continue;
         }
+        if(peers[iCurrentIndex] == NULL)
+        {
+            continue;
+        }
 
         BTTrackerStructBaseSPD* pPeerStruct = check_and_cast<BTTrackerStructBaseSPD*>(peers[iCurrentIndex]);
         // whether this peer is like to be published in the peer list
