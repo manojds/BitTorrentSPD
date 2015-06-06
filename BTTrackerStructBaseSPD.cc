@@ -23,6 +23,11 @@ b_PublishInPeerList(true)
 
 }
 
+BTTrackerStructBaseSPD::~BTTrackerStructBaseSPD()
+{
+
+}
+
 bool BTTrackerStructBaseSPD::isPublishInPeerList() const
 {
     return b_PublishInPeerList;
