@@ -67,9 +67,13 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
 
             BTTrackerStructBase* peerTemp=(BTTrackerStructBase*)getHostModule()->peers()[cPeer];
 
-            BTTrackerStructBaseSPD * peer = check_and_cast<BTTrackerStructBaseSPD *>(peerTemp);
+            //when peer announce with the STOP_EVENT peer struct may be removed in process announce and we will get NULL values
+            if( peerTemp != NULL)
+            {
+                BTTrackerStructBaseSPD * peer = check_and_cast<BTTrackerStructBaseSPD *>(peerTemp);
 
-            peer->setPublishInPeerList(pSPDMsg->publishInPeerList());
+                peer->setPublishInPeerList(pSPDMsg->publishInPeerList());
+            }
 
         }
         return iRetCode;
