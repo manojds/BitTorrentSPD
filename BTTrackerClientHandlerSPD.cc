@@ -457,12 +457,15 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
 
 
     int iStart = intrand(peers.size());
-    int iLimit = peers.size() - 1;
+    int iLimit = peers.size();
 
-    for (int iCurrentIndex = iStart ; iCurrentIndex != iStart ; iCurrentIndex++)
+    int iCurrentIndex = iStart;
+    do
     {
         if (iCurrentIndex >= iLimit)//if we reached the end go the beginning
             iCurrentIndex = 0;
+        else
+            iCurrentIndex++;    //else keep going
 
         // the selected peer is the peer that made the announce, ignore
         if(iCurrentIndex == cPeer)
@@ -492,6 +495,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
             added_peers.insert(iCurrentIndex);
         }
     }
+    while(iCurrentIndex != iStart );
 
     if (added_peers.size() > 0)
     {
