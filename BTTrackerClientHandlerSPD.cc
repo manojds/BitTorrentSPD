@@ -304,7 +304,7 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     }
 
     //if there are relay peers to fill
-    if(  iMaxRelayPeersCount != 0 )
+    if(  iMaxRelayPeersCount > 0 )
     {
         // temporary peer to add to the response
         PEER ttpeer;
@@ -323,10 +323,16 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         {
             int iRndPeer = getHostModule()->getNextIndexOfRelayPeerToFill();
 
+            if(added_peers.find(iRndPeer) != added_peers.end())
+            {
+                //we have already added this peer. continue
+                continue;
+            }
+
             //if there is peer at this index add it
             if(relayPeers[iRndPeer] != NULL)
             {
-                //This announcing peer is also could be a relay peer.
+                //This announcing peer also could be a relay peer.
                 //So this particular index may be give us the same peer from relay peer array.
                 //We should not add the same peer requesting in the response
                 if(amsg->peerId()  == ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId())
@@ -459,6 +465,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     set<int> added_peers            = set<int>();
 
 
+    int iMaxPeersInReply = getHostModule()->maxPeersInReply();
 
     int iStart = intrand(peers.size());
     int iLimit = peers.size();
@@ -503,7 +510,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
             added_peers.insert(iCurrentIndex);
         }
     }
-    while(iCurrentIndex != iStart );
+    while(iCurrentIndex != iStart && added_peers.size() <= iMaxPeersInReply );
 
     if (added_peers.size() > 0)
     {
