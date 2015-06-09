@@ -123,3 +123,9 @@ void BTPeerWireClientHandlerSPDRelay::sendGetPatchInfoRequest()
     }
 
 }
+
+//relays are supposed to upload. so act as they have completed the download
+float BTPeerWireClientHandlerSPDRelay::getDownloadRate()
+{
+    return uploadRate;
+}
