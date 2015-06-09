@@ -51,6 +51,9 @@ protected:
 
     virtual void downloadCompleted(simtime_t _tDuration);
 
+    virtual void checkConnections();
+    virtual void disconnectBadConnections();
+
 
 
     BTThreatHandler*    p_ThreatHndlr;

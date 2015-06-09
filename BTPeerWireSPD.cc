@@ -22,6 +22,7 @@
 #include "BTSPDVulnerablePoint.h"
 #include "BTSPDConnTrack_m.h"
 #include "BTSPDCommonMsgTypes.h"
+#include <algorithm>
 
 Define_Module(BTPeerWireSPD);
 
@@ -303,4 +304,31 @@ IPvXAddress BTPeerWireSPD::getMyIPAddr()
     return ipaddress_var;
 }
 
+void BTPeerWireSPD::checkConnections()
+{
+    disconnectBadConnections();
+
+    //now let the super class to do its functionality
+    BTPeerWireBase::checkConnections();
+}
+
+void BTPeerWireSPD::disconnectBadConnections()
+{
+    TCPServerThreadBase* thread(NULL);
+
+    PeerEntryVector peerVector = peerState.getVector();
+
+    //First sort the peerVector in decreasing download rate order.
+    std::sort(peerVector.rbegin(), peerVector.rend());
+
+    int iLimit = maxNumConnections()- minNumConnections();
+
+    for (unsigned int i=0; i<iLimit; i++)
+    {
+        PeerEntry* peer= &peerVector[i];
+        thread = (TCPServerThreadBase*)peer->getPeerThread();
+
+        thread->timerExpired(new cMessage(toString(CLOSE_CONNECTION_TIMER),CLOSE_CONNECTION_TIMER));
+    }
+}
 
