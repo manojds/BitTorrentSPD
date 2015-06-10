@@ -42,6 +42,8 @@ protected:
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void connectionLostFromPeer(PEER peer);
+
+    virtual void disconnectBadConnections();
     /* End of redefined methods from BTPeerWireBase */
 
 
