@@ -61,6 +61,7 @@ protected:
     cMessage*           p_NotifyNodeCreation;
     bool                b_enableConnMapDumping;
     bool                b_PublishMeByTracker;
+    bool                b_DisconnectBadConnections;
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;
 

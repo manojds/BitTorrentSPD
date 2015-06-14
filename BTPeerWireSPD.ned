@@ -28,6 +28,10 @@ simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
         
         //whether this peer information will be published by the tracker in the peer list
         bool publishMeByTracker = default(true);	
+        
+        //whether to disconnect connections with peers which so not provide much
+        //download rate when maximum connection count reached.
+        bool disconnectBadConnections = default(false);	
 
         string connTrackerModulePath = default("");		
 		

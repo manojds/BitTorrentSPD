@@ -34,7 +34,8 @@ BTPeerWireSPD::BTPeerWireSPD() :
         p_ConnTracker(NULL),
         p_NotifyNodeCreation(NULL),
         b_enableConnMapDumping(false),
-        b_PublishMeByTracker(true)
+        b_PublishMeByTracker(true),
+        b_DisconnectBadConnections(false)
 {
 
 }
@@ -55,9 +56,9 @@ void BTPeerWireSPD::initialize()
     //patch information is same as the platform type
     s_PatchInfo=s_PlatFormType;
 
-    b_enableConnMapDumping = par("enableConnMapDumping");
-
-    b_PublishMeByTracker = par("publishMeByTracker");
+    b_enableConnMapDumping      = par("enableConnMapDumping");
+    b_PublishMeByTracker        = par("publishMeByTracker");
+    b_DisconnectBadConnections  = par("disconnectBadConnections");
 
     p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
             INTERNAL_NODE_CREATION_MSG_TYPE);
@@ -314,6 +315,11 @@ void BTPeerWireSPD::checkConnections()
 
 void BTPeerWireSPD::disconnectBadConnections()
 {
+    if (b_DisconnectBadConnections == false)
+    {
+        return ;
+    }
+
     if ((maxNumConnections()-currentNumConnections_var-pendingNumConnections() -1) <= 0)
     {
 
