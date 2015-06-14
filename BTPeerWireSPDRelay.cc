@@ -221,15 +221,6 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)
     BTPeerWireSPD::connectionLostFromPeer(peer);
 }
 
-void BTPeerWireSPDRelay::disconnectBadConnections()
-{
-    //do not disconnect any one, because seeders have good chance to be disonnected
-    //since when choosing peers to disconnect getDwonloadRate() function for each peer will be called.
-    //and peers which have least download rate will be disconnected. but relays are implemented
-    //such that they to return  upload rate when getDwonloadRate() called. so seeders seems to have lowest download rate
-    //and they will be disconnected.
-
-}
 
 void BTPeerWireSPDRelay::beADownloader()
 {
