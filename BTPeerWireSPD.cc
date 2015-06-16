@@ -168,7 +168,7 @@ void BTPeerWireSPD::scheduleConnections(BTTrackerMsgResponse* msg)
     }
     else
     {
-        BTPeerWireSPD::scheduleConnections(msg);
+        BTPeerWireBase::scheduleConnections(msg);
     }
 
 }

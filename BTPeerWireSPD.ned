@@ -35,7 +35,7 @@ simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
         
         //parameter which indicates whether not to actively participate and initiate connection 
         //once download is completed.
-        bool doNotActivelyParticipateOnDownloadCompletion = default("false");
+        bool doNotActivelyParticipateOnDownloadCompletion = default(false);
 
         string connTrackerModulePath = default("");		
 		
