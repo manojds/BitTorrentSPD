@@ -51,6 +51,10 @@ protected:
 
     virtual void downloadCompleted(simtime_t _tDuration);
 
+    virtual void scheduleConnections(BTTrackerMsgResponse*);
+
+    virtual void disconnectAllActiveConns();
+
     virtual void checkConnections();
     virtual void disconnectBadConnections();
 
@@ -62,6 +66,8 @@ protected:
     bool                b_enableConnMapDumping;
     bool                b_PublishMeByTracker;
     bool                b_DisconnectBadConnections;
+    bool                b_DownloadCompleted;
+    bool                b_DoNotActivelyParticipateOnCompletion;
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;
 

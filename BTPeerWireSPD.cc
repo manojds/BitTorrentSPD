@@ -23,6 +23,7 @@
 #include "BTSPDConnTrack_m.h"
 #include "BTSPDCommonMsgTypes.h"
 #include <algorithm>
+#include "BTPeerWireClientHandlerBase.h"
 
 Define_Module(BTPeerWireSPD);
 
@@ -35,7 +36,9 @@ BTPeerWireSPD::BTPeerWireSPD() :
         p_NotifyNodeCreation(NULL),
         b_enableConnMapDumping(false),
         b_PublishMeByTracker(true),
-        b_DisconnectBadConnections(false)
+        b_DisconnectBadConnections(false),
+        b_DownloadCompleted(false),
+        b_DoNotActivelyParticipateOnCompletion(false)
 {
 
 }
@@ -59,6 +62,7 @@ void BTPeerWireSPD::initialize()
     b_enableConnMapDumping      = par("enableConnMapDumping");
     b_PublishMeByTracker        = par("publishMeByTracker");
     b_DisconnectBadConnections  = par("disconnectBadConnections");
+    b_DoNotActivelyParticipateOnCompletion = par("doNotActivelyParticipateOnDownloadCompletion");
 
     p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
             INTERNAL_NODE_CREATION_MSG_TYPE);
@@ -133,7 +137,7 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
 
 void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
 {
-    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed...");
+    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed... in ["<<_tDuration<<" sec] ");
 
     p_ThreatHndlr->cleanAdversary();
 
@@ -143,8 +147,59 @@ void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
     //now I can safely publish my self in peerlist because I am not vulnerable anymore
     b_PublishMeByTracker = true;
 
+    b_DownloadCompleted = true;
+
+    if (b_DoNotActivelyParticipateOnCompletion)
+        disconnectAllActiveConns();
+
     notifyDwlCompleteToConnMapper(_tDuration);
 
+}
+
+void BTPeerWireSPD::scheduleConnections(BTTrackerMsgResponse* msg)
+{
+    //if download is completed and do not actively participate is set do not
+    //initiate new connections
+    if(b_DownloadCompleted == true || b_DoNotActivelyParticipateOnCompletion == true)
+    {
+        BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::scheduleConnections","["<<this->getParentModule()->getFullName()<<
+                "] not scheduling connection due to Active participation is disabled after donload completion.");
+        return;
+    }
+    else
+    {
+        BTPeerWireSPD::scheduleConnections(msg);
+    }
+
+}
+
+void BTPeerWireSPD::disconnectAllActiveConns()
+{
+    BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::disconnectAllActiveConns","["<<this->getParentModule()->getFullName()<<
+            "] Closing All Active connections with other peers.");
+
+    BTPeerWireClientHandlerBase *thread(NULL);
+    PeerEntryVector peerVector = peerState.getVector();
+
+    for (unsigned int i=0; i<peerVector.size(); i++)
+    {
+        PeerEntry entry= peerVector[i];
+        thread = check_and_cast<BTPeerWireClientHandlerBase *>(entry.getPeerThread());
+        if (!thread)
+            error("%s:%d at %s() Inconsistent thread state, could not find peer thread. \n", __FILE__, __LINE__, __func__);
+
+        TCPServerThreadBase * pThreadBase = (TCPServerThreadBase *)thread;
+
+        if (thread->activeConnection())
+        {
+            BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::disconnectAllActiveConns","["<<this->getParentModule()->getFullName()<<
+                    "] Disconnecting Active Connection with peer ["<< entry.getPeerID()<<"].");
+
+            pThreadBase->timerExpired(new cMessage(toString(CLOSE_CONNECTION_TIMER),CLOSE_CONNECTION_TIMER));
+        }
+
+
+    }
 }
 
 void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
@@ -335,7 +390,7 @@ void BTPeerWireSPD::disconnectBadConnections()
 
         BT_LOG_DEBUG(btLogSinker,"BTPeerWireSPD::disconnectBadConnections","["<<this->getParentModule()->getFullName()<<"] reached maximum peer count. disconnecting ["<<iLimit<<"] peers");
 
-        for (unsigned int i=0; i<iLimit; i++)
+        for (int i=0; i<iLimit; i++)
         {
             PeerEntry* peer= &peerVector[i];
             thread = (TCPServerThreadBase*)peer->getPeerThread();

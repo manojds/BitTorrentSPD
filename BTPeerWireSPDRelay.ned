@@ -30,6 +30,8 @@ simple BTPeerWireSPDRelay extends BTPeerWireSPD like TCPApp
     parameters:
 		@class(BTPeerWireSPDRelay); 
 		
+		
+		
 
 	gates:
 	    input 	relayTrackerIn;

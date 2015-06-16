@@ -32,6 +32,10 @@ simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
         //whether to disconnect connections with peers which so not provide much
         //download rate when maximum connection count reached.
         bool disconnectBadConnections = default(false);	
+        
+        //parameter which indicates whether not to actively participate and initiate connection 
+        //once download is completed.
+        bool doNotActivelyParticipateOnDownloadCompletion = default("false");
 
         string connTrackerModulePath = default("");		
 		

@@ -43,10 +43,8 @@ protected:
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void connectionLostFromPeer(PEER peer);
 
+
     /* End of redefined methods from BTPeerWireBase */
-
-
-
 
 
     virtual void pauseChokingAlgos();
@@ -65,6 +63,7 @@ private:
     bool                    b_TrackerCommIsEnbled;
     bool                    b_Downloader;
     bool                    b_PatchInfoAvailable;
+
     cMessage*               evtRelayTrackerComm;   //Timer to schedule communication with the Tracker for Relay purposes
     std::map<IPvXAddress, PEER>   initiatedPeers;     //Peer who initiated connections to this relay peer
 

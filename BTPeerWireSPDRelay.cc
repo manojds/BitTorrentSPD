@@ -30,6 +30,8 @@ void BTPeerWireSPDRelay::initialize()
 {
     BTPeerWireSPD::initialize();
 
+
+
     //we set patch info to nothing, bcz patch info is not same as our platform
     //patch info can be learned from other peers.
     s_PatchInfo="";
@@ -272,6 +274,7 @@ void BTPeerWireSPDRelay::enableTrackerComm()
 }
 
 void BTPeerWireSPDRelay::disableTrackerComm()
+
 {
     if(b_TrackerCommIsEnbled == true)
     {
@@ -285,6 +288,8 @@ void BTPeerWireSPDRelay::disableTrackerComm()
         }
     }
 }
+
+
 
 void BTPeerWireSPDRelay::writeStats()
 {
