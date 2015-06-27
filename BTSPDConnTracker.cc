@@ -169,19 +169,7 @@ void BTSPDConnTracker::handleNewConnectionMsg(cMessage* _pMsg)
 
     std::set<std::string> & setAllConns = map_AllConnections[pMsg->myName()];
 
-    //we insert the name with specifying whether this connection is active or not.
-    // because of this please note that removal of items by name from this set will not be possible
-    std::string remoteName = pMsg->remoteIP();
-    if (pMsg->activeConn())
-    {
-        remoteName.append(" active");
-    }
-    else
-    {
-        remoteName.append(" passive");
-    }
-
-    setAllConns.insert(remoteName);
+    setAllConns.insert(pMsg->remoteIP());
 }
 
 void BTSPDConnTracker::handleConnectionLostMsg(cMessage* _pMsg)
