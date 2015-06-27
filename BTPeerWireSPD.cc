@@ -160,7 +160,7 @@ void BTPeerWireSPD::scheduleConnections(BTTrackerMsgResponse* msg)
 {
     //if download is completed and do not actively participate is set do not
     //initiate new connections
-    if(b_DownloadCompleted == true || b_DoNotActivelyParticipateOnCompletion == true)
+    if(b_DownloadCompleted == true && b_DoNotActivelyParticipateOnCompletion == true)
     {
         BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::scheduleConnections","["<<this->getParentModule()->getFullName()<<
                 "] not scheduling connection due to Active participation is disabled after donload completion.");
