@@ -38,7 +38,8 @@ BTPeerWireSPD::BTPeerWireSPD() :
         b_PublishMeByTracker(true),
         b_DisconnectBadConnections(false),
         b_DownloadCompleted(false),
-        b_DoNotActivelyParticipateOnCompletion(false)
+        b_DoNotActivelyParticipateOnCompletion(false),
+        fillMethod(FILL_ALL)
 {
 
 }
@@ -63,6 +64,7 @@ void BTPeerWireSPD::initialize()
     b_PublishMeByTracker        = par("publishMeByTracker");
     b_DisconnectBadConnections  = par("disconnectBadConnections");
     b_DoNotActivelyParticipateOnCompletion = par("doNotActivelyParticipateOnDownloadCompletion");
+    fillMethod                      = (PEER_FILL_METHOD)(int)par("fillMethod");
 
     p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
             INTERNAL_NODE_CREATION_MSG_TYPE);
@@ -108,6 +110,8 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         case SEEDER:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_CONN),EVT_CONN);
+            //this seeder flag is to hide the leachers from exposing to others
+            pMsg->setSeeder(true);
 
             break;
         }
@@ -115,6 +119,8 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
         case SEEDING:
         {
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_COMP),EVT_COMP);
+            //this seeder flag is to hide the leachers from exposing to others
+            pMsg->setSeeder(true);
             break;
         }
         case EXITING:
@@ -204,6 +210,29 @@ void BTPeerWireSPD::disconnectAllActiveConns()
 
 void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
+    //come error checking
+    if (b_DownloadCompleted == false && fillMethod == HIDE_DOWNLOADERS && b_PublishMeByTracker == false)
+    {
+        BT_LOG_ERROR( btLogSinker,"BTPeerWireSPD::newConnectionFromPeerEstablished","["<<
+                this->getParentModule()->getFullName()<<"] remote peer"<< peer.peerId<<
+                " b_DownloadCompleted is false, fillMethod is HIDE_DOWNLOADERS and b_PublishMeByTracker is false");
+
+        throw cRuntimeError("connection received from peer when it is not intended."
+                " b_DownloadCompleted is false, fillMethod is HIDE_DOWNLOADERS and b_PublishMeByTracker is false");
+    }
+    else if (fillMethod == ONLY_SEEDERS )
+    {
+        if ( getState() != SEEDER && getState() != SEEDING )
+        {
+            BT_LOG_ERROR( btLogSinker,"BTPeerWireSPD::newConnectionFromPeerEstablished","["<<
+                    this->getParentModule()->getFullName()<<"] remote peer"<< peer.peerId<<
+                    " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS ");
+
+            throw cRuntimeError("connection received from peer when it is not intended."
+                    " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS ");
+        }
+    }
+
     notifyNewAddrToThreatHndlr(peer);
     notifyNewConnToConnMapper(peer);
 }

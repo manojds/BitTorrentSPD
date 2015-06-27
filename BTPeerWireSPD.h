@@ -16,6 +16,7 @@
 #ifndef BTPEERWIRESPD_H_
 #define BTPEERWIRESPD_H_
 #include "../BitTorrent/BTPeerWireBase.h"
+#include "Common.h"
 
 class BTThreatHandler;
 
@@ -68,6 +69,7 @@ protected:
     bool                b_DisconnectBadConnections;
     bool                b_DownloadCompleted;
     bool                b_DoNotActivelyParticipateOnCompletion;
+    PEER_FILL_METHOD    fillMethod;
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;
 

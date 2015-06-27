@@ -16,13 +16,8 @@
 #ifndef BTTRACKERRELAYENABLED_H_
 #define BTTRACKERRELAYENABLED_H_
 #include "../BitTorrent/BTTrackerBase.h"
+#include "Common.h"
 
-enum PEER_FILL_METHOD
-{
-    FILL_ALL =0,
-    ONLY_SEEDERS = 1,
-    HIDE_DOWNLOADERS = 2
-};
 
 class INET_API BTTrackerSPD: public BTTrackerBase {
 public:
