@@ -36,6 +36,7 @@ BTSPDConnTrackNewConnMsg::BTSPDConnTrackNewConnMsg(const char *name, int kind) :
 {
     this->myName_var = 0;
     this->remoteIP_var = 0;
+    this->activeConn_var = 0;
 }
 
 BTSPDConnTrackNewConnMsg::BTSPDConnTrackNewConnMsg(const BTSPDConnTrackNewConnMsg& other) : cMessage(other)
@@ -59,6 +60,7 @@ void BTSPDConnTrackNewConnMsg::copy(const BTSPDConnTrackNewConnMsg& other)
 {
     this->myName_var = other.myName_var;
     this->remoteIP_var = other.remoteIP_var;
+    this->activeConn_var = other.activeConn_var;
 }
 
 void BTSPDConnTrackNewConnMsg::parsimPack(cCommBuffer *b)
@@ -66,6 +68,7 @@ void BTSPDConnTrackNewConnMsg::parsimPack(cCommBuffer *b)
     cMessage::parsimPack(b);
     doPacking(b,this->myName_var);
     doPacking(b,this->remoteIP_var);
+    doPacking(b,this->activeConn_var);
 }
 
 void BTSPDConnTrackNewConnMsg::parsimUnpack(cCommBuffer *b)
@@ -73,6 +76,7 @@ void BTSPDConnTrackNewConnMsg::parsimUnpack(cCommBuffer *b)
     cMessage::parsimUnpack(b);
     doUnpacking(b,this->myName_var);
     doUnpacking(b,this->remoteIP_var);
+    doUnpacking(b,this->activeConn_var);
 }
 
 const char * BTSPDConnTrackNewConnMsg::myName() const
@@ -93,6 +97,16 @@ const char * BTSPDConnTrackNewConnMsg::remoteIP() const
 void BTSPDConnTrackNewConnMsg::setRemoteIP(const char * remoteIP)
 {
     this->remoteIP_var = remoteIP;
+}
+
+bool BTSPDConnTrackNewConnMsg::activeConn() const
+{
+    return activeConn_var;
+}
+
+void BTSPDConnTrackNewConnMsg::setActiveConn(bool activeConn)
+{
+    this->activeConn_var = activeConn;
 }
 
 class BTSPDConnTrackNewConnMsgDescriptor : public cClassDescriptor
@@ -143,7 +157,7 @@ const char *BTSPDConnTrackNewConnMsgDescriptor::getProperty(const char *property
 int BTSPDConnTrackNewConnMsgDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
 }
 
 unsigned int BTSPDConnTrackNewConnMsgDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -157,8 +171,9 @@ unsigned int BTSPDConnTrackNewConnMsgDescriptor::getFieldTypeFlags(void *object,
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *BTSPDConnTrackNewConnMsgDescriptor::getFieldName(void *object, int field) const
@@ -172,8 +187,9 @@ const char *BTSPDConnTrackNewConnMsgDescriptor::getFieldName(void *object, int f
     static const char *fieldNames[] = {
         "myName",
         "remoteIP",
+        "activeConn",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldNames[field] : NULL;
 }
 
 int BTSPDConnTrackNewConnMsgDescriptor::findField(void *object, const char *fieldName) const
@@ -182,6 +198,7 @@ int BTSPDConnTrackNewConnMsgDescriptor::findField(void *object, const char *fiel
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='m' && strcmp(fieldName, "myName")==0) return base+0;
     if (fieldName[0]=='r' && strcmp(fieldName, "remoteIP")==0) return base+1;
+    if (fieldName[0]=='a' && strcmp(fieldName, "activeConn")==0) return base+2;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -196,8 +213,9 @@ const char *BTSPDConnTrackNewConnMsgDescriptor::getFieldTypeString(void *object,
     static const char *fieldTypeStrings[] = {
         "string",
         "string",
+        "bool",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *BTSPDConnTrackNewConnMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -239,6 +257,7 @@ std::string BTSPDConnTrackNewConnMsgDescriptor::getFieldAsString(void *object, i
     switch (field) {
         case 0: return oppstring2string(pp->myName());
         case 1: return oppstring2string(pp->remoteIP());
+        case 2: return bool2string(pp->activeConn());
         default: return "";
     }
 }
@@ -255,6 +274,7 @@ bool BTSPDConnTrackNewConnMsgDescriptor::setFieldAsString(void *object, int fiel
     switch (field) {
         case 0: pp->setMyName((value)); return true;
         case 1: pp->setRemoteIP((value)); return true;
+        case 2: pp->setActiveConn(string2bool(value)); return true;
         default: return false;
     }
 }
@@ -270,8 +290,9 @@ const char *BTSPDConnTrackNewConnMsgDescriptor::getFieldStructName(void *object,
     static const char *fieldStructNames[] = {
         NULL,
         NULL,
+        NULL,
     };
-    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
 }
 
 void *BTSPDConnTrackNewConnMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const

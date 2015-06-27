@@ -20,7 +20,8 @@ message BTSPDConnTrackNewConnMsg
 {
     @omitGetVerb(true);
     string myName;
-    string remoteIP;    
+    string remoteIP; 
+    bool activeConn;   
 }
 
 message BTSPDConnTrackConnDropMsg

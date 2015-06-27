@@ -22,7 +22,8 @@
  * {
  *     @omitGetVerb(true);
  *     string myName;
- *     string remoteIP;    
+ *     string remoteIP; 
+ *     bool activeConn;   
  * }
  * </pre>
  */
@@ -31,6 +32,7 @@ class BTSPDConnTrackNewConnMsg : public ::cMessage
   protected:
     opp_string myName_var;
     opp_string remoteIP_var;
+    bool activeConn_var;
 
   private:
     void copy(const BTSPDConnTrackNewConnMsg& other);
@@ -53,6 +55,8 @@ class BTSPDConnTrackNewConnMsg : public ::cMessage
     virtual void setMyName(const char * myName);
     virtual const char * remoteIP() const;
     virtual void setRemoteIP(const char * remoteIP);
+    virtual bool activeConn() const;
+    virtual void setActiveConn(bool activeConn);
 };
 
 inline void doPacking(cCommBuffer *b, BTSPDConnTrackNewConnMsg& obj) {obj.parsimPack(b);}

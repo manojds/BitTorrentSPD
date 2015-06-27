@@ -46,7 +46,7 @@ protected:
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
 
     virtual void handleNodeCreationEvent();
-    virtual void notifyNewConnToConnMapper(const PEER & peer);
+    virtual void notifyNewConnToConnMapper(const PEER & peer, bool isActive);
     virtual void notifyConnDropToConnMapper(const PEER & peer);
     virtual void notifyDwlCompleteToConnMapper(simtime_t _tDuration);
     virtual void notifyNodeCreationToConnMapper();

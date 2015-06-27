@@ -213,7 +213,7 @@ void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadB
     checkRcvdConnIsViable(peer);
 
     notifyNewAddrToThreatHndlr(peer);
-    notifyNewConnToConnMapper(peer);
+    notifyNewConnToConnMapper(peer, false);
 }
 
 void BTPeerWireSPD::checkRcvdConnIsViable(const PEER & peer)
@@ -245,7 +245,7 @@ void BTPeerWireSPD::checkRcvdConnIsViable(const PEER & peer)
 void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
     notifyNewAddrToThreatHndlr(peer);
-    notifyNewConnToConnMapper(peer);
+    notifyNewConnToConnMapper(peer, true);
 }
 
 void BTPeerWireSPD::connectionLostFromPeer(PEER peer)
@@ -295,7 +295,7 @@ void BTPeerWireSPD::notifyNodeCreationToConnMapper()
     }
 }
 
-void BTPeerWireSPD::notifyNewConnToConnMapper(const PEER & peer)
+void BTPeerWireSPD::notifyNewConnToConnMapper(const PEER & peer, bool isActiveConn)
 {
     if ( b_enableConnMapDumping)
     {
@@ -307,6 +307,7 @@ void BTPeerWireSPD::notifyNewConnToConnMapper(const PEER & peer)
 
         newConnMsg->setMyName(this->getParentModule()->getFullName());
         newConnMsg->setRemoteIP(peer.ipAddress.str().c_str());
+        newConnMsg->setActiveConn(isActiveConn);
         sendDirect(newConnMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
     }
 }
