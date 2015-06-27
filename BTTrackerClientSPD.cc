@@ -22,7 +22,7 @@ Define_Module(BTTrackerClientSPD);
 
 BTTrackerClientSPD::BTTrackerClientSPD():
 b_Downloader(true),
-b_PublishMeInPeerList(true)
+b_PublishMeInPeerList(true),
 b_IsSeeder(false)
 {
 

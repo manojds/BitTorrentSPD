@@ -338,7 +338,7 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         set<int> added_peers;
 
         //if we don't have that much relay peers make the maximum to the amount we have
-        if ( iMaxRelayPeersCount > getHostModule()->realyPeersNum() -1 )
+        if ( iMaxRelayPeersCount > (int)getHostModule()->realyPeersNum() -1 )
             iMaxRelayPeersCount = getHostModule()->realyPeersNum() -1;
         // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
         // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
@@ -482,7 +482,6 @@ void BTTrackerClientHandlerSPD::fillWithoutDownloaders(BTTrackerMsgAnnounce* ams
 {
     // get the peers pool
     cArray& peers               = getHostModule()->peers();
-    int iSeedCount              = getHostModule()->seeds();
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillWithoutDownloaders",
             "fillWithoutDownloaders, peer array size ["<<peers.size()<<"] is seed ["<<seed<<"]");
     // peers added
@@ -534,7 +533,7 @@ void BTTrackerClientHandlerSPD::fillWithoutDownloaders(BTTrackerMsgAnnounce* ams
             added_peers.insert(iCurrentIndex);
         }
     }
-    while(iCurrentIndex != iStart && added_peers.size() <= iMaxPeersInReply );
+    while(iCurrentIndex != iStart && ((int)added_peers.size() <= iMaxPeersInReply ) );
 
     if (added_peers.size() > 0)
     {
@@ -584,7 +583,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
     else // response to a normal peer
     {
         // how many peers we have to add
-        max_peers = (iSeedCount <= getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
+        max_peers = (iSeedCount <= (int)getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
     }
 
     // random selection
