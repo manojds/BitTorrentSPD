@@ -298,7 +298,7 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     }
     else if (fillMethod == ONLY_SEEDERS)
     {
-        fillOnlySeeders(amsg, rmsg, seed, no_peer_id);
+        fillOnlySeeders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
     }
     else if(fillMethod == HIDE_DOWNLOADERS)
     {
