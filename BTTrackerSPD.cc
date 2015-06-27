@@ -19,7 +19,7 @@ Define_Module(BTTrackerSPD);
 
 BTTrackerSPD::BTTrackerSPD():
         i_NextIndexToFill(0),
-        sendSeedersOnly_var(false)
+        fillMethod(FILL_ALL)
 {
     // TODO Auto-generated constructor stub
 
@@ -35,7 +35,7 @@ void BTTrackerSPD::initialize()
 
     relayPeerPropotionInReply_var   = (double)par("relayPeerPropotionInReply");
     useRelayPropotioninRequest_var  = par("useRelayPropotioninRequest");
-    sendSeedersOnly_var             = par("sendSeedersOnly");
+    fillMethod                      = (PEER_FILL_METHOD)(int)par("fillMethod");
     realyIfoHash                    = par("realyInfoHash").stdstringValue ();
 
 
@@ -96,9 +96,9 @@ bool BTTrackerSPD::useRelayPropotioninRequest() const
     return useRelayPropotioninRequest_var;
 }
 
-bool BTTrackerSPD::sendSeersOnly() const
+PEER_FILL_METHOD BTTrackerSPD::getPeerFillMethod() const
 {
-    return sendSeedersOnly_var;
+    return fillMethod;
 
 }
 
@@ -169,3 +169,5 @@ int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
 
     return iRet;
 }
+
+

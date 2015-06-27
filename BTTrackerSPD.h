@@ -17,6 +17,13 @@
 #define BTTRACKERRELAYENABLED_H_
 #include "../BitTorrent/BTTrackerBase.h"
 
+enum PEER_FILL_METHOD
+{
+    FILL_ALL =0,
+    ONLY_SEEDERS = 1,
+    HIDE_DOWNLOADERS = 2
+};
+
 class INET_API BTTrackerSPD: public BTTrackerBase {
 public:
     BTTrackerSPD();
@@ -32,7 +39,7 @@ public:
     double  relayPeerPropotionInReply() const;
     void    setRelayPeerPropotionInReply(double relayPeerPropotionInReply);
     bool    useRelayPropotioninRequest() const;
-    bool    sendSeersOnly() const;
+    PEER_FILL_METHOD    getPeerFillMethod() const;
     void    cleanRemoveRelayPeer(int);
     int     getNextIndexOfRelayPeerToFill();
 protected:
@@ -46,7 +53,7 @@ protected:
     size_t  realyPeersNum_var;    // relay peers counter
     double  relayPeerPropotionInReply_var;
     bool    useRelayPropotioninRequest_var;
-    bool    sendSeedersOnly_var;
+    PEER_FILL_METHOD fillMethod;
     string  realyIfoHash;
     cArray  relayPeers_var;   // relay peers container
 };

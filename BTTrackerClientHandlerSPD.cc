@@ -274,14 +274,19 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
 //    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "Is seed ["<<seed<<"] current true peer count ["<<
 //            getHostModule()->peers().size()<<"] seed count ["<<);
 
-    if(getHostModule()->sendSeersOnly() == true)
+    PEER_FILL_METHOD fillMethod = getHostModule()->getPeerFillMethod();
+    if(fillMethod == HIDE_DOWNLOADERS)
     {
-        fillOnlySeeders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
+        fillWithoutDownloaders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
     }
-    else
+    else if (fillMethod == FILL_ALL)
     {
         // let super class to fill true peers on its will
         BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
+    }
+    else
+    {
+        throw cRuntimeError("Unknown peer fill method [%d] specified for tracker", fillMethod);
     }
 
     //then we start our work
@@ -453,7 +458,7 @@ void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcnt
             <<"] Relay Peer Count ["<<_iRelayPeerCount<<"]");
 }
 
-void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id)
+void BTTrackerClientHandlerSPD::fillWithoutDownloaders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id)
 {
     // get the peers pool
     cArray& peers               = getHostModule()->peers();
