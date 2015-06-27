@@ -23,6 +23,7 @@ Define_Module(BTTrackerClientSPD);
 BTTrackerClientSPD::BTTrackerClientSPD():
 b_Downloader(true),
 b_PublishMeInPeerList(true)
+b_IsSeeder(false)
 {
 
 
@@ -51,6 +52,7 @@ void BTTrackerClientSPD::handleMessage(cMessage* msg)
         {
             b_Downloader=pTrackerCommReq->downloader();
             b_PublishMeInPeerList = pTrackerCommReq->publishInPeerList();
+			b_IsSeeder=pTrackerCommReq->seeder();
         }
         else
         {
@@ -61,6 +63,7 @@ void BTTrackerClientSPD::handleMessage(cMessage* msg)
             //default case
             b_Downloader=true;
             b_PublishMeInPeerList = true;
+			b_IsSeeder=false;
         }
     }
 
@@ -83,11 +86,12 @@ BTTrackerMsgAnnounce * BTTrackerClientSPD::createAnnounceMsg()
 
 
     BT_LOG_DETAIL(btLogSinker,"BTTrackerClientSPD::handleMessage","["<<this->getParentModule()->getFullName()<<
-            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<
+            "using relay peer ratio ["<<dRelayPeerRatio<<"] And Downloader flag ["<<b_Downloader<<"] seeder flag ["<<b_IsSeeder<<"]"<<
             "] publish in peer list flag ["<<b_PublishMeInPeerList<<"]");
 
     pMsg->setRelayPeerRatio(dRelayPeerRatio);
     pMsg->setPublishInPeerList(b_PublishMeInPeerList);
+	pMsg->setSeeder(b_IsSeeder);
 
     return pMsg;
 

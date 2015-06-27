@@ -32,6 +32,7 @@ protected:
     bool    b_Downloader;   //flag to indicate that this client is a downloader or a relay
     //whether to publish this node by the tracker in peer list
     bool    b_PublishMeInPeerList;
+	bool    b_IsSeeder;     //flag to indicate whether this client is a seeder
     double  d_DownloaderRelayPeerRatio;
     double  d_Relay_RelayPeerRatio;
 };

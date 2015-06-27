@@ -73,7 +73,22 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
                 BTTrackerStructBaseSPD * peer = check_and_cast<BTTrackerStructBaseSPD *>(peerTemp);
 
                 peer->setPublishInPeerList(pSPDMsg->publishInPeerList());
+
+                //set client is seeder if it is a seeder. but only if it is not set as a seeder already
+                if(pSPDMsg->seeder())
+                {
+                    // update the peer's status and the seeds' count only if it is not marked as a seed already
+                    if(!peer->isSeed())
+                    {
+                        peer->setIsSeed(true);
+                        getHostModule()->setSeeds(getHostModule()->seeds() + 1);
+                        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
+                                "marking a seed. Current Seed Count ["<<getHostModule()->seeds()<<"]");
+                    }
+                }
             }
+
+
 
         }
         return iRetCode;
@@ -258,8 +273,9 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     //if it is relay hash we don't fill peers.
     if(strcmp(amsg->infoHash(), getHostModule()->relayInfoHash().c_str()) == 0)
     {
-        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers for relay hash announce. "
-                "Client details [address="<< getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "]");
+        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers"
+                " for relay hash announce. Client details [address="<< getSocket()->getRemoteAddress()
+                << ", port=" << getSocket()->getRemotePort() << "]");
         return;
     }
 
@@ -275,14 +291,18 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
 //            getHostModule()->peers().size()<<"] seed count ["<<);
 
     PEER_FILL_METHOD fillMethod = getHostModule()->getPeerFillMethod();
-    if(fillMethod == HIDE_DOWNLOADERS)
-    {
-        fillWithoutDownloaders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
-    }
-    else if (fillMethod == FILL_ALL)
+    if (fillMethod == FILL_ALL)
     {
         // let super class to fill true peers on its will
         BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
+    }
+    else if (fillMethod == ONLY_SEEDERS)
+    {
+        fillOnlySeeders(amsg, rmsg, seed, no_peer_id);
+    }
+    else if(fillMethod == HIDE_DOWNLOADERS)
+    {
+        fillWithoutDownloaders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
     }
     else
     {
@@ -463,9 +483,8 @@ void BTTrackerClientHandlerSPD::fillWithoutDownloaders(BTTrackerMsgAnnounce* ams
     // get the peers pool
     cArray& peers               = getHostModule()->peers();
     int iSeedCount              = getHostModule()->seeds();
-    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
-            "filling only seeders, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()
-            <<"] is seed ["<<seed<<"]");
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillWithoutDownloaders",
+            "fillWithoutDownloaders, peer array size ["<<peers.size()<<"] is seed ["<<seed<<"]");
     // peers added
     set<int> added_peers            = set<int>();
 
@@ -522,6 +541,83 @@ void BTTrackerClientHandlerSPD::fillWithoutDownloaders(BTTrackerMsgAnnounce* ams
         // traverse the set and fill the response
         fillPeersinToMsg(rmsg, 0, added_peers, peers, no_peer_id);
     }
+
+}
+
+void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id)
+{
+    // get the peers pool
+    cArray& peers               = getHostModule()->peers();
+    int iSeedCount              = getHostModule()->seeds();
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders",
+            "filling only seeders, current number of available seeders ["<< iSeedCount<<"] peer array size ["<<peers.size()
+            <<"] is seed ["<<seed<<"]");
+    // peers added
+    set<int> added_peers            = set<int>();
+    // iterator for the added_peers
+    set<int>::iterator it;
+    // the number of peers in the reply
+    size_t max_peers            = 0;
+
+    // temporary peer to add to the response
+    PEER ttpeer;
+    // random peer
+    int rndpeer             = -1;
+
+    if ( iSeedCount < 1 )//no seeds to add
+        return;
+    else if(seed) // response to a seed
+    {
+        //return;
+        //we are not supposed to add any peers. but to activate seeders (to activate their choking algorithm)
+        //we need to send some peers in the response.
+        //so we will send one seeder.
+
+        if(iSeedCount > 1)
+        {
+            max_peers=1;
+        }
+        else//there is only one seed. that is this peer
+            return;
+
+    }
+    else // response to a normal peer
+    {
+        // how many peers we have to add
+        max_peers = (iSeedCount <= getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
+    }
+
+    // random selection
+    while(added_peers.size() < max_peers)
+    {
+        // get a random peer
+        rndpeer = intrand(peers.size());
+
+        // the random peer is the peer that made the announce, ignore
+        if(rndpeer == cPeer)
+        {
+            continue;
+        }
+        // the random peer is already added, ignore
+        if(added_peers.find(rndpeer) != added_peers.end())
+        {
+            continue;
+        }
+        // only add seeders, i.e. if it is not a seeder do not add
+        if( (BTTrackerStructBase*)peers[rndpeer] && (((BTTrackerStructBase*)peers[rndpeer])->isSeed() ==false ))
+        {
+            continue;
+        }
+
+        // add the peer to the "added peers" pool
+        if((BTTrackerStructBase*)peers[rndpeer])
+        {
+            added_peers.insert(rndpeer);
+        }
+    }
+
+    // traverse the set and fill the response
+    fillPeersinToMsg(rmsg, 0, added_peers, peers, no_peer_id);
 
 }
 
