@@ -41,6 +41,7 @@ protected:
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void connectionLostFromPeer(PEER peer);
+    virtual void checkRcvdConnIsViable(const PEER & peer);
 
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
 

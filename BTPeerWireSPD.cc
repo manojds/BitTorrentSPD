@@ -210,7 +210,15 @@ void BTPeerWireSPD::disconnectAllActiveConns()
 
 void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
-    //come error checking
+    checkRcvdConnIsViable(peer);
+
+    notifyNewAddrToThreatHndlr(peer);
+    notifyNewConnToConnMapper(peer);
+}
+
+void BTPeerWireSPD::checkRcvdConnIsViable(const PEER & peer)
+{
+    //error checking
     if (b_DownloadCompleted == false && fillMethod == HIDE_DOWNLOADERS && b_PublishMeByTracker == false)
     {
         BT_LOG_ERROR( btLogSinker,"BTPeerWireSPD::newConnectionFromPeerEstablished","["<<
@@ -232,9 +240,6 @@ void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadB
                     " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS ");
         }
     }
-
-    notifyNewAddrToThreatHndlr(peer);
-    notifyNewConnToConnMapper(peer);
 }
 
 void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)

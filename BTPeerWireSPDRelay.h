@@ -27,6 +27,8 @@ public:
     virtual void startActiveParticipationInSwarm();
     virtual void stopParticipationInSwarm();
 
+    virtual void checkRcvdConnIsViable(const PEER & peer);
+
 
 protected:
     /* Redefined methods from BTPeerWireSPD */

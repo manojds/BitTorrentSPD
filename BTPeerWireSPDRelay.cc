@@ -197,6 +197,12 @@ void BTPeerWireSPDRelay::stopParticipationInSwarm()
 
 }
 
+void BTPeerWireSPDRelay::checkRcvdConnIsViable(const PEER & peer)
+{
+    //currently we don't have wnything to do here as a relay
+
+}
+
 void BTPeerWireSPDRelay::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
 
