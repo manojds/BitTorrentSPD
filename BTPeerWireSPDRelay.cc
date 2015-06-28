@@ -199,18 +199,7 @@ void BTPeerWireSPDRelay::stopParticipationInSwarm()
 
 void BTPeerWireSPDRelay::checkRcvdConnIsViable(const PEER & peer)
 {
-    if (fillMethod == ONLY_SEEDERS )
-    {
-        if ( getState() < SEEDING )
-        {
-            BT_LOG_ERROR( btLogSinker,"BTPeerWireSPD::newConnectionFromPeerEstablished","["<<
-                    this->getParentModule()->getFullName()<<"] remote peer"<< peer.peerId<<
-                    " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS . Current state ["<<getState()<<"]");
-
-            throw cRuntimeError("connection received from peer when it is not intended."
-                    " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS ");
-        }
-    }
+    //currently we don't have anything to do here as a relay
 
 }
 
