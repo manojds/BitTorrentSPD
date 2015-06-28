@@ -333,6 +333,8 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     {
         // temporary peer to add to the response
         PEER ttpeer;
+        //number of relay peers which are included as true peers.
+        int iRelayPeerCountAsTruePeers(0);
 
         // peers added
         set<int> added_peers;
@@ -384,6 +386,21 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
                 }
                 else
                 {
+                    iRelayPeerCountAsTruePeers++;
+                    //there may be case where we don't have enough relay peers to add
+                    //since relay peers are already included as true peers and
+                    //iMaxRelayPeersCount is not calculated with considering that.
+
+                    if ( relayPeers.size() - iRelayPeerCountAsTruePeers < iMaxRelayPeersCount)
+                    {
+                        BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse","fillPeersInResponse -"
+                                "reducing iMaxRelayPeersCount from ["<<iMaxRelayPeersCount<<"] to ["<<
+                                relayPeers.size() - iRelayPeerCountAsTruePeers<<"] since not enough relay peers to add");
+
+                        iMaxRelayPeersCount = relayPeers.size() - iRelayPeerCountAsTruePeers;
+                    }
+
+
 //                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
 //                            "fillPeersInResponse - not added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
 //                            <<"index ["<<iRndPeer<<"]");
