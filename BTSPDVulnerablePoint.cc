@@ -128,21 +128,21 @@ void BTSPDVulnerablePClientHndlr::established()
 
 void BTSPDVulnerablePClientHndlr::dataArrived(cMessage* mmsg, bool)
 {
-//    cPacket * PacketMsg = dynamic_cast<cPacket *>(mmsg);
-//    if (PacketMsg == NULL)
-//    {
-//        opp_error("MJP - Message (%s)%s is not a cPacket -- ",
-//                  mmsg->getClassName(), mmsg->getName());
-//        delete mmsg;
-//        return;
-//    }
-//
-//    cPacket * msg = PacketMsg->decapsulate();
-//    delete mmsg;
-        
-    if(mmsg->getKind() == BTSPD_ATTACK_MSG_TYPE)
+    cPacket * PacketMsg = dynamic_cast<cPacket *>(mmsg);
+    if (PacketMsg == NULL)
     {
-        BTSPDAttackMessage* attackMsg = check_and_cast<BTSPDAttackMessage*>(mmsg);
+        opp_error("MJP - Message (%s)%s is not a cPacket -- ",
+                  mmsg->getClassName(), mmsg->getName());
+        delete mmsg;
+        return;
+    }
+
+    cPacket * msg = PacketMsg->decapsulate();
+    delete mmsg;
+        
+    if(msg->getKind() == BTSPD_ATTACK_MSG_TYPE)
+    {
+        BTSPDAttackMessage* attackMsg = check_and_cast<BTSPDAttackMessage*>(msg);
 
 
         BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
@@ -151,14 +151,14 @@ void BTSPDVulnerablePClientHndlr::dataArrived(cMessage* mmsg, bool)
 
         tryToExploit(attackMsg);
 
-        delete mmsg;
+        delete attackMsg;
 
 
     }
     else
     {
         throw cRuntimeError("VulnrblClientHndlr::dataArrived - unknown message received. kind [%d] name [%s]",
-                mmsg->getKind(), mmsg->getName());
+                msg->getKind(), msg->getName());
     }
 }
 
