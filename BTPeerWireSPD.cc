@@ -230,11 +230,11 @@ void BTPeerWireSPD::checkRcvdConnIsViable(const PEER & peer)
     }
     else if (fillMethod == ONLY_SEEDERS )
     {
-        if ( getState() != SEEDER && getState() != SEEDING )
+        if ( getState() < SEEDING )
         {
             BT_LOG_ERROR( btLogSinker,"BTPeerWireSPD::newConnectionFromPeerEstablished","["<<
                     this->getParentModule()->getFullName()<<"] remote peer"<< peer.peerId<<
-                    " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS ");
+                    " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS . Current state ["<<getState()<<"]");
 
             throw cRuntimeError("connection received from peer when it is not intended."
                     " I am not a seeder or not seeding, fillMethod is ONLY_SEEDERS ");
