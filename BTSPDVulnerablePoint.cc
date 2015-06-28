@@ -62,7 +62,7 @@ void BTSPDVulnerablePoint::vulnerabilityFixed()
     }
 }
 
-bool BTSPDVulnerablePoint::tryToExploit()
+bool BTSPDVulnerablePoint::tryToExploit(BTSPDAttackMessage* msg)
 {
 //    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
 //            << "]  trying to exploit vulnerability...");
@@ -70,14 +70,7 @@ bool BTSPDVulnerablePoint::tryToExploit()
     bool bRet(false);
     if(isVulnerable())
     {
-        bRet= exploit();
-
-//        if(bRet)
-//        {
-//            BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
-//                        << "]  trying to exploit vulnerability...");
-//
-//        }
+        bRet= exploit(msg);
 
     }
     else
@@ -89,16 +82,33 @@ bool BTSPDVulnerablePoint::tryToExploit()
     return bRet;
 }
 
-bool BTSPDVulnerablePoint::exploit()
+bool BTSPDVulnerablePoint::exploit(BTSPDAttackMessage* msg)
 {
 //    BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::exploit", "[" << getParentModule()->getFullName()
 //                    << "] I have been exploited........");
 
 
+    bool bRet(false);
+
     BTThreatHandler* p_ThreatHndlr=
             (BTThreatHandler*)(getParentModule()->getSubmodule("threatHandler"));
 
-    return p_ThreatHndlr->activateAdversary();
+    if (p_ThreatHndlr->activateAdversary())
+    {
+        //error checking
+        if (strcmp(msg->victim(), getParentModule()->getFullName()) != 0 )
+        {
+            throw cRuntimeError("Attack message received which is not intended for me. "
+                    "My Name [%s], Attacker [%s] Intended Victim [%s]", getParentModule()->getFullName(),
+                    msg->attacker(), msg->victim());
+        }
+
+        bRet = true;
+        BT_LOG_INFO (btLogSinker,"BTSPDVulnerablePoint::exploit","["<<getParentModule()->getFullName()<<
+                "] ******* I have been exploited. Attacker ["<<msg->attacker()<<"] attack Type ["<<msg->attackType()<<"]");
+    }
+
+    return bRet;
 }
 
 
@@ -118,41 +128,44 @@ void BTSPDVulnerablePClientHndlr::established()
 
 void BTSPDVulnerablePClientHndlr::dataArrived(cMessage* mmsg, bool)
 {
-    cPacket * PacketMsg = dynamic_cast<cPacket *>(mmsg);
-    if (PacketMsg == NULL)
-    {
-        opp_error("MJP - Message (%s)%s is not a cPacket -- ",
-                  mmsg->getClassName(), mmsg->getName());
-        delete mmsg;
-        return;
-    }
-
-    cPacket * msg = PacketMsg->decapsulate();
-    delete mmsg;
+//    cPacket * PacketMsg = dynamic_cast<cPacket *>(mmsg);
+//    if (PacketMsg == NULL)
+//    {
+//        opp_error("MJP - Message (%s)%s is not a cPacket -- ",
+//                  mmsg->getClassName(), mmsg->getName());
+//        delete mmsg;
+//        return;
+//    }
+//
+//    cPacket * msg = PacketMsg->decapsulate();
+//    delete mmsg;
         
-    if(msg->getKind() == BTSPD_ATTACK_MSG_TYPE)
+    if(mmsg->getKind() == BTSPD_ATTACK_MSG_TYPE)
     {
-        delete msg;
+        BTSPDAttackMessage* attackMsg = check_and_cast<BTSPDAttackMessage*>(mmsg);
+
 
         BT_LOG_INFO(btLogSinker, "VulnrblClientHndlr::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
                 << "] Attack Message received - from ["<<  getSocket()->getRemoteAddress() <<"]");
 
 
-        tryToExploit();
+        tryToExploit(attackMsg);
+
+        delete mmsg;
 
 
     }
     else
     {
         throw cRuntimeError("VulnrblClientHndlr::dataArrived - unknown message received. kind [%d] name [%s]",
-                msg->getKind(), msg->getName());
+                mmsg->getKind(), mmsg->getName());
     }
 }
 
-void BTSPDVulnerablePClientHndlr::tryToExploit()
+void BTSPDVulnerablePClientHndlr::tryToExploit(BTSPDAttackMessage* msg)
 {
     BTSPDVulnerablePoint * pHostMod=check_and_cast<BTSPDVulnerablePoint*>(getHostModule());
-    pHostMod->tryToExploit();
+    pHostMod->tryToExploit(msg);
 }
 
 

@@ -16,6 +16,21 @@
 
 
 /**
+ * Enum generated from <tt>applications/BitTorrentSPD/BTSPDThreatHandlerMsgs.msg</tt> by opp_msgc.
+ * <pre>
+ * enum ATTACK_TYPE
+ * {
+ *     ADDR_FOUND_ACTIVE_CONN = 1; 
+ *     ADDR_FOUND_PASSIVE_CONN = 2; 
+ * }
+ * </pre>
+ */
+enum ATTACK_TYPE {
+    ADDR_FOUND_ACTIVE_CONN = 1,
+    ADDR_FOUND_PASSIVE_CONN = 2
+};
+
+/**
  * Class generated from <tt>applications/BitTorrentSPD/BTSPDThreatHandlerMsgs.msg</tt> by opp_msgc.
  * <pre>
  * message BTSPD_NewAddrFound
@@ -57,6 +72,55 @@ class BTSPD_NewAddrFound : public ::cMessage
 
 inline void doPacking(cCommBuffer *b, BTSPD_NewAddrFound& obj) {obj.parsimPack(b);}
 inline void doUnpacking(cCommBuffer *b, BTSPD_NewAddrFound& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>applications/BitTorrentSPD/BTSPDThreatHandlerMsgs.msg</tt> by opp_msgc.
+ * <pre>
+ * packet BTSPDAttackMessage
+ * {
+ *     @omitGetVerb(true);
+ *     string attacker;
+ *     string victim;
+ *     
+ *     unsigned int attackType @enum(ATTACK_TYPE);
+ *     
+ * }
+ * </pre>
+ */
+class BTSPDAttackMessage : public ::cPacket
+{
+  protected:
+    opp_string attacker_var;
+    opp_string victim_var;
+    unsigned int attackType_var;
+
+  private:
+    void copy(const BTSPDAttackMessage& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const BTSPDAttackMessage&);
+
+  public:
+    BTSPDAttackMessage(const char *name=NULL, int kind=0);
+    BTSPDAttackMessage(const BTSPDAttackMessage& other);
+    virtual ~BTSPDAttackMessage();
+    BTSPDAttackMessage& operator=(const BTSPDAttackMessage& other);
+    virtual BTSPDAttackMessage *dup() const {return new BTSPDAttackMessage(*this);}
+    virtual void parsimPack(cCommBuffer *b);
+    virtual void parsimUnpack(cCommBuffer *b);
+
+    // field getter/setter methods
+    virtual const char * attacker() const;
+    virtual void setAttacker(const char * attacker);
+    virtual const char * victim() const;
+    virtual void setVictim(const char * victim);
+    virtual unsigned int attackType() const;
+    virtual void setAttackType(unsigned int attackType);
+};
+
+inline void doPacking(cCommBuffer *b, BTSPDAttackMessage& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, BTSPDAttackMessage& obj) {obj.parsimUnpack(b);}
 
 
 #endif // _BTSPDTHREATHANDLERMSGS_M_H_

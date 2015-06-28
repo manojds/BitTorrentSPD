@@ -212,7 +212,7 @@ void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadB
 {
     checkRcvdConnIsViable(peer);
 
-    notifyNewAddrToThreatHndlr(peer);
+    notifyNewAddrToThreatHndlr(peer, false);
     notifyNewConnToConnMapper(peer, false);
 }
 
@@ -244,7 +244,7 @@ void BTPeerWireSPD::checkRcvdConnIsViable(const PEER & peer)
 
 void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
-    notifyNewAddrToThreatHndlr(peer);
+    notifyNewAddrToThreatHndlr(peer, true);
     notifyNewConnToConnMapper(peer, true);
 }
 
@@ -253,13 +253,13 @@ void BTPeerWireSPD::connectionLostFromPeer(PEER peer)
     notifyConnDropToConnMapper(peer);
 }
 
-void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer)
+void BTPeerWireSPD::notifyNewAddrToThreatHndlr(const PEER & peer, bool isActiveConn)
 {
     if(p_ThreatHndlr)
     {
         char pPort[32];
         snprintf(pPort, 32, "%u", peer.peerPort);
-        p_ThreatHndlr->newAddrFound(peer.ipAddress.str(), pPort);
+        p_ThreatHndlr->newAddrFound(peer.peerId.c_str(), peer.ipAddress.str(), pPort, isActiveConn);
     }
 }
 

@@ -20,6 +20,13 @@
 #include "../tcpapp/TCPGenericCliAppBase.h"
 #include <queue>
 
+class Victim
+{
+public:
+    std::string address;
+    std::string sNodeName;
+    bool        activeConn;
+};
 
 class INET_API BTThreatHandler : public TCPGenericCliAppBase
 {
@@ -27,7 +34,7 @@ public:
     BTThreatHandler();
     virtual ~BTThreatHandler();
 
-    virtual void newAddrFound(const std::string & _sIP, const std::string & _sPort);
+    virtual void newAddrFound(const std::string & _sNodeName, const std::string & _sIP, const std::string & _sPort, bool isActiveConn);
 
     virtual bool activateAdversary();
     virtual void cleanAdversary();
@@ -51,8 +58,7 @@ public:
     virtual void findAndSetIPAddress();
     virtual void scheduleNextAttackAt(simtime_t t);
     virtual void tryNextAttack();
-    virtual bool compromised();
-    virtual void sendAttackMsg();
+    virtual void sendAttackMsg(const Victim & victim);
 
 
 
@@ -68,7 +74,7 @@ public:
     cSimpleModule*      p_SecStatistics;
     simtime_t           t_AttackRetryDelay;
     double              d_AttackingPorbability;
-    std::queue<std::string>  q_LearnedAddrses;
+    std::queue<Victim>  q_LearnedNodes;
 };
 
 #endif

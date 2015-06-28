@@ -18,6 +18,7 @@
 
 #include <omnetpp.h>
 #include "../tcpapp/TCPSrvHostApp.h"
+#include "BTSPDThreatHandlerMsgs_m.h"
 
 class INET_API BTSPDVulnerablePoint  : public TCPSrvHostApp
 {
@@ -29,9 +30,9 @@ public:
 
     void vulnerabilityFixed();
 
-    virtual bool tryToExploit();
+    virtual bool tryToExploit(BTSPDAttackMessage* msg);
 
-    virtual bool exploit();
+    virtual bool exploit(BTSPDAttackMessage* msg);
 
   protected:
     virtual void initialize();
@@ -49,7 +50,7 @@ public:
     BTSPDVulnerablePClientHndlr();
     virtual ~BTSPDVulnerablePClientHndlr();
 
-    virtual void tryToExploit();
+    virtual void tryToExploit(BTSPDAttackMessage* msg);
 
 protected:
     /* Redefined methods from TCPServerThreadBase */

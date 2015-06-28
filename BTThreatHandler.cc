@@ -23,6 +23,7 @@
 #include "../../networklayer/ipv6/IPv6InterfaceData.h"
 #include "../tcpapp/GenericAppMsg_m.h"
 #include "BTSPDSecurityStatisticsMsgs_m.h"
+#include "BTSPDThreatHandlerMsgs_m.h"
 
 Define_Module(BTThreatHandler);
 
@@ -70,6 +71,8 @@ void BTThreatHandler::handleMessage(cMessage *msg)
 {
     if(msg->arrivedOn("btorrentIn"))
     {
+        //TODO :: seems like this code is not used.
+        //double check
         handleMsgFromBT(msg);
     }
     else
@@ -128,11 +131,6 @@ void BTThreatHandler::handleTimer(cMessage *msg)
 
 bool BTThreatHandler::activateAdversary()
 {
-    return compromised();
-}
-
-bool BTThreatHandler::compromised()
-{
     Enter_Method_Silent();
 
     bool bRet(false);
@@ -160,6 +158,8 @@ bool BTThreatHandler::compromised()
     return bRet;
 }
 
+
+
 void BTThreatHandler::cleanAdversary()
 {
     if(b_Malicious == true && b_ThreatRemovable == true)
@@ -170,8 +170,8 @@ void BTThreatHandler::cleanAdversary()
                 "]  Adversary neutralized !");
         b_Malicious= false;
 
-        while(!q_LearnedAddrses.empty())
-            q_LearnedAddrses.pop();
+        while(!q_LearnedNodes.empty())
+            q_LearnedNodes.pop();
 
         BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_INFECTION_CLEANED_MSG",BTSPD_INFECTION_CLEANED_MSG_TYPE);
         pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
@@ -192,7 +192,7 @@ void BTThreatHandler::tryNextAttack()
 {
     if(b_AttackIsOngoing == false)
     {
-        if(q_LearnedAddrses.size() > 0)
+        if(q_LearnedNodes.size() > 0)
         {
             bool bAttack(false);
 
@@ -214,11 +214,12 @@ void BTThreatHandler::tryNextAttack()
 
                 b_AttackIsOngoing= true;
                 //set the address on which we are attacking
-                std::string sHostIP=q_LearnedAddrses.front();
-                par("connectAddress")= sHostIP.c_str();
 
-                BT_LOG_INFO(btLogSinker,"BTThreatHandler::tryNextAttack","["<<getParentModule()->getFullName()<<"]  connecting to ["<<
-                        q_LearnedAddrses.front()<<"] to attack...");
+                Victim victim = q_LearnedNodes.front();
+                par("connectAddress")= victim.address.c_str();
+
+                BT_LOG_INFO(btLogSinker,"BTThreatHandler::tryNextAttack","["<<getParentModule()->getFullName()<<
+                        "]  connecting to ["<<victim.address<<"] to attack...");
 
                 //port would be taken from the configuration
 
@@ -248,9 +249,9 @@ void BTThreatHandler::socketEstablished(int connId, void *ptr)
 {
     TCPGenericCliAppBase::socketEstablished(connId, ptr);
 
-    sendAttackMsg();
+    sendAttackMsg(q_LearnedNodes.front());
 
-    q_LearnedAddrses.pop();
+    q_LearnedNodes.pop();
     //and then close the socket, bcz we need it no more
     close();
 
@@ -260,19 +261,26 @@ void BTThreatHandler::socketEstablished(int connId, void *ptr)
 }
 
 
-void BTThreatHandler::sendAttackMsg()
+void BTThreatHandler::sendAttackMsg(const Victim & victim)
 {
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::sendAttackMsg","["<<getParentModule()->getFullName()<<"]  attacking on ["<<
-            q_LearnedAddrses.front()<<"] ");
+            victim.address<<"] ");
 
 
-    cPacket *msg = new cPacket("BTSPD_ATTACK_MSG", BTSPD_ATTACK_MSG_TYPE);
-    GenericAppMsg* wrapper = new GenericAppMsg(msg->getName(), TCP_I_DATA);
-    wrapper->encapsulate(msg);
+    BTSPDAttackMessage *msg = new BTSPDAttackMessage("BTSPD_ATTACK_MSG", BTSPD_ATTACK_MSG_TYPE);
+    if (victim.activeConn == true)
+        msg->setAttackType(ADDR_FOUND_ACTIVE_CONN);
+    else
+        msg->setAttackType(ADDR_FOUND_PASSIVE_CONN);
 
-    wrapper->setByteLength(1);
+    msg->setVictim(victim.sNodeName.c_str());
+//    GenericAppMsg* wrapper = new GenericAppMsg(msg->getName(), TCP_I_DATA);
+//    wrapper->encapsulate(msg);
+//
+//    wrapper->setByteLength(1);
 
-    socket.send(wrapper);
+
+    socket.send(msg);
 }
 
 
@@ -286,7 +294,7 @@ void BTThreatHandler::socketFailure(int, void*, int)
 
 
 
-void BTThreatHandler::newAddrFound(const std::string & _sIP, const std::string & _sPort)
+void BTThreatHandler::newAddrFound(const std::string & _sNodeName, const std::string & _sIP, const std::string & _sPort, bool isActiveConn)
 {
     BT_LOG_INFO(btLogSinker,"BTThreatHandler::newAddrFound","["<<getParentModule()->getFullName()<<"]  New address found ["<<
             _sIP<<":"<<_sPort<< "]");
@@ -294,7 +302,12 @@ void BTThreatHandler::newAddrFound(const std::string & _sIP, const std::string &
     //we act on new addresses only if we are malicious
     if(b_Malicious)
     {
-        q_LearnedAddrses.push(_sIP);
+        Victim victim;
+        victim.address = _sIP;
+        victim.sNodeName = _sNodeName;
+        victim.activeConn = isActiveConn;
+
+        q_LearnedNodes.push(victim);
 
         scheduleNextAttackAt(simTime());
     }

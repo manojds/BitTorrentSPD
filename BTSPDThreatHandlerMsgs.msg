@@ -19,3 +19,21 @@ message BTSPD_NewAddrFound
     string port;
 }
 
+// announce event types
+enum ATTACK_TYPE
+{
+    ADDR_FOUND_ACTIVE_CONN = 1; // address found using active conn
+    ADDR_FOUND_PASSIVE_CONN = 2; // address found using passive conn
+}
+
+packet BTSPDAttackMessage
+{
+    @omitGetVerb(true);
+    string attacker;
+    string victim;
+    
+    unsigned int attackType @enum(ATTACK_TYPE);
+    
+}
+    
+

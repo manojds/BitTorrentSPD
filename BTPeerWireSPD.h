@@ -43,7 +43,7 @@ protected:
     virtual void connectionLostFromPeer(PEER peer);
     virtual void checkRcvdConnIsViable(const PEER & peer);
 
-    virtual void notifyNewAddrToThreatHndlr(const PEER & peer);
+    virtual void notifyNewAddrToThreatHndlr(const PEER & peer, bool isActiveConn);
 
     virtual void handleNodeCreationEvent();
     virtual void notifyNewConnToConnMapper(const PEER & peer, bool isActive);
