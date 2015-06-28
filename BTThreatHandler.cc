@@ -281,7 +281,7 @@ void BTThreatHandler::sendAttackMsg(const Victim & victim)
     wrapper->setByteLength(1);
 
 
-    socket.send(msg);
+    socket.send(wrapper);
 }
 
 
