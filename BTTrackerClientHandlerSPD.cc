@@ -346,7 +346,8 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         for ( ; (int)added_peers.size() < iMaxRelayPeersCount  ; )
 
         {
-            int iRndPeer = getHostModule()->getNextIndexOfRelayPeerToFill();
+            //int iRndPeer = getHostModule()->getNextIndexOfRelayPeerToFill();
+            int iRndPeer = intrand(relayPeers.size());
 
             if(added_peers.find(iRndPeer) != added_peers.end())
             {
@@ -377,16 +378,15 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
                 if(!bPresent)
                 {
                     added_peers.insert(iRndPeer);
-                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
-                            "fillPeersInResponse - added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
-                            <<"index ["<<iRndPeer<<"]");
+//                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
+//                            "fillPeersInResponse - added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
+//                            <<"index ["<<iRndPeer<<"]");
                 }
                 else
                 {
-                    added_peers.insert(iRndPeer);
-                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
-                            "fillPeersInResponse - not added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
-                            <<"index ["<<iRndPeer<<"]");
+//                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
+//                            "fillPeersInResponse - not added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
+//                            <<"index ["<<iRndPeer<<"]");
                 }
             }
         }
@@ -636,6 +636,9 @@ void BTTrackerClientHandlerSPD::fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int
     {
         // get the peer from the pool
         tpeer = (BTTrackerStructBase*)peerPool[*it];
+
+        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersinToMsg",
+                "fillPeersinToMsg - adding peer "<< tpeer->peerId()<<"]");
 
 
         // copy some fields/values
