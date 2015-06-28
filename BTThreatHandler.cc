@@ -274,6 +274,7 @@ void BTThreatHandler::sendAttackMsg(const Victim & victim)
         msg->setAttackType(ADDR_FOUND_PASSIVE_CONN);
 
     msg->setVictim(victim.sNodeName.c_str());
+    msg->setAttacker(getParentModule()->getFullName());
 
     GenericAppMsg* wrapper = new GenericAppMsg(msg->getName(), TCP_I_DATA);
     wrapper->encapsulate(msg);

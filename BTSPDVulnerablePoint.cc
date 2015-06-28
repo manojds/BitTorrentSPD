@@ -95,17 +95,18 @@ bool BTSPDVulnerablePoint::exploit(BTSPDAttackMessage* msg)
 
     if (p_ThreatHndlr->activateAdversary())
     {
-        //error checking
-        if (strcmp(msg->victim(), getParentModule()->getFullName()) != 0 )
-        {
-            throw cRuntimeError("Attack message received which is not intended for me. "
-                    "My Name [%s], Attacker [%s] Intended Victim [%s]", getParentModule()->getFullName(),
-                    msg->attacker(), msg->victim());
-        }
+//        //error checking
+//        if (strcmp(msg->victim(), getParentModule()->getFullName()) != 0 )
+//        {
+//            throw cRuntimeError("Attack message received which is not intended for me. "
+//                    "My Name [%s], Attacker [%s] Intended Victim [%s]", getParentModule()->getFullName(),
+//                    msg->attacker(), msg->victim());
+//        }
 
         bRet = true;
         BT_LOG_INFO (btLogSinker,"BTSPDVulnerablePoint::exploit","["<<getParentModule()->getFullName()<<
-                "] ******* I have been exploited. Attacker ["<<msg->attacker()<<"] attack Type ["<<msg->attackType()<<"]");
+                "] ******* I have been exploited. Attacker ["<<msg->attacker()<<"] attack Type ["<<msg->attackType()
+                <<"] intended victim ["<<msg->victim()<<"]");
     }
 
     return bRet;
