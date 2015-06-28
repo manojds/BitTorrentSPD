@@ -46,7 +46,23 @@ void BTSPDSecurityStatistics::initialize()
 {
     b_PrintStatsToFile = par("printStatsToFile");
     if (b_PrintStatsToFile)
+    {
         s_StatFileName = par("statFileName").stdstringValue();
+
+        time_t timer;
+        time(&timer);
+
+        char pFullFileName[256];
+
+#ifndef WINNT
+    snprintf(pFullFileName, 256,"%s_%ld.txt", s_StatFileName.c_str(), (long)timer;
+#else
+    _snprintf(pFullFileName, 256,"%s_%ld.txt", s_StatFileName.c_str(), (long)timer);
+#endif /* WINNT */
+
+    s_StatFileName = pFullFileName;
+
+    }
 
     i_StatPrintInterval = par("statPrintInterval");
 
