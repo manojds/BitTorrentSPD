@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sys/timeb.h>
 
 #include "BTSPDSecurityStatistics.h"
 #include "BTSPDCommonMsgTypes.h"

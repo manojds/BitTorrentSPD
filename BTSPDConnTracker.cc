@@ -19,6 +19,7 @@
 #include <string.h>
 #include <sstream>
 #include <fstream>
+#include <sys/timeb.h>
 #include "../BitTorrent/BTLogImpl.h"
 
 Define_Module(BTSPDConnTracker);
