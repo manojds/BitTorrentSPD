@@ -54,10 +54,17 @@ void BTSPDSecurityStatistics::initialize()
 
         char pFullFileName[256];
 
+        struct timeb tbNow;
+        char szNow[128];
+
+        ftime(&tbNow);
+        strftime(szNow, sizeof (szNow), "%m%d_%H%M%S", localtime(&tbNow.time));
+
+
 #ifndef WINNT
-    snprintf(pFullFileName, 256,"%s_%ld.txt", s_StatFileName.c_str(), (long)timer);
+    snprintf(pFullFileName, 256,"%s_%s.txt", s_StatFileName.c_str(), szNow);
 #else
-    _snprintf(pFullFileName, 256,"%s_%ld.txt", s_StatFileName.c_str(), (long)timer);
+    _snprintf(pFullFileName, 256,"%s_%s.txt", s_StatFileName.c_str(), szNow);
 #endif /* WINNT */
 
     s_StatFileName = pFullFileName;

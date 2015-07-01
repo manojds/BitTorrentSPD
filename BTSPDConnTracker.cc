@@ -80,8 +80,25 @@ void BTSPDConnTracker::constructTerminalNameMapping()
 
 void BTSPDConnTracker::finish()
 {
-    if (b_enableConnMapDumping)
-        dumpConnMapToFile(map_AllConnections, s_FileName+"_Last_All.txt");
+    time_t timer;
+    time(&timer);
+
+    char pFullFileName[256];
+
+    struct timeb tbNow;
+    char szNow[128];
+
+    ftime(&tbNow);
+    strftime(szNow, sizeof (szNow), "%m%d_%H%M%S", localtime(&tbNow.time));
+
+
+#ifndef WINNT
+snprintf(pFullFileName, 256,"%s_%s.txt", s_FileName.c_str(), szNow);
+#else
+_snprintf(pFullFileName, 256,"%s_%s.txt", s_FileName.c_str(), szNow);
+#endif /* WINNT */
+
+    dumpConnMapToFile(map_AllConnections, pFullFileName);
 }
 
 void BTSPDConnTracker::handleMessage(cMessage *msg)
