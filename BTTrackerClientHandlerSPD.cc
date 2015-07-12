@@ -273,7 +273,7 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
     //if it is relay hash we don't fill peers.
     if(strcmp(amsg->infoHash(), getHostModule()->relayInfoHash().c_str()) == 0)
     {
-        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers"
+        BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers"
                 " for relay hash announce. Client details [address="<< getSocket()->getRemoteAddress()
                 << ", port=" << getSocket()->getRemotePort() << "]");
         return;
@@ -489,7 +489,7 @@ void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcnt
 
         }
     }
-    BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::determinePeerMix",
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::determinePeerMix",
             "Relay Peer Percentage ["<<dRelayPeerPcntg<<"] Available True Peer Count ["<<iCurrenTruePeerCountinRes<<
             "], Available Relay Peer Count["<<_iAvailableRelayPeerCount<<"]. In Response True Peer count ["<<_iTruePeerCount
             <<"] Relay Peer Count ["<<_iRelayPeerCount<<"]");
@@ -654,7 +654,7 @@ void BTTrackerClientHandlerSPD::fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int
         // get the peer from the pool
         tpeer = (BTTrackerStructBase*)peerPool[*it];
 
-        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersinToMsg",
+        BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersinToMsg",
                 "fillPeersinToMsg - adding peer "<< tpeer->peerId()<<"]");
 
 
