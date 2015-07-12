@@ -16,7 +16,7 @@
 #ifndef BTPEERWIRESPD_H_
 #define BTPEERWIRESPD_H_
 #include "../BitTorrent/BTPeerWireBase.h"
-#include "Common.h"
+#include "BTSPDCommon.h"
 
 class BTThreatHandler;
 
@@ -40,6 +40,7 @@ protected:
 
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
+    virtual void peerFoundFromTracker(PEER peer);
     virtual void connectionLostFromPeer(PEER peer);
     virtual void checkRcvdConnIsViable(const PEER & peer);
 

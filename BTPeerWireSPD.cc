@@ -244,8 +244,15 @@ void BTPeerWireSPD::checkRcvdConnIsViable(const PEER & peer)
 
 void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
-    notifyNewAddrToThreatHndlr(peer, true);
     notifyNewConnToConnMapper(peer, true);
+}
+
+void BTPeerWireSPD::peerFoundFromTracker(PEER peer)
+{
+   BT_LOG_DETAIL(btLogSinker, "BTPeerWireSPD::peerFoundFromTracker","New Address found from tracker. node ["<<
+           peer.peerId<<"] Address ["<<peer.ipAddress<<"]");
+   notifyNewAddrToThreatHndlr(peer, true);
+
 }
 
 void BTPeerWireSPD::connectionLostFromPeer(PEER peer)
