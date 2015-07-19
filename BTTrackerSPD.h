@@ -16,7 +16,7 @@
 #ifndef BTTRACKERRELAYENABLED_H_
 #define BTTRACKERRELAYENABLED_H_
 #include "../BitTorrent/BTTrackerBase.h"
-#include "Common.h"
+#include "BTSPDCommon.h"
 
 
 class INET_API BTTrackerSPD: public BTTrackerBase {
