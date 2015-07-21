@@ -23,29 +23,35 @@ module BTHostSPD extends BTHost
     parameters:
         string threatHandlerAppType;
         string vulnerbilityAppType;
+        string instrusionDetectionAgentAppType;
         string plaformType;
         @display("bgb=337,472");
-    gates:    
-    
+    gates:
+
     submodules:
         //sub modlue which handles the tracker communication for the relay torrent hash
         threatHandler: <threatHandlerAppType> like TCPApp {
             parameters:
                 @display("p=290,80;i=block/app");
         }
-        
+
         vulnerability: <vulnerbilityAppType> like TCPApp {
             parameters:
                 @display("p=290,140;i=block/app");
-        }        
-        
+        }
+
+        intrutionDetectionAgent: <instrusionDetectionAgentAppType> like TCPApp {
+            parameters:
+                @display("p=290,216;i=block/app");
+        }
+
     connections allowunconnected:
-        peerWire.threatHandlerOut --> {  } --> threatHandler.btorrentIn;
-        
-        threatHandler.tcpOut --> {  } --> tcp.appIn++;
-        threatHandler.tcpIn <-- {  } <-- tcp.appOut++;  
-        
-        vulnerability.tcpOut --> {  } --> tcp.appIn++;
-        vulnerability.tcpIn <-- {  } <-- tcp.appOut++;               
-               
+        peerWire.threatHandlerOut --> threatHandler.btorrentIn;
+
+        threatHandler.tcpOut --> tcp.appIn++;
+        threatHandler.tcpIn <-- tcp.appOut++;
+
+        vulnerability.tcpOut --> tcp.appIn++;
+        vulnerability.tcpIn <-- tcp.appOut++;
+
 }

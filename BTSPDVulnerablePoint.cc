@@ -17,6 +17,7 @@
 #include "../BTLogImpl.h"
 #include "BTSPDCommonMsgTypes.h"
 #include "BTThreatHandler.h"
+#include "BTSPDIntrusionDetectionAgent.h"
 #include "BTSPDSecurityStatisticsMsgs_m.h"
 
 Register_Class(BTSPDVulnerablePClientHndlr);
@@ -33,6 +34,8 @@ void BTSPDVulnerablePoint::initialize()
 {
     TCPSrvHostApp::initialize();
     b_Vulnerable= par("vulnerable");
+    b_DetectAttacks = par("b_DetectAttacks");
+
 
     const char * pModPath=par("securityStatisticsModulePath").stringValue();
 
@@ -77,6 +80,8 @@ bool BTSPDVulnerablePoint::tryToExploit(BTSPDAttackMessage* msg)
     {
         BT_LOG_INFO(btLogSinker, "BTSPDVulnerablePoint::tryToExploit", "[" << getParentModule()->getFullName()
                                     << "] I am not vulnerable, so no problem........");
+
+        attackDetected(msg);
     }
 
     return bRet;
@@ -110,6 +115,14 @@ bool BTSPDVulnerablePoint::exploit(BTSPDAttackMessage* msg)
     }
 
     return bRet;
+}
+
+void BTSPDVulnerablePoint::attackDetected(BTSPDAttackMessage* msg)
+{
+    BTSPDIntrusionDetectionAgent* pAgent =
+            (BTSPDIntrusionDetectionAgent*)(getParentModule()->getSubmodule("intrutionDetectionAgent"));
+
+    pAgent->attackDetected(msg->attacker());
 }
 
 

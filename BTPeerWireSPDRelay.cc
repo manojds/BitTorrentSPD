@@ -8,7 +8,7 @@
 #include "BTPeerWireSPDRelay.h"
 #include "../BitTorrent/BTPeerWireClientHandlerBase.h"
 #include "../BitTorrent/BTLogImpl.h"
-#include "BTStatisticsRelay.h"
+#include "BTStatisticsSPD.h"
 #include "BTHostIntrnlMsgsSPD_m.h"
 
 Define_Module(BTPeerWireSPDRelay);

@@ -14,26 +14,22 @@
 // 
 
 package inet.applications.BitTorrentSPD;
+
 import inet.applications.tcpapp.TCPApp;
-//
-// TODO auto-generated module
-//
-simple BTSPDVulnerablePoint like TCPApp 
+
+simple BTSPDIntrusionDetectionAgent like TCPApp
 {
     parameters:
-        string address; 		// local address - may be symbolic, IPv4 or IPv6
+        
+        volatile string address= default("");				// local address 
 
-        int port;		// listening port
+        volatile int port= default(-1);						//local port        
+
+        volatile string connectAddress= default("not_specified");		// remote address - tracker's address
+
+        volatile int connectPort= default(-1);				// remote port number
         
-        string serverThreadClass;	// class name of "thread" objects to launch on incoming  connections
-        
-        bool vulnerable= default(true);
-        
-        bool detectAttacks =  default(false);
-        
-        string securityStatisticsModulePath;
     gates:
-        input tcpIn;
-        output tcpOut;
-
+        input tcpIn;        
+        output tcpOut;            
 }

@@ -13,27 +13,10 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package inet.applications.BitTorrentSPD;
-import inet.applications.tcpapp.TCPApp;
 //
-// TODO auto-generated module
+// TODO generated message class
 //
-simple BTSPDVulnerablePoint like TCPApp 
-{
-    parameters:
-        string address; 		// local address - may be symbolic, IPv4 or IPv6
+packet BTSPDPeerBlackListReqMsg {
 
-        int port;		// listening port
-        
-        string serverThreadClass;	// class name of "thread" objects to launch on incoming  connections
-        
-        bool vulnerable= default(true);
-        
-        bool detectAttacks =  default(false);
-        
-        string securityStatisticsModulePath;
-    gates:
-        input tcpIn;
-        output tcpOut;
-
+    string attackers[];
 }

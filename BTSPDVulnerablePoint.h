@@ -37,9 +37,12 @@ public:
   protected:
     virtual void initialize();
 
+    virtual void attackDetected(BTSPDAttackMessage* msg);
+
 
 
     bool                b_Vulnerable;
+    bool                b_DetectAttacks;
     cSimpleModule*      p_SecStatistics;
 };
 
