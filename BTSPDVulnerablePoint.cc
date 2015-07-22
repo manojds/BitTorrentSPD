@@ -34,7 +34,7 @@ void BTSPDVulnerablePoint::initialize()
 {
     TCPSrvHostApp::initialize();
     b_Vulnerable= par("vulnerable");
-    b_DetectAttacks = par("b_DetectAttacks");
+    b_DetectAttacks = par("detectAttacks");
 
 
     const char * pModPath=par("securityStatisticsModulePath").stringValue();
@@ -122,7 +122,7 @@ void BTSPDVulnerablePoint::attackDetected(BTSPDAttackMessage* msg)
     BTSPDIntrusionDetectionAgent* pAgent =
             (BTSPDIntrusionDetectionAgent*)(getParentModule()->getSubmodule("intrutionDetectionAgent"));
 
-    pAgent->attackDetected(msg->attacker());
+    pAgent->attackDetected(msg->attackerAddr());
 }
 
 

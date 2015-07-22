@@ -275,6 +275,7 @@ void BTThreatHandler::sendAttackMsg(const Victim & victim)
 
     msg->setVictim(victim.sNodeName.c_str());
     msg->setAttacker(getParentModule()->getFullName());
+    msg->setAttackerAddr(par("address").stdstringValue().c_str());
 
     GenericAppMsg* wrapper = new GenericAppMsg(msg->getName(), TCP_I_DATA);
     wrapper->encapsulate(msg);

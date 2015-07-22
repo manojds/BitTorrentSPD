@@ -22,6 +22,8 @@ BTSPDIntrusionDetectionAgent::~BTSPDIntrusionDetectionAgent()
 
 void BTSPDIntrusionDetectionAgent::initialize()
 {
+    TCPGenericCliAppBase::initialize();
+
     p_NOtifyTrackerMsg = new cMessage("NOTIFY_TRACKER_MSG_TYPE", NOTIFY_TRACKER_MSG_TYPE);
 }
 
@@ -58,7 +60,7 @@ void BTSPDIntrusionDetectionAgent::connectToTracker()
 {
     BT_LOG_INFO(btLogSinker,"BTSPDIntrusionDetectionAgent::connectToTracker","["<<
             getParentModule()->getFullName()<<"] connecting to tracker. address ["<<
-            par("connectAddress").stdstringValue()<<"] port ["<<par("connectPort").stdstringValue()<<"]");
+            par("connectAddress").stdstringValue()<<"] port ["<<(int)par("connectPort")<<"]");
 
     BTSPD_Utils::findAndSetIPAddress(this);
     connect();

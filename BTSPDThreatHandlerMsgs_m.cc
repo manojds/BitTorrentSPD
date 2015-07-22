@@ -301,6 +301,7 @@ BTSPDAttackMessage::BTSPDAttackMessage(const char *name, int kind) : cPacket(nam
 {
     this->attacker_var = 0;
     this->victim_var = 0;
+    this->attackerAddr_var = 0;
     this->attackType_var = 0;
 }
 
@@ -325,6 +326,7 @@ void BTSPDAttackMessage::copy(const BTSPDAttackMessage& other)
 {
     this->attacker_var = other.attacker_var;
     this->victim_var = other.victim_var;
+    this->attackerAddr_var = other.attackerAddr_var;
     this->attackType_var = other.attackType_var;
 }
 
@@ -333,6 +335,7 @@ void BTSPDAttackMessage::parsimPack(cCommBuffer *b)
     cPacket::parsimPack(b);
     doPacking(b,this->attacker_var);
     doPacking(b,this->victim_var);
+    doPacking(b,this->attackerAddr_var);
     doPacking(b,this->attackType_var);
 }
 
@@ -341,6 +344,7 @@ void BTSPDAttackMessage::parsimUnpack(cCommBuffer *b)
     cPacket::parsimUnpack(b);
     doUnpacking(b,this->attacker_var);
     doUnpacking(b,this->victim_var);
+    doUnpacking(b,this->attackerAddr_var);
     doUnpacking(b,this->attackType_var);
 }
 
@@ -362,6 +366,16 @@ const char * BTSPDAttackMessage::victim() const
 void BTSPDAttackMessage::setVictim(const char * victim)
 {
     this->victim_var = victim;
+}
+
+const char * BTSPDAttackMessage::attackerAddr() const
+{
+    return attackerAddr_var.c_str();
+}
+
+void BTSPDAttackMessage::setAttackerAddr(const char * attackerAddr)
+{
+    this->attackerAddr_var = attackerAddr;
 }
 
 unsigned int BTSPDAttackMessage::attackType() const
@@ -422,7 +436,7 @@ const char *BTSPDAttackMessageDescriptor::getProperty(const char *propertyname) 
 int BTSPDAttackMessageDescriptor::getFieldCount(void *object) const
 {
     cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount(object) : 3;
+    return basedesc ? 4+basedesc->getFieldCount(object) : 4;
 }
 
 unsigned int BTSPDAttackMessageDescriptor::getFieldTypeFlags(void *object, int field) const
@@ -437,8 +451,9 @@ unsigned int BTSPDAttackMessageDescriptor::getFieldTypeFlags(void *object, int f
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *BTSPDAttackMessageDescriptor::getFieldName(void *object, int field) const
@@ -452,9 +467,10 @@ const char *BTSPDAttackMessageDescriptor::getFieldName(void *object, int field) 
     static const char *fieldNames[] = {
         "attacker",
         "victim",
+        "attackerAddr",
         "attackType",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldNames[field] : NULL;
 }
 
 int BTSPDAttackMessageDescriptor::findField(void *object, const char *fieldName) const
@@ -463,7 +479,8 @@ int BTSPDAttackMessageDescriptor::findField(void *object, const char *fieldName)
     int base = basedesc ? basedesc->getFieldCount(object) : 0;
     if (fieldName[0]=='a' && strcmp(fieldName, "attacker")==0) return base+0;
     if (fieldName[0]=='v' && strcmp(fieldName, "victim")==0) return base+1;
-    if (fieldName[0]=='a' && strcmp(fieldName, "attackType")==0) return base+2;
+    if (fieldName[0]=='a' && strcmp(fieldName, "attackerAddr")==0) return base+2;
+    if (fieldName[0]=='a' && strcmp(fieldName, "attackType")==0) return base+3;
     return basedesc ? basedesc->findField(object, fieldName) : -1;
 }
 
@@ -478,9 +495,10 @@ const char *BTSPDAttackMessageDescriptor::getFieldTypeString(void *object, int f
     static const char *fieldTypeStrings[] = {
         "string",
         "string",
+        "string",
         "unsigned int",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : NULL;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : NULL;
 }
 
 const char *BTSPDAttackMessageDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
@@ -492,7 +510,7 @@ const char *BTSPDAttackMessageDescriptor::getFieldProperty(void *object, int fie
         field -= basedesc->getFieldCount(object);
     }
     switch (field) {
-        case 2:
+        case 3:
             if (!strcmp(propertyname,"enum")) return "ATTACK_TYPE";
             return NULL;
         default: return NULL;
@@ -525,7 +543,8 @@ std::string BTSPDAttackMessageDescriptor::getFieldAsString(void *object, int fie
     switch (field) {
         case 0: return oppstring2string(pp->attacker());
         case 1: return oppstring2string(pp->victim());
-        case 2: return ulong2string(pp->attackType());
+        case 2: return oppstring2string(pp->attackerAddr());
+        case 3: return ulong2string(pp->attackType());
         default: return "";
     }
 }
@@ -542,7 +561,8 @@ bool BTSPDAttackMessageDescriptor::setFieldAsString(void *object, int field, int
     switch (field) {
         case 0: pp->setAttacker((value)); return true;
         case 1: pp->setVictim((value)); return true;
-        case 2: pp->setAttackType(string2ulong(value)); return true;
+        case 2: pp->setAttackerAddr((value)); return true;
+        case 3: pp->setAttackType(string2ulong(value)); return true;
         default: return false;
     }
 }
@@ -559,8 +579,9 @@ const char *BTSPDAttackMessageDescriptor::getFieldStructName(void *object, int f
         NULL,
         NULL,
         NULL,
+        NULL,
     };
-    return (field>=0 && field<3) ? fieldStructNames[field] : NULL;
+    return (field>=0 && field<4) ? fieldStructNames[field] : NULL;
 }
 
 void *BTSPDAttackMessageDescriptor::getFieldStructPointer(void *object, int field, int i) const

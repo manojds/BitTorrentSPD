@@ -81,6 +81,7 @@ inline void doUnpacking(cCommBuffer *b, BTSPD_NewAddrFound& obj) {obj.parsimUnpa
  *     @omitGetVerb(true);
  *     string attacker;
  *     string victim;
+ *     string attackerAddr;
  *     
  *     unsigned int attackType @enum(ATTACK_TYPE);
  *     
@@ -92,6 +93,7 @@ class BTSPDAttackMessage : public ::cPacket
   protected:
     opp_string attacker_var;
     opp_string victim_var;
+    opp_string attackerAddr_var;
     unsigned int attackType_var;
 
   private:
@@ -115,6 +117,8 @@ class BTSPDAttackMessage : public ::cPacket
     virtual void setAttacker(const char * attacker);
     virtual const char * victim() const;
     virtual void setVictim(const char * victim);
+    virtual const char * attackerAddr() const;
+    virtual void setAttackerAddr(const char * attackerAddr);
     virtual unsigned int attackType() const;
     virtual void setAttackType(unsigned int attackType);
 };

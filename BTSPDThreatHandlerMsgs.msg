@@ -31,6 +31,7 @@ packet BTSPDAttackMessage
     @omitGetVerb(true);
     string attacker;
     string victim;
+    string attackerAddr;
     
     unsigned int attackType @enum(ATTACK_TYPE);
     

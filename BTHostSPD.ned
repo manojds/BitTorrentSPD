@@ -53,5 +53,8 @@ module BTHostSPD extends BTHost
 
         vulnerability.tcpOut --> tcp.appIn++;
         vulnerability.tcpIn <-- tcp.appOut++;
+        
+        intrutionDetectionAgent.tcpOut --> tcp.appIn++;
+        intrutionDetectionAgent.tcpIn <-- tcp.appOut++;        
 
 }
