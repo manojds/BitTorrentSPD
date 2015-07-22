@@ -14,6 +14,7 @@
 // 
 
 #include "BTTrackerSPD.h"
+#include "../BitTorrent/BTLogImpl.h"
 
 Define_Module(BTTrackerSPD);
 
@@ -169,5 +170,6 @@ int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
 
     return iRet;
 }
+
 
 

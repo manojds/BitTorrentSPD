@@ -25,6 +25,8 @@ public:
     BTTrackerSPD* getHostModule();
 
 protected:
+    virtual void dataArrived(cMessage*, bool);
+
     // overrides from BTTrackerClientHandlerBase
     virtual int processAnnounce(BTTrackerMsgAnnounce*);
     virtual void fillPeersInResponse(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse*, bool, bool);    // selects the peers which will included in the response

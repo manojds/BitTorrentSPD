@@ -5,6 +5,7 @@
 #include "BTSPDPeerBlackListReqMsg_m.h"
 #include "../tcpapp/GenericAppMsg_m.h"
 
+
 Define_Module(BTSPDIntrusionDetectionAgent);
 
 
@@ -89,12 +90,7 @@ void BTSPDIntrusionDetectionAgent::sendAttackerInfoToTracker()
         pMsg->setAttackers(i , itr->c_str());
     }
 
-    GenericAppMsg* wrapper = new GenericAppMsg(pMsg->getName(), TCP_I_DATA);
-    wrapper->encapsulate(pMsg);
-
-    wrapper->setByteLength(1);
-
-    socket.send(wrapper);
+    socket.send(pMsg);
 
     close();
 

@@ -17,6 +17,7 @@
 #include "../BitTorrent/BTLogImpl.h"
 #include "BTTrackerMsgSPD_m.h"
 #include "BTTrackerStructBaseSPD.h"
+#include "BTSPDPeerBlackListReqMsg_m.h"
 
 Register_Class(BTTrackerClientHandlerSPD);
 
@@ -680,4 +681,23 @@ BTTrackerStructBase * BTTrackerClientHandlerSPD::createTrackerStructObj(BTTracke
             amsg->peerPort(), string(amsg->key()), simTime(), (amsg->event() == A_COMPLETED) ? true : false);
 
     return pRet;
+}
+
+
+void BTTrackerClientHandlerSPD::dataArrived(cMessage* msg, bool urgent)
+{
+
+    BTSPDPeerBlackListReqMsg* pMsg = dynamic_cast<BTSPDPeerBlackListReqMsg*>(msg);
+
+    if (pMsg != NULL)
+    {
+        BT_LOG_INFO(btLogSinker,"BTTrackerClientHandlerSPD::dataArrived","dataArrived - received BTSPDPeerBlackListReqMsg...");
+
+    }
+    else
+    {
+        BTTrackerClientHandlerBase::dataArrived(msg, urgent );
+
+    }
+
 }

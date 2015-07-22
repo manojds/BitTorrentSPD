@@ -44,6 +44,8 @@ protected:
 
 
 
+
+
     int     i_NextIndexToFill;
     size_t  realyPeersNum_var;    // relay peers counter
     double  relayPeerPropotionInReply_var;
