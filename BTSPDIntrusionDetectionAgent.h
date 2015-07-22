@@ -47,6 +47,7 @@ public:
     virtual void handleTimer(cMessage *msg){};
     virtual void socketEstablished(int, void*);
     virtual void socketFailure(int, void*, int);
+    virtual void socketPeerClosed(int, void*);
     // end of the overridden methods
 
     cMessage*   p_NOtifyTrackerMsg;

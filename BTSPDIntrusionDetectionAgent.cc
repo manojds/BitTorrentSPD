@@ -102,7 +102,7 @@ void BTSPDIntrusionDetectionAgent::sendAttackerInfoToTracker()
 
     close();
 
-    b_ConenctingToTracker = false;
+
 
     set_Attackers.clear();
 
@@ -114,5 +114,13 @@ void BTSPDIntrusionDetectionAgent::socketFailure(int, void*, int)
     BT_LOG_WARN(btLogSinker,"BTSPDIntrusionDetectionAgent::socketFailure","["<<getParentModule()->getFullName()<<"] failed to connect ");
 
     scheduleConnectWithTracker();
+}
+
+
+void BTSPDIntrusionDetectionAgent::socketPeerClosed(int connId, void *yourPtr)
+{
+    TCPGenericCliAppBase::socketPeerClosed(connId, yourPtr);
+
+    b_ConenctingToTracker = false;
 
 }
