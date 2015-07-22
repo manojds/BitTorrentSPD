@@ -11,7 +11,9 @@ Define_Module(BTSPDIntrusionDetectionAgent);
 
 #define NOTIFY_TRACKER_MSG_TYPE     200
 
-BTSPDIntrusionDetectionAgent::BTSPDIntrusionDetectionAgent(): p_NOtifyTrackerMsg(NULL)
+BTSPDIntrusionDetectionAgent::BTSPDIntrusionDetectionAgent():
+        p_NOtifyTrackerMsg(NULL),
+        b_ConenctingToTracker(false)
 {
 
 }
@@ -59,17 +61,23 @@ void BTSPDIntrusionDetectionAgent::scheduleConnectWithTracker()
 
 void BTSPDIntrusionDetectionAgent::connectToTracker()
 {
-    BT_LOG_INFO(btLogSinker,"BTSPDIntrusionDetectionAgent::connectToTracker","["<<
-            getParentModule()->getFullName()<<"] connecting to tracker. address ["<<
-            par("connectAddress").stdstringValue()<<"] port ["<<(int)par("connectPort")<<"]");
+    if (!b_ConenctingToTracker)
+    {
+        b_ConenctingToTracker = true;
 
-    BTSPD_Utils::findAndSetIPAddress(this);
-    connect();
+        BT_LOG_INFO(btLogSinker,"BTSPDIntrusionDetectionAgent::connectToTracker","["<<
+                getParentModule()->getFullName()<<"] connecting to tracker. address ["<<
+                par("connectAddress").stdstringValue()<<"] port ["<<(int)par("connectPort")<<"]");
+
+        BTSPD_Utils::findAndSetIPAddress(this);
+        connect();
+    }
 
 }
 
-void BTSPDIntrusionDetectionAgent::socketEstablished(int, void*)
+void BTSPDIntrusionDetectionAgent::socketEstablished(int connId, void *ptr)
 {
+    TCPGenericCliAppBase::socketEstablished(connId, ptr);
     sendAttackerInfoToTracker();
 }
 
@@ -93,6 +101,8 @@ void BTSPDIntrusionDetectionAgent::sendAttackerInfoToTracker()
     socket.send(pMsg);
 
     close();
+
+    b_ConenctingToTracker = false;
 
     set_Attackers.clear();
 

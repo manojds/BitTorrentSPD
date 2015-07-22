@@ -50,6 +50,7 @@ public:
     // end of the overridden methods
 
     cMessage*   p_NOtifyTrackerMsg;
+    bool        b_ConenctingToTracker;
     set<string> set_Attackers;
 
 
