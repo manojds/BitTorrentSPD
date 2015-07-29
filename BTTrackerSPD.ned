@@ -29,4 +29,5 @@ simple BTTrackerSPD extends BTTrackerBase like TCPApp , UDPApp
         // 0 - normal method, 1- fill only seeders, 2- hide downloders
         int		fillMethod= default (0);
         string 	realyInfoHash;		// the SHA-1 (20 bytes) hash value of realy torrent
+        bool	filterBlackListedPeers = default (false);
 }

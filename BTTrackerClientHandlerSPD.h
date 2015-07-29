@@ -16,33 +16,26 @@
 #ifndef BTTRACKERCLIENTHANDLERRELAYENBLED_H_
 #define BTTRACKERCLIENTHANDLERRELAYENBLED_H_
 #include "BTTrackerSPD.h"
+#include "BTTrackerMsgSPD_m.h"
 
-class INET_API BTTrackerClientHandlerSPD :public BTTrackerClientHandlerBase {
+class BTTrackerClientHandlerSPD : public BTTrackerClientHandlerBase
+{
 public:
     BTTrackerClientHandlerSPD();
     virtual ~BTTrackerClientHandlerSPD();
-
-    BTTrackerSPD* getHostModule();
-
+    BTTrackerSPD *getHostModule();
 protected:
     virtual void dataArrived(cMessage*, bool);
-
-    // overrides from BTTrackerClientHandlerBase
     virtual int processAnnounce(BTTrackerMsgAnnounce*);
-    virtual void fillPeersInResponse(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse*, bool, bool);    // selects the peers which will included in the response
-    // end of overrides from BTTrackerClientHandlerBase
-    virtual void fillWithoutDownloaders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse*, bool, bool);
-    virtual void fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id);
-
-    virtual void determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes,
-            int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount);
-
-    virtual void fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int _iStartIndex,
-            const std::set<int> & added_peers, const cArray & peerPool, bool no_peer_id);
-
+    virtual void fillPeersInResponse(BTTrackerMsgAnnounce *amsg, BTTrackerMsgResponse*, bool, bool);
+    virtual void fillWithoutDownloaders(BTTrackerMsgAnnounce *amsg, BTTrackerMsgResponse*, bool, bool);
+    virtual void fillOnlySeeders(BTTrackerMsgAnnounce *amsg, BTTrackerMsgResponse *rmsg, bool seed, bool no_peer_id);
+    virtual void determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes, int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount);
+    virtual void fillPeersinToMsg(BTTrackerMsgResponse *rmsg, int _iStartIndex, const std::set<int> & added_peers, const cArray & peerPool, bool no_peer_id);
     virtual int processRelayAnnounce(BTTrackerMsgAnnounce*);
-
-    virtual BTTrackerStructBase * createTrackerStructObj(BTTrackerMsgAnnounce* amsg);
+    virtual BTTrackerStructBase *createTrackerStructObj(BTTrackerMsgAnnounce *amsg);
+    virtual void removeBlackListedPeersFromResponse(BTTrackerMsgResponse*);
+    virtual void fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTrackerMsgAnnounceSPD *pSPDMsg, BTTrackerMsgAnnounce *amsg, bool no_peer_id);
 
 
 };

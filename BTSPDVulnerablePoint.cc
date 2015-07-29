@@ -119,10 +119,13 @@ bool BTSPDVulnerablePoint::exploit(BTSPDAttackMessage* msg)
 
 void BTSPDVulnerablePoint::attackDetected(BTSPDAttackMessage* msg)
 {
-    BTSPDIntrusionDetectionAgent* pAgent =
-            (BTSPDIntrusionDetectionAgent*)(getParentModule()->getSubmodule("intrutionDetectionAgent"));
+    if (b_DetectAttacks)
+    {
+        BTSPDIntrusionDetectionAgent* pAgent =
+                (BTSPDIntrusionDetectionAgent*)(getParentModule()->getSubmodule("intrutionDetectionAgent"));
 
-    pAgent->attackDetected(msg->attackerAddr());
+        pAgent->attackDetected(msg->attackerAddr());
+    }
 }
 
 

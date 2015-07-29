@@ -18,8 +18,10 @@ using std::map;
 class BTSPDTrackerBlackList
 {
 public:
-    BTSPDTrackerBlackList(unsigned int _uiBlackListThreshold);
+    BTSPDTrackerBlackList();
     virtual ~BTSPDTrackerBlackList();
+
+    void initialize(unsigned int _uiBlackListThreshold);
 
     void requestToBlackListPeer(const string & _sTarget, const string & _sReqSource);
     bool isPeerBlackListed(const string & _sPeer);

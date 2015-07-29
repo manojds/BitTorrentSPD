@@ -265,70 +265,20 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
     }
 }
 
-/**
- * Fill the response with peers.
- * for true hash
- */
-void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id)
+void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTrackerMsgAnnounceSPD *pSPDMsg, BTTrackerMsgAnnounce *amsg, bool no_peer_id)
 {
-    //if it is relay hash we don't fill peers.
-    if(strcmp(amsg->infoHash(), getHostModule()->relayInfoHash().c_str()) == 0)
-    {
-        BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers"
-                " for relay hash announce. Client details [address="<< getSocket()->getRemoteAddress()
-                << ", port=" << getSocket()->getRemotePort() << "]");
-        return;
-    }
-
-    //This message should be a BTTrackerMsgAnnounceSPD message
-    BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
-    if(pSPDMsg == NULL)
-    {
-        throw cRuntimeError
-            ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
-    }
-
-//    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "Is seed ["<<seed<<"] current true peer count ["<<
-//            getHostModule()->peers().size()<<"] seed count ["<<);
-
-    PEER_FILL_METHOD fillMethod = getHostModule()->getPeerFillMethod();
-    if (fillMethod == FILL_ALL)
-    {
-        // let super class to fill true peers on its will
-        BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
-    }
-    else if (fillMethod == ONLY_SEEDERS)
-    {
-        fillOnlySeeders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
-    }
-    else if(fillMethod == HIDE_DOWNLOADERS)
-    {
-        fillWithoutDownloaders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
-    }
-    else
-    {
-        throw cRuntimeError("Unknown peer fill method [%d] specified for tracker", fillMethod);
-    }
-
     //then we start our work
-
-    cArray& relayPeers=getHostModule()->relayPeers();
-
-    int iAvailableTruePeerCount=rmsg->peersArraySize();
-    int iAvaialbeRelayPeerCount=relayPeers.size();
-
+    cArray & relayPeers = getHostModule()->relayPeers();
+    int iAvailableTruePeerCount = rmsg->peersArraySize();
+    int iAvaialbeRelayPeerCount = relayPeers.size();
     int iMaxTruePeerCount(0);
     int iMaxRelayPeersCount(0);
-
-    determinePeerMix(pSPDMsg->relayPeerRatio(), iAvailableTruePeerCount, iAvaialbeRelayPeerCount , iMaxTruePeerCount, iMaxRelayPeersCount);
-
+    determinePeerMix(pSPDMsg->relayPeerRatio(), iAvailableTruePeerCount, iAvaialbeRelayPeerCount, iMaxTruePeerCount, iMaxRelayPeersCount);
     //if the true peer count needs to be changed
-    if (iAvailableTruePeerCount != iMaxTruePeerCount)
-    {
+    if(iAvailableTruePeerCount != iMaxTruePeerCount){
         //now shrink the Peer array to the required size
         rmsg->setPeersArraySize(iMaxTruePeerCount);
     }
-
     //if there are relay peers to fill
     if(  iMaxRelayPeersCount > 0 )
     {
@@ -410,6 +360,60 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
         }
 
         fillPeersinToMsg(rmsg, iMaxTruePeerCount, added_peers, relayPeers, no_peer_id);
+    }
+}
+
+/**
+ * Fill the response with peers.
+ * for true hash
+ */
+void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, BTTrackerMsgResponse* rmsg, bool seed, bool no_peer_id)
+{
+    //if it is relay hash we don't fill peers.
+    if(strcmp(amsg->infoHash(), getHostModule()->relayInfoHash().c_str()) == 0)
+    {
+        BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "fillPeersInResponse - Avoiding filling peers"
+                " for relay hash announce. Client details [address="<< getSocket()->getRemoteAddress()
+                << ", port=" << getSocket()->getRemotePort() << "]");
+        return;
+    }
+
+    //This message should be a BTTrackerMsgAnnounceSPD message
+    BTTrackerMsgAnnounceSPD* pSPDMsg= dynamic_cast<BTTrackerMsgAnnounceSPD*>(amsg);
+    if(pSPDMsg == NULL)
+    {
+        throw cRuntimeError
+            ("BTTrackerClientHandlerSPD::fillPeersInResponse - received a Message from client which is not a BTTrackerMsgAnnounceSPD message");
+    }
+
+//    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse", "Is seed ["<<seed<<"] current true peer count ["<<
+//            getHostModule()->peers().size()<<"] seed count ["<<);
+
+    PEER_FILL_METHOD fillMethod = getHostModule()->getPeerFillMethod();
+    if (fillMethod == FILL_ALL)
+    {
+        // let super class to fill true peers on its will
+        BTTrackerClientHandlerBase::fillPeersInResponse(amsg, rmsg, seed, no_peer_id);
+    }
+    else if (fillMethod == ONLY_SEEDERS)
+    {
+        fillOnlySeeders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
+    }
+    else if(fillMethod == HIDE_DOWNLOADERS)
+    {
+        fillWithoutDownloaders(amsg, rmsg, pSPDMsg->seeder(), no_peer_id);
+    }
+    else
+    {
+        throw cRuntimeError("Unknown peer fill method [%d] specified for tracker", fillMethod);
+    }
+
+    //then we start our work
+    fillRelayPeers(rmsg, pSPDMsg, amsg, no_peer_id);
+
+    if (getHostModule()->isblackListerPeerFilteringEnabled())
+    {
+        removeBlackListedPeersFromResponse(rmsg);
     }
 }
 
@@ -691,13 +695,61 @@ void BTTrackerClientHandlerSPD::dataArrived(cMessage* msg, bool urgent)
 
     if (pMsg != NULL)
     {
-        BT_LOG_INFO(btLogSinker,"BTTrackerClientHandlerSPD::dataArrived","dataArrived - received BTSPDPeerBlackListReqMsg...");
+        BT_LOG_DEBUG(btLogSinker,"BTTrackerClientHandlerSPD::dataArrived","dataArrived - received BTSPDPeerBlackListReqMsg... attacker array size ["
+                <<pMsg->getAttackersArraySize()<<"]");
 
+        for (unsigned int i = 0 ; i < pMsg->getAttackersArraySize() ; i++)
+        {
+            getHostModule()->blackListClient(pMsg->getAttackers(i) , getSocket()->getRemoteAddress().get4().str());
+        }
     }
     else
     {
         BTTrackerClientHandlerBase::dataArrived(msg, urgent );
 
     }
+}
 
+void BTTrackerClientHandlerSPD::removeBlackListedPeersFromResponse(BTTrackerMsgResponse* _pMsg)
+{
+    BTTrackerMsgResponse oriMsg(*_pMsg);
+
+    std::set<int> peers;
+
+
+    BT_LOG_DEBUG(btLogSinker,"BTTrackerClientHandlerSPD","removeBlackListedPeersFromResponse - response contained  ["
+            <<_pMsg->peersArraySize()<<"] elements before removing black listed peers");
+
+
+    std::set<int>::iterator itr = peers.begin();
+    for ( unsigned int i = 0 ; i < _pMsg->peersArraySize()  ; i++)
+    {
+        string peerIP = _pMsg->peers(i).ipAddress.str();
+        if ( ! getHostModule()->isClientBlackListed(peerIP))
+        {
+            peers.insert(i);
+        }
+        else
+        {
+            BT_LOG_DETAIL(btLogSinker,"BTTrackerClientHandlerSPD","removeBlackListedPeersFromResponse - excluding peer  ["
+                    <<peerIP<<"] since it is black listed");
+        }
+    }
+
+    //now set them to the response
+
+    //first set it to zero, and then to the required sized to make the insertion faster.
+    //if we set to the required size directly implementation tries to copy the existing elements.
+    _pMsg->setPeersArraySize(0);
+    _pMsg->setPeersArraySize(peers.size());
+
+    itr = peers.begin();
+
+    for (unsigned int i = 0 ; itr != peers.end() ; ++itr, ++i)
+    {
+        _pMsg->setPeers(i, oriMsg.peers(*itr));
+    }
+
+    BT_LOG_DEBUG(btLogSinker,"BTTrackerClientHandlerSPD","removeBlackListedPeersFromResponse - after removing black listed peers there are  ["
+            <<_pMsg->peersArraySize()<<"] elements ");
 }

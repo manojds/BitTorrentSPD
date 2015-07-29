@@ -20,7 +20,8 @@ Define_Module(BTTrackerSPD);
 
 BTTrackerSPD::BTTrackerSPD():
         i_NextIndexToFill(0),
-        fillMethod(FILL_ALL)
+        fillMethod(FILL_ALL),
+        b_filterBlackListedPeers(false)
 {
     // TODO Auto-generated constructor stub
 
@@ -38,6 +39,8 @@ void BTTrackerSPD::initialize()
     useRelayPropotioninRequest_var  = par("useRelayPropotioninRequest");
     fillMethod                      = (PEER_FILL_METHOD)(int)par("fillMethod");
     realyIfoHash                    = par("realyInfoHash").stdstringValue ();
+
+    b_filterBlackListedPeers        = par("filterBlackListedPeers");
 
 
     realyPeersNum_var   = 0;
@@ -169,6 +172,25 @@ int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
     }
 
     return iRet;
+}
+
+void BTTrackerSPD::blackListClient(const std::string & _targetIP, const std::string & _sourceIP)
+{
+    if (b_filterBlackListedPeers)
+        blckList.requestToBlackListPeer(_targetIP, _sourceIP);
+}
+
+bool BTTrackerSPD::isClientBlackListed(const std::string & _clientIP)
+{
+    if (b_filterBlackListedPeers)
+        return blckList.isPeerBlackListed(_clientIP);
+    else
+        return false;
+}
+
+bool BTTrackerSPD::isblackListerPeerFilteringEnabled()
+{
+    return b_filterBlackListedPeers;
 }
 
 

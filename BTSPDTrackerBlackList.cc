@@ -8,8 +8,8 @@
 #include "BTSPDTrackerBlackList.h"
 #include "../BitTorrent/BTLogImpl.h"
 
-BTSPDTrackerBlackList::BTSPDTrackerBlackList(unsigned int _uiBlackListThreshold) :
-ui_BlackListThreshold(_uiBlackListThreshold)
+BTSPDTrackerBlackList::BTSPDTrackerBlackList() :
+ui_BlackListThreshold(1)
 {
 
 
@@ -24,6 +24,11 @@ BTSPDTrackerBlackList::~BTSPDTrackerBlackList()
         delete pSet;
     }
     map_BlackListCandidates.clear();
+}
+
+void BTSPDTrackerBlackList::initialize(unsigned int _uiBlackListThreshold)
+{
+    ui_BlackListThreshold = _uiBlackListThreshold;
 }
 
 void BTSPDTrackerBlackList::requestToBlackListPeer(const string & _sTarget, const string & _sReqSource)
@@ -47,6 +52,8 @@ void BTSPDTrackerBlackList::requestToBlackListPeer(const string & _sTarget, cons
     else
     {
         sourceSet = new set<string>();
+
+        itrMap = (map_BlackListCandidates.insert(std::make_pair(_sTarget, sourceSet))).first;
     }
 
     sourceSet->insert(_sReqSource);

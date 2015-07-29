@@ -17,6 +17,7 @@
 #define BTTRACKERRELAYENABLED_H_
 #include "../BitTorrent/BTTrackerBase.h"
 #include "BTSPDCommon.h"
+#include "BTSPDTrackerBlackList.h"
 
 
 class INET_API BTTrackerSPD: public BTTrackerBase {
@@ -37,6 +38,10 @@ public:
     PEER_FILL_METHOD    getPeerFillMethod() const;
     void    cleanRemoveRelayPeer(int);
     int     getNextIndexOfRelayPeerToFill();
+
+    void    blackListClient(const std::string & _targetIP, const std::string & _sourceIP);
+    bool    isClientBlackListed(const std::string & _clientIP);
+    bool    isblackListerPeerFilteringEnabled();
 protected:
     virtual void initialize();
 
@@ -46,13 +51,15 @@ protected:
 
 
 
-    int     i_NextIndexToFill;
-    size_t  realyPeersNum_var;    // relay peers counter
-    double  relayPeerPropotionInReply_var;
-    bool    useRelayPropotioninRequest_var;
-    PEER_FILL_METHOD fillMethod;
-    string  realyIfoHash;
-    cArray  relayPeers_var;   // relay peers container
+    int                 i_NextIndexToFill;
+    size_t              realyPeersNum_var;    // relay peers counter
+    double              relayPeerPropotionInReply_var;
+    bool                useRelayPropotioninRequest_var;
+    PEER_FILL_METHOD    fillMethod;
+    string              realyIfoHash;
+    cArray              relayPeers_var;   // relay peers container
+    BTSPDTrackerBlackList blckList;
+    bool                b_filterBlackListedPeers;
 };
 
 #endif /* BTTRACKERRELAYENABLED_H_ */

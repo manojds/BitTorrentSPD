@@ -93,10 +93,12 @@ void BTSPDIntrusionDetectionAgent::sendAttackerInfoToTracker()
     set<string>::iterator itr = set_Attackers.begin();
     unsigned int i = 0;
 
-    for ( ; itr != set_Attackers.begin(); i++, itr++)
+    for ( ; itr != set_Attackers.end(); i++, itr++)
     {
         pMsg->setAttackers(i , itr->c_str());
     }
+
+    pMsg->setByteLength(set_Attackers.size()*15);
 
     socket.send(pMsg);
 
