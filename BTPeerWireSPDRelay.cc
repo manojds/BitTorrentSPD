@@ -36,10 +36,20 @@ void BTPeerWireSPDRelay::initialize()
     //patch info can be learned from other peers.
     s_PatchInfo="";
     b_PatchInfoAvailable=false;
+
+}
+
+void BTPeerWireSPDRelay::startNodeAt(simtime_t t)
+{
+
+    BTPeerWireSPD::startNodeAt(t);
+
+    Enter_Method_Silent();
+
     evtRelayTrackerComm = new cMessage(toString(INTERNAL_TRACKER_REALY_COM_MSG), INTERNAL_TRACKER_REALY_COM_MSG);
-    //TODO :: uncomment this to enble communication with tracker as relay peer
-    //          after respective modifications done in the tracker.
-    scheduleAt(simTime(), evtRelayTrackerComm);
+    scheduleAt(t, evtRelayTrackerComm);
+
+
 }
 
 void BTPeerWireSPDRelay::handleMessage(cMessage *msg)

@@ -15,9 +15,8 @@
 
 package inet.applications.BitTorrentSPD;
 import inet.applications.tcpapp.TCPApp;
-//
-// TODO auto-generated module
-//
+
+
 simple BTSPDVulnerablePoint like TCPApp 
 {
     parameters:

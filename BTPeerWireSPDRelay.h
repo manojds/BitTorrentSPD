@@ -34,6 +34,8 @@ protected:
     /* Redefined methods from BTPeerWireSPD */
     virtual void initialize();
 
+    virtual void startNodeAt(simtime_t t);
+
     virtual void handleMessage(cMessage *msg);
 
     virtual void handleSelfMessage(cMessage* msg);
