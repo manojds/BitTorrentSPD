@@ -42,8 +42,11 @@ void BTTrackerSPD::initialize()
 
     b_filterBlackListedPeers        = par("filterBlackListedPeers");
 
+    unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
 
     realyPeersNum_var   = 0;
+
+    blckList.initialize(uiBlackListThreshold);
 
     WATCH(relayPeerPropotionInReply_var);
     WATCH(realyPeersNum_var);
