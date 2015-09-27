@@ -35,7 +35,7 @@ void BTStatisticsSPD::initialize()
 {
     BTStatistics::initialize();
 
-    BT_LOG_INFO(btLogSinker, "BTStatisticsSPD::initialize", "Initializing ....");
+    BT_LOG_ESSEN(btLogSinker, "BTStatisticsSPD::initialize", "Initializing ....");
 
 
     dwSuccess_Relay = new  cStdDev("BitTorrent Relay:Download Duration");
@@ -62,8 +62,8 @@ void BTStatisticsSPD::handleMessage(cMessage* msg)
                 dwSuccess_Relay->collect(dwTime);
                 dwSuccess_Relay_vec.record(dwTime);
 
-                BT_LOG_INFO(btLogSinker, "BTStatisticsSPD::handleMessage",
-                        "Download success count is now ["<<dwSuccess_Relay->getCount()<<
+                BT_LOG_ESSEN(btLogSinker, "BTStatisticsSPD::handleMessage",
+                        "Relay Download success count is now ["<<dwSuccess_Relay->getCount()<<
                         "] just completed node ["<<msg->getSenderModule()->getParentModule()->getFullName()<<"] Current average ["
                         <<dwSuccess_Relay->getMean()<<"] just completed value ["<<dwTime <<"]");
             }
@@ -85,9 +85,13 @@ void BTStatisticsSPD::handleMessage(cMessage* msg)
 
 }
 
+
 void BTStatisticsSPD::finish()
 {
-    BT_LOG_INFO(btLogSinker,"BTStatisticsSPD::doFinish","Finishing ...");
+    BT_LOG_ESSEN(btLogSinker,"BTStatisticsSPD::doFinish","Finishing ...");
+
+    BT_LOG_ESSEN(btLogSinker,"BTStatisticsSPD::doFinish","Relay Download duration Mean ["<<dwSuccess_Relay->getMean()<<
+            "] STD Dev["<<dwSuccess_Relay->getStddev()<<"] Count ["<<dwSuccess_Relay->getCount()<<"]");
 
     dwSuccess_Relay->record();
     numBlockFail_Relay->record();

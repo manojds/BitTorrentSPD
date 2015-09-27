@@ -199,7 +199,7 @@ void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
 
 void BTPeerWireSPDRelay::stopParticipationInSwarm()
 {
-    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::stopParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
+    BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::stopParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
             "Stopping participating in swarm");
     disableTrackerComm();
     pauseChokingAlgos();
