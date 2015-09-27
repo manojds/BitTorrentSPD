@@ -45,6 +45,8 @@ public:
 protected:
     virtual void initialize();
 
+    virtual void handleMessage(cMessage*);
+
     void    setRelayInfoHash(const string& infoHash);
 
 

@@ -196,5 +196,29 @@ bool BTTrackerSPD::isblackListerPeerFilteringEnabled()
     return b_filterBlackListedPeers;
 }
 
+void BTTrackerSPD::handleMessage(cMessage* msg)
+{
+    // local handling of the cleanup message
+    if(msg->getKind() == EVT_CLN)
+    {
 
+        // traverse the peers pool and remove the inactive entries
+        for(int i=0; i<relayPeers_var.size(); i++)
+        {
+            // get an entry
+            BTTrackerStructBase* tpeer = (BTTrackerStructBase*)relayPeers_var[i];
+            // the entry is not null and is inactive
+            if(tpeer && (simTime() - tpeer->lastAnnounce() >= (simtime_t)cleanupInterval_var))
+            {
+                BT_LOG_INFO(btLogSinker, "BTTrackerSPD::handleMessage","Removing relay peer due to inactivity");
+                cleanRemovePeer(tpeer);
+                realyPeersNum_var--;
+            }
+
+        }
+
+    }
+
+    BTTrackerBase::handleMessage(msg);
+}
 
