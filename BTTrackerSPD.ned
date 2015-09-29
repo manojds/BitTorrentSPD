@@ -31,4 +31,6 @@ simple BTTrackerSPD extends BTTrackerBase like TCPApp , UDPApp
         string 	realyInfoHash;		// the SHA-1 (20 bytes) hash value of realy torrent
         bool	filterBlackListedPeers = default (false);
         int		blackListThreshold = default (5);
+        
+        bool 	excludeRelaysFromTruePeerList = default(false);
 }

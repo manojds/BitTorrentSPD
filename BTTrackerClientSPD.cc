@@ -93,6 +93,8 @@ BTTrackerMsgAnnounce * BTTrackerClientSPD::createAnnounceMsg()
     pMsg->setPublishInPeerList(b_PublishMeInPeerList);
 	pMsg->setSeeder(b_IsSeeder);
 
+	pMsg->setIsRelay(!b_Downloader);
+
     return pMsg;
 
 }

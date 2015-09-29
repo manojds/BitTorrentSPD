@@ -21,8 +21,9 @@
 
 Register_Class(BTTrackerClientHandlerSPD);
 
-BTTrackerClientHandlerSPD::BTTrackerClientHandlerSPD() {
-    // TODO Auto-generated constructor stub
+BTTrackerClientHandlerSPD::BTTrackerClientHandlerSPD():
+        b_IsClient_A_Relay(false)
+{
 
 }
 
@@ -55,45 +56,60 @@ int BTTrackerClientHandlerSPD::processAnnounce(BTTrackerMsgAnnounce* amsg)
     }
     else
     {
-        //let the super class to handle the normal announce procedure
-        int iRetCode= BTTrackerClientHandlerBase::processAnnounce( amsg);
 
-        //after that mark if this client as seeder if it is a seeder.
+        int iRetCode(A_INVALID_EVENT);
 
-        if(cPeer != -1 && iRetCode < A_INVALID_EVENT)
+        BTTrackerMsgAnnounceSPD* pSPDMsg= check_and_cast<BTTrackerMsgAnnounceSPD*>(amsg);
+
+        //if relay is making announce for true info hash and setting relays in true peer portion of peer list is disabled
+        //do not follow the normal announce. in that case we do not add the peer to peer array
+        if(getHostModule()->isExcludeRelaysInTruePeerList() && pSPDMsg->isRelay())
         {
-            BTTrackerMsgAnnounceSPD* pSPDMsg= check_and_cast<BTTrackerMsgAnnounceSPD*>(amsg);
-
-            //get the corresponding peer
-
-            BTTrackerStructBase* peerTemp=(BTTrackerStructBase*)getHostModule()->peers()[cPeer];
-
-            //when peer announce with the STOP_EVENT peer struct may be removed in process announce and we will get NULL values
-            if( peerTemp != NULL)
-            {
-                BTTrackerStructBaseSPD * peer = check_and_cast<BTTrackerStructBaseSPD *>(peerTemp);
-
-                peer->setPublishInPeerList(pSPDMsg->publishInPeerList());
-
-                //set client is seeder if it is a seeder. but only if it is not set as a seeder already
-                if(pSPDMsg->seeder())
-                {
-                    // update the peer's status and the seeds' count only if it is not marked as a seed already
-                    if(!peer->isSeed())
-                    {
-                        peer->setIsSeed(true);
-                        getHostModule()->setSeeds(getHostModule()->seeds() + 1);
-                        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
-                                "marking a seed. Current Seed Count ["<<getHostModule()->seeds()<<"]");
-                    }
-                }
-            }
-
-
-
+            iRetCode = processAnnounceForTrueHashFromRelay(amsg);
         }
+        else
+        {
+            //let the super class to handle the normal announce procedure
+            iRetCode = BTTrackerClientHandlerBase::processAnnounce( amsg);
+            //after that mark if this client as seeder if it is a seeder.
+
+            if(cPeer != -1 && iRetCode < A_INVALID_EVENT)
+            {
+                updateSPDFieldsinTrackerStruct(pSPDMsg);
+            }
+        }
+
         return iRetCode;
     }
+}
+
+void BTTrackerClientHandlerSPD::updateSPDFieldsinTrackerStruct(BTTrackerMsgAnnounceSPD* pSPDMsg)
+{
+    //get the corresponding peer
+
+    BTTrackerStructBase* peerTemp=(BTTrackerStructBase*)getHostModule()->peers()[cPeer];
+
+    //when peer announce with the STOP_EVENT peer struct may be removed in process announce and we will get NULL values
+    if( peerTemp != NULL)
+    {
+        BTTrackerStructBaseSPD * peer = check_and_cast<BTTrackerStructBaseSPD *>(peerTemp);
+
+        peer->setPublishInPeerList(pSPDMsg->publishInPeerList());
+
+        //set client is seeder if it is a seeder. but only if it is not set as a seeder already
+        if(pSPDMsg->seeder())
+        {
+            // update the peer's status and the seeds' count only if it is not marked as a seed already
+            if(!peer->isSeed())
+            {
+                peer->setIsSeed(true);
+                getHostModule()->setSeeds(getHostModule()->seeds() + 1);
+                BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
+                        "marking a seed. Current Seed Count ["<<getHostModule()->seeds()<<"]");
+            }
+        }
+    }
+
 }
 
 
@@ -752,4 +768,66 @@ void BTTrackerClientHandlerSPD::removeBlackListedPeersFromResponse(BTTrackerMsgR
 
     BT_LOG_DEBUG(btLogSinker,"BTTrackerClientHandlerSPD","removeBlackListedPeersFromResponse - after removing black listed peers there are  ["
             <<_pMsg->peersArraySize()<<"] elements ");
+}
+
+int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgAnnounce* amsg)
+{
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay", "Announce request from relay for true hash. client[address="
+            << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "] with event ["<<amsg->event()<<"] Client ["<<amsg->peerId()<<"]");
+
+
+
+    // sanity checks - failures
+    // invalid info hash
+    if(amsg->infoHash() != getHostModule()->infoHash())
+    {
+        return A_INVALID_IHASH;
+    }
+    // no peer id
+    if(strlen(amsg->peerId()) == 0)
+    {
+        return A_INVALID_PEERID;
+    }
+    // invalid port
+    if(amsg->peerPort() == 0)
+    {
+        return A_INVALID_PORT;
+    }
+
+
+    // differentiate based on the actual message event field
+    switch(amsg->event())
+    {
+        // started event
+        case A_STARTED:
+
+            // valid announce with started event
+            return A_VALID_STARTED;
+            break;
+
+        // completed event
+        case A_COMPLETED:
+
+            // valid announce with completed event
+            return A_VALID_COMPLETED;
+            break;
+
+        // normal announce
+        case A_NORMAL:
+
+            // valid normal announce
+            return A_VALID_NORMAL;
+            break;
+
+        // stopped event
+        case A_STOPPED:
+
+            // valid announce with stopped event
+            return A_VALID_STOPPED;
+            break;
+
+        // invalid message event field
+        default:
+            return A_INVALID_EVENT;
+    }
 }

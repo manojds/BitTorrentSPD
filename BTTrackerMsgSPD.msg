@@ -26,6 +26,8 @@ packet BTTrackerMsgAnnounceSPD extends BTTrackerMsgAnnounce
     double 	relayPeerRatio;
     bool	seeder;	//falg which indicate the client is seeder or not . it is used for hide leacher from others
     				//the EVT_COMP event cannot be used since it is not sent to the tracker if the client is a seeder from the begining.
+    				
+	bool	isRelay = false; //flag which indicate whther relay is making the announce request for true hash
 
 	//flag to indicate whether to pusblish this node by ther tracker in the peerlist
 	bool	publishInPeerList;    				

@@ -42,6 +42,7 @@ public:
     void    blackListClient(const std::string & _targetIP, const std::string & _sourceIP);
     bool    isClientBlackListed(const std::string & _clientIP);
     bool    isblackListerPeerFilteringEnabled();
+    bool    isExcludeRelaysInTruePeerList();
 protected:
     virtual void initialize();
 
@@ -62,6 +63,7 @@ protected:
     cArray              relayPeers_var;   // relay peers container
     BTSPDTrackerBlackList blckList;
     bool                b_filterBlackListedPeers;
+    bool                b_ExcludeRelaysInTruePeerList;
 };
 
 #endif /* BTTRACKERRELAYENABLED_H_ */

@@ -21,7 +21,8 @@ Define_Module(BTTrackerSPD);
 BTTrackerSPD::BTTrackerSPD():
         i_NextIndexToFill(0),
         fillMethod(FILL_ALL),
-        b_filterBlackListedPeers(false)
+        b_filterBlackListedPeers(false),
+        b_ExcludeRelaysInTruePeerList(false)
 {
     // TODO Auto-generated constructor stub
 
@@ -41,6 +42,8 @@ void BTTrackerSPD::initialize()
     realyIfoHash                    = par("realyInfoHash").stdstringValue ();
 
     b_filterBlackListedPeers        = par("filterBlackListedPeers");
+
+    b_ExcludeRelaysInTruePeerList     = par("excludeRelaysFromTruePeerList");
 
     unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
 
@@ -194,6 +197,11 @@ bool BTTrackerSPD::isClientBlackListed(const std::string & _clientIP)
 bool BTTrackerSPD::isblackListerPeerFilteringEnabled()
 {
     return b_filterBlackListedPeers;
+}
+
+bool BTTrackerSPD::isExcludeRelaysInTruePeerList()
+{
+    return b_ExcludeRelaysInTruePeerList;
 }
 
 void BTTrackerSPD::handleMessage(cMessage* msg)
