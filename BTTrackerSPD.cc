@@ -218,8 +218,9 @@ void BTTrackerSPD::handleMessage(cMessage* msg)
             // the entry is not null and is inactive
             if(tpeer && (simTime() - tpeer->lastAnnounce() >= (simtime_t)cleanupInterval_var))
             {
-                BT_LOG_INFO(btLogSinker, "BTTrackerSPD::handleMessage","Removing relay peer due to inactivity");
-                cleanRemovePeer(tpeer);
+                BT_LOG_INFO(btLogSinker, "BTTrackerSPD::handleMessage","Removing relay peer ["<< tpeer->peerId()
+                        <<"] due to inactivity");
+                cleanRemoveRelayPeer(tpeer);
                 realyPeersNum_var--;
             }
 
@@ -229,4 +230,14 @@ void BTTrackerSPD::handleMessage(cMessage* msg)
 
     BTTrackerBase::handleMessage(msg);
 }
+
+/**
+ * Remove a relay peer from the peer set ensuring memory deallocation.
+ */
+void BTTrackerSPD::cleanRemoveRelayPeer(BTTrackerStructBase* peer)
+{
+    cleanRemovePeer(relayPeers().find(peer));
+}
+
+
 

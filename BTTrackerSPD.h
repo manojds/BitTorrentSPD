@@ -50,6 +50,8 @@ protected:
 
     void    setRelayInfoHash(const string& infoHash);
 
+    void cleanRemoveRelayPeer(BTTrackerStructBase* peer);
+
 
 
 
