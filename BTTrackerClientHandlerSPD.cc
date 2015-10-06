@@ -308,9 +308,15 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
 
         //if we don't have that much relay peers make the maximum to the amount we have
         if ( iMaxRelayPeersCount > (int)getHostModule()->realyPeersNum() -1 )
-            iMaxRelayPeersCount = getHostModule()->realyPeersNum() -1;
-        // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
-        // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
+        {
+                iMaxRelayPeersCount = getHostModule()->realyPeersNum() -1;
+            // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
+            // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
+
+            BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
+                                            "reduced  iMaxRelayPeersCount to ["<<iMaxRelayPeersCount<<"] to because only ["<<
+                                            (int)getHostModule()->realyPeersNum()<<"] relay peers available");
+        }
 
         for ( ; (int)added_peers.size() < iMaxRelayPeersCount  ; )
 
@@ -360,7 +366,7 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
 
                     if ( relayPeers.size() - iRelayPeerCountAsTruePeers < iMaxRelayPeersCount)
                     {
-                        BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse","fillPeersInResponse -"
+                        BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                 "reducing iMaxRelayPeersCount from ["<<iMaxRelayPeersCount<<"] to ["<<
                                 relayPeers.size() - iRelayPeerCountAsTruePeers<<"] since not enough relay peers to add");
 
@@ -675,7 +681,7 @@ void BTTrackerClientHandlerSPD::fillPeersinToMsg(BTTrackerMsgResponse* rmsg, int
         // get the peer from the pool
         tpeer = (BTTrackerStructBase*)peerPool[*it];
 
-        BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersinToMsg",
+        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersinToMsg",
                 "fillPeersinToMsg - adding peer "<< tpeer->peerId()<<"]");
 
 
