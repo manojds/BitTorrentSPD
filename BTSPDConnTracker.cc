@@ -102,7 +102,9 @@ snprintf(pFullFileName, 256,"%s_%s.txt", s_FileName.c_str(), szNow);
 _snprintf(pFullFileName, 256,"%s_%s.txt", s_FileName.c_str(), szNow);
 #endif /* WINNT */
 
-    dumpConnMapToFile(map_AllConnections, pFullFileName);
+
+    if (b_enableConnMapDumping)
+        dumpConnMapToFile(map_AllConnections, pFullFileName);
 }
 
 void BTSPDConnTracker::handleMessage(cMessage *msg)
@@ -176,7 +178,7 @@ void BTSPDConnTracker::dumpConnectionsToFile()
         strm<<s_FileName<<"_ActiveConns";
         dumpConnMapToFile(map_CurrentConnections, strm.str()+".txt");
     }
-    else if (b_enableConnMapDumping)
+    if (b_enableConnMapDumping)
     {
         dumpConnMapToFile(map_CurrentConnections, strm.str()+".txt");
         dumpConnMapToFile(map_AllConnections, strm.str()+"_All.txt");
