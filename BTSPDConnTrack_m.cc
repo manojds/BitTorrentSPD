@@ -846,6 +846,522 @@ void *BTSPDConnTrackNodeCreationMsgDescriptor::getFieldStructPointer(void *objec
     }
 }
 
+Register_Class(BTSPDConnTrackReaedyToLeaveMsg);
+
+BTSPDConnTrackReaedyToLeaveMsg::BTSPDConnTrackReaedyToLeaveMsg(const char *name, int kind) : cMessage(name,kind)
+{
+    this->myName_var = 0;
+    this->readyToLeaveTime_var = 0;
+}
+
+BTSPDConnTrackReaedyToLeaveMsg::BTSPDConnTrackReaedyToLeaveMsg(const BTSPDConnTrackReaedyToLeaveMsg& other) : cMessage(other)
+{
+    copy(other);
+}
+
+BTSPDConnTrackReaedyToLeaveMsg::~BTSPDConnTrackReaedyToLeaveMsg()
+{
+}
+
+BTSPDConnTrackReaedyToLeaveMsg& BTSPDConnTrackReaedyToLeaveMsg::operator=(const BTSPDConnTrackReaedyToLeaveMsg& other)
+{
+    if (this==&other) return *this;
+    cMessage::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void BTSPDConnTrackReaedyToLeaveMsg::copy(const BTSPDConnTrackReaedyToLeaveMsg& other)
+{
+    this->myName_var = other.myName_var;
+    this->readyToLeaveTime_var = other.readyToLeaveTime_var;
+}
+
+void BTSPDConnTrackReaedyToLeaveMsg::parsimPack(cCommBuffer *b)
+{
+    cMessage::parsimPack(b);
+    doPacking(b,this->myName_var);
+    doPacking(b,this->readyToLeaveTime_var);
+}
+
+void BTSPDConnTrackReaedyToLeaveMsg::parsimUnpack(cCommBuffer *b)
+{
+    cMessage::parsimUnpack(b);
+    doUnpacking(b,this->myName_var);
+    doUnpacking(b,this->readyToLeaveTime_var);
+}
+
+const char * BTSPDConnTrackReaedyToLeaveMsg::myName() const
+{
+    return myName_var.c_str();
+}
+
+void BTSPDConnTrackReaedyToLeaveMsg::setMyName(const char * myName)
+{
+    this->myName_var = myName;
+}
+
+double BTSPDConnTrackReaedyToLeaveMsg::readyToLeaveTime() const
+{
+    return readyToLeaveTime_var;
+}
+
+void BTSPDConnTrackReaedyToLeaveMsg::setReadyToLeaveTime(double readyToLeaveTime)
+{
+    this->readyToLeaveTime_var = readyToLeaveTime;
+}
+
+class BTSPDConnTrackReaedyToLeaveMsgDescriptor : public cClassDescriptor
+{
+  public:
+    BTSPDConnTrackReaedyToLeaveMsgDescriptor();
+    virtual ~BTSPDConnTrackReaedyToLeaveMsgDescriptor();
+
+    virtual bool doesSupport(cObject *obj) const;
+    virtual const char *getProperty(const char *propertyname) const;
+    virtual int getFieldCount(void *object) const;
+    virtual const char *getFieldName(void *object, int field) const;
+    virtual int findField(void *object, const char *fieldName) const;
+    virtual unsigned int getFieldTypeFlags(void *object, int field) const;
+    virtual const char *getFieldTypeString(void *object, int field) const;
+    virtual const char *getFieldProperty(void *object, int field, const char *propertyname) const;
+    virtual int getArraySize(void *object, int field) const;
+
+    virtual std::string getFieldAsString(void *object, int field, int i) const;
+    virtual bool setFieldAsString(void *object, int field, int i, const char *value) const;
+
+    virtual const char *getFieldStructName(void *object, int field) const;
+    virtual void *getFieldStructPointer(void *object, int field, int i) const;
+};
+
+Register_ClassDescriptor(BTSPDConnTrackReaedyToLeaveMsgDescriptor);
+
+BTSPDConnTrackReaedyToLeaveMsgDescriptor::BTSPDConnTrackReaedyToLeaveMsgDescriptor() : cClassDescriptor("BTSPDConnTrackReaedyToLeaveMsg", "cMessage")
+{
+}
+
+BTSPDConnTrackReaedyToLeaveMsgDescriptor::~BTSPDConnTrackReaedyToLeaveMsgDescriptor()
+{
+}
+
+bool BTSPDConnTrackReaedyToLeaveMsgDescriptor::doesSupport(cObject *obj) const
+{
+    return dynamic_cast<BTSPDConnTrackReaedyToLeaveMsg *>(obj)!=NULL;
+}
+
+const char *BTSPDConnTrackReaedyToLeaveMsgDescriptor::getProperty(const char *propertyname) const
+{
+    if (!strcmp(propertyname,"omitGetVerb")) return "true";
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : NULL;
+}
+
+int BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldCount(void *object) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+}
+
+unsigned int BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldTypeFlags(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeFlags(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+}
+
+const char *BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldNames[] = {
+        "myName",
+        "readyToLeaveTime",
+    };
+    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+}
+
+int BTSPDConnTrackReaedyToLeaveMsgDescriptor::findField(void *object, const char *fieldName) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount(object) : 0;
+    if (fieldName[0]=='m' && strcmp(fieldName, "myName")==0) return base+0;
+    if (fieldName[0]=='r' && strcmp(fieldName, "readyToLeaveTime")==0) return base+1;
+    return basedesc ? basedesc->findField(object, fieldName) : -1;
+}
+
+const char *BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldTypeString(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeString(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldTypeStrings[] = {
+        "string",
+        "double",
+    };
+    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+}
+
+const char *BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldProperty(object, field, propertyname);
+        field -= basedesc->getFieldCount(object);
+    }
+    switch (field) {
+        default: return NULL;
+    }
+}
+
+int BTSPDConnTrackReaedyToLeaveMsgDescriptor::getArraySize(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getArraySize(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackReaedyToLeaveMsg *pp = (BTSPDConnTrackReaedyToLeaveMsg *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+std::string BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldAsString(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldAsString(object,field,i);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackReaedyToLeaveMsg *pp = (BTSPDConnTrackReaedyToLeaveMsg *)object; (void)pp;
+    switch (field) {
+        case 0: return oppstring2string(pp->myName());
+        case 1: return double2string(pp->readyToLeaveTime());
+        default: return "";
+    }
+}
+
+bool BTSPDConnTrackReaedyToLeaveMsgDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->setFieldAsString(object,field,i,value);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackReaedyToLeaveMsg *pp = (BTSPDConnTrackReaedyToLeaveMsg *)object; (void)pp;
+    switch (field) {
+        case 0: pp->setMyName((value)); return true;
+        case 1: pp->setReadyToLeaveTime(string2double(value)); return true;
+        default: return false;
+    }
+}
+
+const char *BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldStructName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldStructNames[] = {
+        NULL,
+        NULL,
+    };
+    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
+}
+
+void *BTSPDConnTrackReaedyToLeaveMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructPointer(object, field, i);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackReaedyToLeaveMsg *pp = (BTSPDConnTrackReaedyToLeaveMsg *)object; (void)pp;
+    switch (field) {
+        default: return NULL;
+    }
+}
+
+Register_Class(BTSPDConnTrackNodeLeaveMsg);
+
+BTSPDConnTrackNodeLeaveMsg::BTSPDConnTrackNodeLeaveMsg(const char *name, int kind) : cMessage(name,kind)
+{
+    this->myName_var = 0;
+    this->leaveTime_var = 0;
+}
+
+BTSPDConnTrackNodeLeaveMsg::BTSPDConnTrackNodeLeaveMsg(const BTSPDConnTrackNodeLeaveMsg& other) : cMessage(other)
+{
+    copy(other);
+}
+
+BTSPDConnTrackNodeLeaveMsg::~BTSPDConnTrackNodeLeaveMsg()
+{
+}
+
+BTSPDConnTrackNodeLeaveMsg& BTSPDConnTrackNodeLeaveMsg::operator=(const BTSPDConnTrackNodeLeaveMsg& other)
+{
+    if (this==&other) return *this;
+    cMessage::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void BTSPDConnTrackNodeLeaveMsg::copy(const BTSPDConnTrackNodeLeaveMsg& other)
+{
+    this->myName_var = other.myName_var;
+    this->leaveTime_var = other.leaveTime_var;
+}
+
+void BTSPDConnTrackNodeLeaveMsg::parsimPack(cCommBuffer *b)
+{
+    cMessage::parsimPack(b);
+    doPacking(b,this->myName_var);
+    doPacking(b,this->leaveTime_var);
+}
+
+void BTSPDConnTrackNodeLeaveMsg::parsimUnpack(cCommBuffer *b)
+{
+    cMessage::parsimUnpack(b);
+    doUnpacking(b,this->myName_var);
+    doUnpacking(b,this->leaveTime_var);
+}
+
+const char * BTSPDConnTrackNodeLeaveMsg::myName() const
+{
+    return myName_var.c_str();
+}
+
+void BTSPDConnTrackNodeLeaveMsg::setMyName(const char * myName)
+{
+    this->myName_var = myName;
+}
+
+double BTSPDConnTrackNodeLeaveMsg::leaveTime() const
+{
+    return leaveTime_var;
+}
+
+void BTSPDConnTrackNodeLeaveMsg::setLeaveTime(double leaveTime)
+{
+    this->leaveTime_var = leaveTime;
+}
+
+class BTSPDConnTrackNodeLeaveMsgDescriptor : public cClassDescriptor
+{
+  public:
+    BTSPDConnTrackNodeLeaveMsgDescriptor();
+    virtual ~BTSPDConnTrackNodeLeaveMsgDescriptor();
+
+    virtual bool doesSupport(cObject *obj) const;
+    virtual const char *getProperty(const char *propertyname) const;
+    virtual int getFieldCount(void *object) const;
+    virtual const char *getFieldName(void *object, int field) const;
+    virtual int findField(void *object, const char *fieldName) const;
+    virtual unsigned int getFieldTypeFlags(void *object, int field) const;
+    virtual const char *getFieldTypeString(void *object, int field) const;
+    virtual const char *getFieldProperty(void *object, int field, const char *propertyname) const;
+    virtual int getArraySize(void *object, int field) const;
+
+    virtual std::string getFieldAsString(void *object, int field, int i) const;
+    virtual bool setFieldAsString(void *object, int field, int i, const char *value) const;
+
+    virtual const char *getFieldStructName(void *object, int field) const;
+    virtual void *getFieldStructPointer(void *object, int field, int i) const;
+};
+
+Register_ClassDescriptor(BTSPDConnTrackNodeLeaveMsgDescriptor);
+
+BTSPDConnTrackNodeLeaveMsgDescriptor::BTSPDConnTrackNodeLeaveMsgDescriptor() : cClassDescriptor("BTSPDConnTrackNodeLeaveMsg", "cMessage")
+{
+}
+
+BTSPDConnTrackNodeLeaveMsgDescriptor::~BTSPDConnTrackNodeLeaveMsgDescriptor()
+{
+}
+
+bool BTSPDConnTrackNodeLeaveMsgDescriptor::doesSupport(cObject *obj) const
+{
+    return dynamic_cast<BTSPDConnTrackNodeLeaveMsg *>(obj)!=NULL;
+}
+
+const char *BTSPDConnTrackNodeLeaveMsgDescriptor::getProperty(const char *propertyname) const
+{
+    if (!strcmp(propertyname,"omitGetVerb")) return "true";
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : NULL;
+}
+
+int BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldCount(void *object) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 2+basedesc->getFieldCount(object) : 2;
+}
+
+unsigned int BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldTypeFlags(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeFlags(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+}
+
+const char *BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldNames[] = {
+        "myName",
+        "leaveTime",
+    };
+    return (field>=0 && field<2) ? fieldNames[field] : NULL;
+}
+
+int BTSPDConnTrackNodeLeaveMsgDescriptor::findField(void *object, const char *fieldName) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount(object) : 0;
+    if (fieldName[0]=='m' && strcmp(fieldName, "myName")==0) return base+0;
+    if (fieldName[0]=='l' && strcmp(fieldName, "leaveTime")==0) return base+1;
+    return basedesc ? basedesc->findField(object, fieldName) : -1;
+}
+
+const char *BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldTypeString(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldTypeString(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldTypeStrings[] = {
+        "string",
+        "double",
+    };
+    return (field>=0 && field<2) ? fieldTypeStrings[field] : NULL;
+}
+
+const char *BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldProperty(void *object, int field, const char *propertyname) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldProperty(object, field, propertyname);
+        field -= basedesc->getFieldCount(object);
+    }
+    switch (field) {
+        default: return NULL;
+    }
+}
+
+int BTSPDConnTrackNodeLeaveMsgDescriptor::getArraySize(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getArraySize(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackNodeLeaveMsg *pp = (BTSPDConnTrackNodeLeaveMsg *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+std::string BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldAsString(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldAsString(object,field,i);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackNodeLeaveMsg *pp = (BTSPDConnTrackNodeLeaveMsg *)object; (void)pp;
+    switch (field) {
+        case 0: return oppstring2string(pp->myName());
+        case 1: return double2string(pp->leaveTime());
+        default: return "";
+    }
+}
+
+bool BTSPDConnTrackNodeLeaveMsgDescriptor::setFieldAsString(void *object, int field, int i, const char *value) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->setFieldAsString(object,field,i,value);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackNodeLeaveMsg *pp = (BTSPDConnTrackNodeLeaveMsg *)object; (void)pp;
+    switch (field) {
+        case 0: pp->setMyName((value)); return true;
+        case 1: pp->setLeaveTime(string2double(value)); return true;
+        default: return false;
+    }
+}
+
+const char *BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldStructName(void *object, int field) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructName(object, field);
+        field -= basedesc->getFieldCount(object);
+    }
+    static const char *fieldStructNames[] = {
+        NULL,
+        NULL,
+    };
+    return (field>=0 && field<2) ? fieldStructNames[field] : NULL;
+}
+
+void *BTSPDConnTrackNodeLeaveMsgDescriptor::getFieldStructPointer(void *object, int field, int i) const
+{
+    cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount(object))
+            return basedesc->getFieldStructPointer(object, field, i);
+        field -= basedesc->getFieldCount(object);
+    }
+    BTSPDConnTrackNodeLeaveMsg *pp = (BTSPDConnTrackNodeLeaveMsg *)object; (void)pp;
+    switch (field) {
+        default: return NULL;
+    }
+}
+
 Register_Class(BTSPDConnTrackDwlCompeteMsg);
 
 BTSPDConnTrackDwlCompeteMsg::BTSPDConnTrackDwlCompeteMsg(const char *name, int kind) : cMessage(name,kind)

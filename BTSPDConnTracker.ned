@@ -19,7 +19,8 @@ simple BTSPDConnTracker
 {
     parameters:
         string 	OutPutFile;   
-        bool 	enableConnMapDumping = default(false);	
+        bool 	enableConnMapDumping = default(false);
+        bool 	printActiveConn = default(false);		
         int		dumpingInterval = default(1000);  
         int		terminalTypeCount= default(0);
         string 	overlayTerminal0;

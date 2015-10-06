@@ -29,6 +29,8 @@ Define_Module(BTSPDConnTracker);
 using namespace std;
 
 BTSPDConnTracker::BTSPDConnTracker():
+        b_enableConnMapDumping(false),
+        b_PrintActiveConn(false),
         i_LastConnDumpFileIndex(0),
         evt_DumpToFile(NULL)
 {
@@ -49,11 +51,12 @@ void BTSPDConnTracker::initialize()
     s_FileName = par("OutPutFile").stringValue();
 
     b_enableConnMapDumping = par("enableConnMapDumping");
+    b_PrintActiveConn = par("printActiveConn");
 
 
     constructTerminalNameMapping();
 
-    if(b_enableConnMapDumping)
+    if(b_enableConnMapDumping || b_PrintActiveConn)
     {
         evt_DumpToFile = new cMessage("WRITE_CONN_MAP_TO_FILE_MSG_TYPE", WRITE_CONN_MAP_TO_FILE_MSG_TYPE);
         scheduleAt(simTime()+i_DumpingInterval, evt_DumpToFile);
@@ -126,6 +129,15 @@ void BTSPDConnTracker::handleMessage(cMessage *msg)
         {
             handleDwlCompleteMsg(msg);
         }
+        else if (msg->getKind() ==  BTSPD_CONN_TRACK_READY_TO_LEAVE_MSG_TYPE)
+        {
+            handleNodeReadyToLeaveMsg(msg);
+        }
+        else if (msg->getKind() == BTSPD_CONN_TRACK_NODE_LEAVE_MSG_TYPE)
+        {
+            handleNodeLeaveMsg(msg);
+        }
+
         else
         {
             throw cRuntimeError("BTSPDConnTrackerFunc::handleMessage - Unknown Message received. kind [%d] name [%s]",
@@ -158,8 +170,17 @@ void BTSPDConnTracker::dumpConnectionsToFile()
     stringstream strm;
     strm<<s_FileName<<"_"<<i_LastConnDumpFileIndex;
 
-    dumpConnMapToFile(map_CurrentConnections, strm.str()+".txt");
-    dumpConnMapToFile(map_AllConnections, strm.str()+"_All.txt");
+    if(b_PrintActiveConn)
+    {
+        stringstream strm;
+        strm<<s_FileName<<"_ActiveConns";
+        dumpConnMapToFile(map_CurrentConnections, strm.str()+".txt");
+    }
+    else if (b_enableConnMapDumping)
+    {
+        dumpConnMapToFile(map_CurrentConnections, strm.str()+".txt");
+        dumpConnMapToFile(map_AllConnections, strm.str()+"_All.txt");
+    }
 }
 
 void BTSPDConnTracker::handleNewNodeCreationMsg(cMessage* _pMsg)
@@ -173,6 +194,35 @@ void BTSPDConnTracker::handleNewNodeCreationMsg(cMessage* _pMsg)
     stringstream strm;
     strm<<"z1 NodeCreationTime["<<pMsg->creationTime()<<"]";
     setConns.insert(strm.str());
+}
+
+void BTSPDConnTracker::handleNodeLeaveMsg(cMessage* _pMsg)
+{
+    BTSPDConnTrackNodeLeaveMsg* pMsg =
+            check_and_cast<BTSPDConnTrackNodeLeaveMsg*>(_pMsg);
+
+
+    std::set<std::string> & setConns = map_AllConnections[pMsg->myName()];
+    stringstream strm;
+    strm<<"z3 NodeLeaveTime["<<pMsg->leaveTime()<<"]";
+    setConns.insert(strm.str());
+
+    map_CurrentConnections.erase(pMsg->myName());
+}
+
+void BTSPDConnTracker::handleNodeReadyToLeaveMsg(cMessage* _pMsg)
+{
+    BTSPDConnTrackReaedyToLeaveMsg* pMsg =
+            check_and_cast<BTSPDConnTrackReaedyToLeaveMsg*>(_pMsg);
+
+    stringstream strm;
+    strm<<"z2 ReadyToLeaveTime["<<pMsg->readyToLeaveTime()<<"]";
+
+    std::set<std::string> & setAllConns = map_AllConnections[pMsg->myName()];
+    setAllConns.insert(strm.str());
+
+    std::set<std::string> & setCurrConns = map_CurrentConnections[pMsg->myName()];
+    setCurrConns.insert(strm.str());
 }
 
 void BTSPDConnTracker::handleNewConnectionMsg(cMessage* _pMsg)
@@ -205,7 +255,7 @@ void BTSPDConnTracker::handleDwlCompleteMsg(cMessage* _pMsg)
 
     std::set<std::string> & setConns = map_AllConnections[pMsg->myName()];
     stringstream strm;
-    strm<<"z2 DownloadCompletionTime["<<pMsg->completionTime()<<"], "<<
+    strm<<"z4 DownloadCompletionTime["<<pMsg->completionTime()<<"], "<<
             "DownloaDuration["<<pMsg->duration()<<"]";
     setConns.insert(strm.str());
     //also insert in to the current conn map such that  download completion is visible on current conn file

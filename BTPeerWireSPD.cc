@@ -444,5 +444,37 @@ void BTPeerWireSPD::disconnectBadConnections()
     }
 }
 
+void BTPeerWireSPD::onLeavingSwarm()
+{
+    if ( b_enableConnMapDumping)
+    {
+        //BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()<<"] sending Connection map update...");
+
+        BTSPDConnTrackNodeLeaveMsg* nodeLeaveMsg =
+                new BTSPDConnTrackNodeLeaveMsg("BTSPD_CONN_TRACK_NODE_LEAVE_MSG_TYPE",
+                        BTSPD_CONN_TRACK_NEWCONN_MSG_TYPE);
+
+        nodeLeaveMsg->setMyName(this->getParentModule()->getFullName());
+        nodeLeaveMsg->setLeaveTime(simTime().dbl());
+        sendDirect(nodeLeaveMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
+void BTPeerWireSPD::onReadyToLeaveSwarm()
+{
+    if ( b_enableConnMapDumping)
+    {
+        //BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::notifyNewConnToConnMapper","["<<this->getParentModule()->getFullName()<<"] sending Connection map update...");
+
+        BTSPDConnTrackReaedyToLeaveMsg* nodeLeaveMsg =
+                new BTSPDConnTrackReaedyToLeaveMsg("BTSPD_CONN_TRACK_READY_TO_LEAVE_MSG_TYPE",
+                        BTSPD_CONN_TRACK_READY_TO_LEAVE_MSG_TYPE);
+
+        nodeLeaveMsg->setMyName(this->getParentModule()->getFullName());
+        nodeLeaveMsg->setReadyToLeaveTime(simTime().dbl());
+        sendDirect(nodeLeaveMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
+    }
+}
+
 
 

@@ -61,6 +61,9 @@ protected:
     virtual void checkConnections();
     virtual void disconnectBadConnections();
 
+    virtual void onLeavingSwarm();
+    virtual void onReadyToLeaveSwarm();
+
 
 
 

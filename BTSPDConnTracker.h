@@ -40,6 +40,8 @@ public:
 
     virtual void dumpConnectionsToFile();
     virtual void handleNewNodeCreationMsg(cMessage* _pMsg);
+    virtual void handleNodeReadyToLeaveMsg(cMessage* _pMsg);
+    virtual void handleNodeLeaveMsg(cMessage* _pMsg);
     virtual void handleNewConnectionMsg(cMessage* _pMsg);
     virtual void handleConnectionLostMsg(cMessage* _pMsg);
     virtual void handleDwlCompleteMsg(cMessage* _pMsg);
@@ -57,14 +59,18 @@ public:
   protected:
 
     bool        b_enableConnMapDumping;
+    bool        b_PrintActiveConn;
     int         i_DumpingInterval;
     int         i_LastConnDumpFileIndex;
     cMessage*   evt_DumpToFile;
 
     std::string s_FileName;
 
+    //this map contains active connections of all nodes
     std::map<std::string, std::set<std::string> > map_CurrentConnections;
+    //this map contains all established connections of all nodes
     std::map<std::string, std::set<std::string> > map_AllConnections;
+    //this map holds node name to IP mapping
     std::map<std::string, std::string>            map_IPtoName;
     std::map<std::string, std::string>            map_TerminalNames;
 

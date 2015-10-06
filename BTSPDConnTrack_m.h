@@ -155,6 +155,92 @@ inline void doUnpacking(cCommBuffer *b, BTSPDConnTrackNodeCreationMsg& obj) {obj
 /**
  * Class generated from <tt>applications/BitTorrentSPD/BTSPDConnTrack.msg</tt> by opp_msgc.
  * <pre>
+ * message BTSPDConnTrackReaedyToLeaveMsg
+ * {
+ *     @omitGetVerb(true);
+ *     string myName;    
+ *     double readyToLeaveTime;
+ * }
+ * </pre>
+ */
+class BTSPDConnTrackReaedyToLeaveMsg : public ::cMessage
+{
+  protected:
+    opp_string myName_var;
+    double readyToLeaveTime_var;
+
+  private:
+    void copy(const BTSPDConnTrackReaedyToLeaveMsg& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const BTSPDConnTrackReaedyToLeaveMsg&);
+
+  public:
+    BTSPDConnTrackReaedyToLeaveMsg(const char *name=NULL, int kind=0);
+    BTSPDConnTrackReaedyToLeaveMsg(const BTSPDConnTrackReaedyToLeaveMsg& other);
+    virtual ~BTSPDConnTrackReaedyToLeaveMsg();
+    BTSPDConnTrackReaedyToLeaveMsg& operator=(const BTSPDConnTrackReaedyToLeaveMsg& other);
+    virtual BTSPDConnTrackReaedyToLeaveMsg *dup() const {return new BTSPDConnTrackReaedyToLeaveMsg(*this);}
+    virtual void parsimPack(cCommBuffer *b);
+    virtual void parsimUnpack(cCommBuffer *b);
+
+    // field getter/setter methods
+    virtual const char * myName() const;
+    virtual void setMyName(const char * myName);
+    virtual double readyToLeaveTime() const;
+    virtual void setReadyToLeaveTime(double readyToLeaveTime);
+};
+
+inline void doPacking(cCommBuffer *b, BTSPDConnTrackReaedyToLeaveMsg& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, BTSPDConnTrackReaedyToLeaveMsg& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>applications/BitTorrentSPD/BTSPDConnTrack.msg</tt> by opp_msgc.
+ * <pre>
+ * message BTSPDConnTrackNodeLeaveMsg
+ * {
+ *     @omitGetVerb(true);
+ *     string myName;    
+ *     double leaveTime;
+ * }
+ * </pre>
+ */
+class BTSPDConnTrackNodeLeaveMsg : public ::cMessage
+{
+  protected:
+    opp_string myName_var;
+    double leaveTime_var;
+
+  private:
+    void copy(const BTSPDConnTrackNodeLeaveMsg& other);
+
+  protected:
+    // protected and unimplemented operator==(), to prevent accidental usage
+    bool operator==(const BTSPDConnTrackNodeLeaveMsg&);
+
+  public:
+    BTSPDConnTrackNodeLeaveMsg(const char *name=NULL, int kind=0);
+    BTSPDConnTrackNodeLeaveMsg(const BTSPDConnTrackNodeLeaveMsg& other);
+    virtual ~BTSPDConnTrackNodeLeaveMsg();
+    BTSPDConnTrackNodeLeaveMsg& operator=(const BTSPDConnTrackNodeLeaveMsg& other);
+    virtual BTSPDConnTrackNodeLeaveMsg *dup() const {return new BTSPDConnTrackNodeLeaveMsg(*this);}
+    virtual void parsimPack(cCommBuffer *b);
+    virtual void parsimUnpack(cCommBuffer *b);
+
+    // field getter/setter methods
+    virtual const char * myName() const;
+    virtual void setMyName(const char * myName);
+    virtual double leaveTime() const;
+    virtual void setLeaveTime(double leaveTime);
+};
+
+inline void doPacking(cCommBuffer *b, BTSPDConnTrackNodeLeaveMsg& obj) {obj.parsimPack(b);}
+inline void doUnpacking(cCommBuffer *b, BTSPDConnTrackNodeLeaveMsg& obj) {obj.parsimUnpack(b);}
+
+/**
+ * Class generated from <tt>applications/BitTorrentSPD/BTSPDConnTrack.msg</tt> by opp_msgc.
+ * <pre>
  * message BTSPDConnTrackDwlCompeteMsg
  * {
  *     @omitGetVerb(true);

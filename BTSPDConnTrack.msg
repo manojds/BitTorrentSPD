@@ -39,6 +39,20 @@ message BTSPDConnTrackNodeCreationMsg
     double creationTime;    
 }
 
+message BTSPDConnTrackReaedyToLeaveMsg
+{
+    @omitGetVerb(true);
+    string myName;    
+    double readyToLeaveTime;
+}
+
+message BTSPDConnTrackNodeLeaveMsg
+{
+    @omitGetVerb(true);
+    string myName;    
+    double leaveTime;
+}
+
 message BTSPDConnTrackDwlCompeteMsg
 {
     @omitGetVerb(true);
