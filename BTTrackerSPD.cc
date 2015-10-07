@@ -22,6 +22,7 @@ BTTrackerSPD::BTTrackerSPD():
         i_NextIndexToFill(0),
         fillMethod(FILL_ALL),
         i_RelaySeedCount(0),
+        i_RelayCompletedCount(0),
         b_filterBlackListedPeers(false),
         b_ExcludeRelaysInTruePeerList(false)
 {
@@ -155,13 +156,7 @@ cArray& BTTrackerSPD::relayPeers()
     return relayPeers_var;
 }
 
-/**
- * Get the relay peers who are participating in the swarm.
- */
-cArray& BTTrackerSPD::relayPeersInSwarm()
-{
-    return relayPeersInSwarm_var;
-}
+
 
 void BTTrackerSPD::cleanRemoveRelayPeer(int index)
 {
@@ -249,25 +244,31 @@ void BTTrackerSPD::cleanRemoveRelayPeer(BTTrackerStructBase* peer)
 }
 
 
-int BTTrackerSPD::containRealyinSwarm(BTTrackerStructBase* obj) const
+bool BTTrackerSPD::containRealyinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const
 {
-    // temp peer
-    BTTrackerStructBase* tpeer;
+    _bIsSeed = false;
+    std::map<std::string, bool>::const_iterator itr = relayPeersInSwarm_var.find(_sPeerID);
 
-    // traverse the peers pool to find obj
-    for(int i=0; i<relayPeersInSwarm_var.size(); i++)
+    if (relayPeersInSwarm_var.end() != itr)
     {
-        // get peer i
-        tpeer = (BTTrackerStructBase*)relayPeersInSwarm_var[i];
-        // user operator ==
-        if(tpeer && obj && (*obj == *tpeer))
-        {
-            return i;
-        }
+        _bIsSeed = itr->second;
+        return true;
     }
+    else
+    {
+        return false;
+    }
+}
 
-    // not found
-    return -1;
+void BTTrackerSPD::addRelayPeerintoSwarm(const std::string & _sPeerID, bool isSeed)
+{
+    relayPeersInSwarm_var[_sPeerID] = isSeed;
+}
+
+void BTTrackerSPD::removeRelayPeerFromSwarm(const std::string & _sPeerID)
+{
+    relayPeersInSwarm_var.erase(_sPeerID);
+
 }
 
 void BTTrackerSPD::setRelaySeeds(int count)
@@ -291,24 +292,19 @@ void BTTrackerSPD::decrementRelaySeedCount()
     i_RelaySeedCount--;
 }
 
-void BTTrackerSPD::cleanAndRemoveRelayPeerInSwarm(int index)
+void BTTrackerSPD::incrementRelayCompletedCount()
 {
-    if (index>=0)
-    {
-        BTTrackerStructBase* peer = (BTTrackerStructBase*)relayPeersInSwarm_var[index];
-        relayPeersInSwarm_var.remove(index);
-        delete peer;
-    }
-    else
-        opp_error("Cannot delete peer entry. Indicated peer not found in the set.");
+    i_RelayCompletedCount++;
 }
+
 
 void BTTrackerSPD::writeStats()
 {
     BTTrackerBase::writeStats();
 
-    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats ******** - Relay peer count in swarm ["<<relayPeersInSwarm().size()<<
-            "] Relay seeder count ["<<i_RelaySeedCount<<"]");
+    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats ******** - Total Relay Count ["<<realyPeersNum()
+            <<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
+            "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"]");
 
 
 

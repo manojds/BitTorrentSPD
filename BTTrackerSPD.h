@@ -18,6 +18,7 @@
 #include "../BitTorrent/BTTrackerBase.h"
 #include "BTSPDCommon.h"
 #include "BTSPDTrackerBlackList.h"
+#include <map>
 
 
 class INET_API BTTrackerSPD: public BTTrackerBase {
@@ -29,7 +30,7 @@ public:
 
     int containsRelay(BTTrackerStructBase* obj) const;
     cArray& relayPeers();
-    cArray& relayPeersInSwarm();
+
     size_t  realyPeersNum() const;
     void    setRealyPeersNum(size_t peersNum);
 
@@ -45,16 +46,17 @@ public:
     bool    isblackListerPeerFilteringEnabled();
     bool    isExcludeRelaysInTruePeerList();
 
-    int     containRealyinSwarm(BTTrackerStructBase* obj) const;
+    bool    containRealyinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const;
+    void    addRelayPeerintoSwarm(const std::string & _sPeerID, bool isSeed);
+    void    removeRelayPeerFromSwarm(const std::string & _sPeerID);
 
     void    setRelaySeeds(int count);
     int     getRelaySeeds();
     void    incrementRelaySeedCount();
     void    decrementRelaySeedCount();
 
+    void    incrementRelayCompletedCount();
 
-
-    void    cleanAndRemoveRelayPeerInSwarm(int index);
 protected:
     virtual void initialize();
 
@@ -79,8 +81,9 @@ protected:
     PEER_FILL_METHOD    fillMethod;
     string              realyIfoHash;
     cArray              relayPeers_var;   // relay peers container
-    cArray              relayPeersInSwarm_var;//container for relay peers who participating in the swarm
+    std::map<std::string, bool>   relayPeersInSwarm_var;//container for relay peers who participating in the swarm
     int                 i_RelaySeedCount;
+    int                 i_RelayCompletedCount;
     BTSPDTrackerBlackList blckList;
     bool                b_filterBlackListedPeers;
     bool                b_ExcludeRelaysInTruePeerList;
