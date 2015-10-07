@@ -29,6 +29,7 @@ public:
 
     int containsRelay(BTTrackerStructBase* obj) const;
     cArray& relayPeers();
+    cArray& relayPeersInSwarm();
     size_t  realyPeersNum() const;
     void    setRealyPeersNum(size_t peersNum);
 
@@ -43,6 +44,17 @@ public:
     bool    isClientBlackListed(const std::string & _clientIP);
     bool    isblackListerPeerFilteringEnabled();
     bool    isExcludeRelaysInTruePeerList();
+
+    int     containRealyinSwarm(BTTrackerStructBase* obj) const;
+
+    void    setRelaySeeds(int count);
+    int     getRelaySeeds();
+    void    incrementRelaySeedCount();
+    void    decrementRelaySeedCount();
+
+
+
+    void    cleanAndRemoveRelayPeerInSwarm(int index);
 protected:
     virtual void initialize();
 
@@ -50,7 +62,11 @@ protected:
 
     void    setRelayInfoHash(const string& infoHash);
 
-    void cleanRemoveRelayPeer(BTTrackerStructBase* peer);
+    void    cleanRemoveRelayPeer(BTTrackerStructBase* peer);
+
+    virtual void writeStats();
+
+
 
 
 
@@ -63,6 +79,8 @@ protected:
     PEER_FILL_METHOD    fillMethod;
     string              realyIfoHash;
     cArray              relayPeers_var;   // relay peers container
+    cArray              relayPeersInSwarm_var;//container for relay peers who participating in the swarm
+    int                 i_RelaySeedCount;
     BTSPDTrackerBlackList blckList;
     bool                b_filterBlackListedPeers;
     bool                b_ExcludeRelaysInTruePeerList;

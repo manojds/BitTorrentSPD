@@ -23,7 +23,7 @@ class BTTrackerClientHandlerSPD : public BTTrackerClientHandlerBase
 public:
     BTTrackerClientHandlerSPD();
     virtual ~BTTrackerClientHandlerSPD();
-    BTTrackerSPD *getHostModule();
+    virtual BTTrackerSPD *getHostModule();
 protected:
     //overrides from BTTrackerClientHandlerBase
     virtual void dataArrived(cMessage*, bool);

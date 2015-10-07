@@ -21,6 +21,7 @@ Define_Module(BTTrackerSPD);
 BTTrackerSPD::BTTrackerSPD():
         i_NextIndexToFill(0),
         fillMethod(FILL_ALL),
+        i_RelaySeedCount(0),
         b_filterBlackListedPeers(false),
         b_ExcludeRelaysInTruePeerList(false)
 {
@@ -154,6 +155,14 @@ cArray& BTTrackerSPD::relayPeers()
     return relayPeers_var;
 }
 
+/**
+ * Get the relay peers who are participating in the swarm.
+ */
+cArray& BTTrackerSPD::relayPeersInSwarm()
+{
+    return relayPeersInSwarm_var;
+}
+
 void BTTrackerSPD::cleanRemoveRelayPeer(int index)
 {
     if (index>=0)
@@ -240,4 +249,67 @@ void BTTrackerSPD::cleanRemoveRelayPeer(BTTrackerStructBase* peer)
 }
 
 
+int BTTrackerSPD::containRealyinSwarm(BTTrackerStructBase* obj) const
+{
+    // temp peer
+    BTTrackerStructBase* tpeer;
 
+    // traverse the peers pool to find obj
+    for(int i=0; i<relayPeersInSwarm_var.size(); i++)
+    {
+        // get peer i
+        tpeer = (BTTrackerStructBase*)relayPeersInSwarm_var[i];
+        // user operator ==
+        if(tpeer && obj && (*obj == *tpeer))
+        {
+            return i;
+        }
+    }
+
+    // not found
+    return -1;
+}
+
+void BTTrackerSPD::setRelaySeeds(int count)
+{
+    i_RelaySeedCount = count;
+
+}
+
+int BTTrackerSPD::getRelaySeeds()
+{
+    return i_RelaySeedCount;
+}
+
+void BTTrackerSPD::incrementRelaySeedCount()
+{
+    i_RelaySeedCount++;
+}
+
+void BTTrackerSPD::decrementRelaySeedCount()
+{
+    i_RelaySeedCount--;
+}
+
+void BTTrackerSPD::cleanAndRemoveRelayPeerInSwarm(int index)
+{
+    if (index>=0)
+    {
+        BTTrackerStructBase* peer = (BTTrackerStructBase*)relayPeersInSwarm_var[index];
+        relayPeersInSwarm_var.remove(index);
+        delete peer;
+    }
+    else
+        opp_error("Cannot delete peer entry. Indicated peer not found in the set.");
+}
+
+void BTTrackerSPD::writeStats()
+{
+    BTTrackerBase::writeStats();
+
+    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats ******** - Relay peer count in swarm ["<<relayPeersInSwarm().size()<<
+            "] Relay seeder count ["<<i_RelaySeedCount<<"]");
+
+
+
+}

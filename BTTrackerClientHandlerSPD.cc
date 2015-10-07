@@ -630,6 +630,11 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
         max_peers = (iSeedCount <= (int)getHostModule()->maxPeersInReply()) ? iSeedCount : getHostModule()->maxPeersInReply();
     }
 
+//    for (int i = 0 ; i < peers.size(); i++)
+//    {
+//        BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHandlerSPD::fillOnlySeeders","peer at index ["<<i<<"] is ["
+//                << ((BTTrackerStructBase*)peers[i])->peerId()<<"]");
+//    }
     // random selection
     while(added_peers.size() < max_peers)
     {
@@ -641,6 +646,7 @@ void BTTrackerClientHandlerSPD::fillOnlySeeders(BTTrackerMsgAnnounce* amsg, BTTr
         {
             continue;
         }
+
         // the random peer is already added, ignore
         if(added_peers.find(rndpeer) != added_peers.end())
         {
@@ -783,6 +789,19 @@ int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgA
 
 
 
+    BTTrackerStructBase* tpeer  = createTrackerStructObj(amsg);
+    //set peer index to minus one, such that it won't effect in filling peers
+    cPeer                   = -1;
+    int iPeerIndex          = getHostModule()->containRealyinSwarm(tpeer);
+
+//    if (cPeer == -1 && amsg->event() != A_STARTED)
+//    {
+//        BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay", "Event ["<< amsg->event()<<
+//                "] received from peer ["<< tpeer->peerId()<< "] without Start event");
+//
+//        throw cRuntimeError("Event [%d] received from peer [%s] without Start event", amsg->event(), tpeer->peerId().c_str());
+//    }
+
     // sanity checks - failures
     // invalid info hash
     if(amsg->infoHash() != getHostModule()->infoHash())
@@ -800,12 +819,33 @@ int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgA
         return A_INVALID_PORT;
     }
 
+    BTTrackerStructBase* peer   = NULL;
 
     // differentiate based on the actual message event field
     switch(amsg->event())
     {
         // started event
         case A_STARTED:
+
+            // insert the peer to the peers pool
+            if(iPeerIndex == -1) // do the magic only if the peer does not exist
+            {
+                iPeerIndex = getHostModule()->relayPeersInSwarm().add(tpeer);
+
+            }
+            else // the peer exists, update its fields
+            {
+                // get the peer
+                peer = (BTTrackerStructBase*)getHostModule()->relayPeersInSwarm()[iPeerIndex];
+                // update
+                peer->setIpAddress(tpeer->ipAddress());
+                peer->setPeerId(tpeer->peerId());
+                peer->setPeerPort(tpeer->peerPort());
+                peer->setKey(tpeer->key());
+                peer->setLastAnnounce(tpeer->lastAnnounce());
+                peer->setIsSeed(tpeer->isSeed());
+                delete tpeer;
+            }
 
             // valid announce with started event
             return A_VALID_STARTED;
@@ -814,6 +854,28 @@ int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgA
         // completed event
         case A_COMPLETED:
 
+            if ( iPeerIndex != -1 )
+            {
+                peer = (BTTrackerStructBase*)getHostModule()->relayPeersInSwarm()[iPeerIndex];
+
+                // update the peer's status and the seeds' count only for the first completed event
+                if(!peer->isSeed())
+                {
+                    peer->setIsSeed(true);
+                    getHostModule()->incrementRelaySeedCount();
+                }
+
+                // update
+                peer->setIpAddress(tpeer->ipAddress());
+                peer->setPeerId(tpeer->peerId());
+                peer->setPeerPort(tpeer->peerPort());
+                peer->setKey(tpeer->key());
+                peer->setLastAnnounce(tpeer->lastAnnounce());
+
+            }
+
+            delete tpeer;
+
             // valid announce with completed event
             return A_VALID_COMPLETED;
             break;
@@ -821,12 +883,46 @@ int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgA
         // normal announce
         case A_NORMAL:
 
+            if(iPeerIndex != -1)
+            {
+                peer = (BTTrackerStructBase*)getHostModule()->relayPeersInSwarm()[iPeerIndex];
+
+                // update
+                peer->setIpAddress(tpeer->ipAddress());
+                peer->setPeerId(tpeer->peerId());
+                peer->setPeerPort(tpeer->peerPort());
+                peer->setKey(tpeer->key());
+                peer->setLastAnnounce(tpeer->lastAnnounce());
+                //removed by Manoj. We don't need this because it is already initialized as not a seed.
+                //removed since this created problems when hiding leachers( sedning only seeders in the reponse)
+                //peer->setIsSeed(false);
+
+            }
+            delete tpeer;
+
             // valid normal announce
             return A_VALID_NORMAL;
             break;
 
         // stopped event
         case A_STOPPED:
+
+            if (iPeerIndex != -1)
+            {
+                // get the peer
+                peer = (BTTrackerStructBase*)getHostModule()->relayPeersInSwarm()[iPeerIndex];
+
+                // remove him and if the peer was a seeder change the seeds count
+                if(peer->isSeed())
+                {
+                    getHostModule()->decrementRelaySeedCount();
+                }
+                //getHostModule()->peers().remove(cPeer);
+                getHostModule()->cleanAndRemoveRelayPeerInSwarm(iPeerIndex);
+
+            }
+            delete tpeer;
+
 
             // valid announce with stopped event
             return A_VALID_STOPPED;
