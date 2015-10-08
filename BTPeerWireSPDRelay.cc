@@ -222,7 +222,7 @@ void BTPeerWireSPDRelay::newConnectionToPeerEstablished(PEER peer, TCPServerThre
     BTPeerWireSPD::newConnectionToPeerEstablished(peer, thread);
 }
 
-void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)
+void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer, bool isActiveConn)
 {
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::connectionLostFromPeer",
             "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection Lost with peer ["<<peer.ipAddress<<"]");
@@ -236,7 +236,7 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer)
         stopParticipationInSwarm();
     }
 
-    BTPeerWireSPD::connectionLostFromPeer(peer);
+    BTPeerWireSPD::connectionLostFromPeer(peer, isActiveConn);
 }
 
 

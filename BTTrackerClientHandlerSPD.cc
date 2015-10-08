@@ -820,6 +820,7 @@ int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgA
             if (!bPeerPresent)
             {
                 getHostModule()->addRelayPeerintoSwarm(amsg->peerId(), false);
+                getHostModule()->incrementRelayStartedCount();
             }
 
             // valid announce with started event

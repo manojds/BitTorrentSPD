@@ -40,6 +40,8 @@ BTPeerWireSPD::BTPeerWireSPD() :
         b_DisconnectBadConnections(false),
         b_DownloadCompleted(false),
         b_DoNotActivelyParticipateOnCompletion(false),
+        i_PassiveConnCount(0),
+        i_MaxPassiveConnCount(0),
         fillMethod(FILL_ALL)
 {
 
@@ -67,6 +69,15 @@ void BTPeerWireSPD::initialize()
     b_DisconnectBadConnections  = par("disconnectBadConnections");
     b_DoNotActivelyParticipateOnCompletion = par("doNotActivelyParticipateOnDownloadCompletion");
     fillMethod                      = (PEER_FILL_METHOD)(int)par("fillMethod");
+
+    double  dMaxPassiveConnFraction = par("maxPassiveConnCountFraction");
+    i_MaxPassiveConnCount        = maxNumConnections() * dMaxPassiveConnFraction;
+    i_PassiveConnCount           = 0;
+
+
+    BT_LOG_DETAIL( btLogSinker,"BTPeerWireSPD::initialize","["<<this->getParentModule()->getFullName()<<
+                        "] Max Passive Connection count ["<<i_MaxPassiveConnCount<<"]");
+
 
     p_NotifyNodeCreation = new cMessage("INTERNAL_NODE_CREATION_MSG_TYPE",
             INTERNAL_NODE_CREATION_MSG_TYPE);
@@ -229,6 +240,8 @@ void BTPeerWireSPD::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadB
 {
     checkRcvdConnIsViable(peer);
 
+    i_PassiveConnCount++;
+
     notifyNewAddrToThreatHndlr(peer, false);
     notifyNewConnToConnMapper(peer, false);
 }
@@ -272,8 +285,13 @@ void BTPeerWireSPD::peerFoundFromTracker(PEER peer)
 
 }
 
-void BTPeerWireSPD::connectionLostFromPeer(PEER peer)
+void BTPeerWireSPD::connectionLostFromPeer(PEER peer, bool isActiveConn)
 {
+    if (!isActiveConn)
+    {
+        --i_PassiveConnCount;
+    }
+
     notifyConnDropToConnMapper(peer);
 }
 
@@ -423,8 +441,27 @@ void BTPeerWireSPD::checkConnections()
 {
     disconnectBadConnections();
 
+    checkActiveConnLimit();
+
     //now let the super class to do its functionality
     BTPeerWireBase::checkConnections();
+}
+
+void BTPeerWireSPD::checkActiveConnLimit()
+{
+    if (i_PassiveConnCount > i_MaxPassiveConnCount )
+    {
+        BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::checkActiveConnLimit","["<<this->getParentModule()->getFullName()<<
+                    "] Stop listening because, Passive Connection count ["<<i_PassiveConnCount<<"] exceeds max ["<<i_MaxPassiveConnCount<<"]");
+        stopListening();
+    }
+
+    if (i_PassiveConnCount < (i_MaxPassiveConnCount - 3) )
+    {
+        BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::checkActiveConnLimit","["<<this->getParentModule()->getFullName()<<
+                    "] Start listening because, Passive Connection count ["<<i_PassiveConnCount<<"] going lower than the limit. max ["<<i_MaxPassiveConnCount<<"]");
+        startListening();
+    }
 }
 
 void BTPeerWireSPD::disconnectBadConnections()
@@ -436,7 +473,6 @@ void BTPeerWireSPD::disconnectBadConnections()
 
     if ((maxNumConnections()-currentNumConnections_var-pendingNumConnections() -1) <= 0)
     {
-
 
         TCPServerThreadBase* thread(NULL);
 

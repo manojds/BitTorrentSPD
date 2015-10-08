@@ -38,6 +38,9 @@ simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
         //parameter which indicates whether not to actively participate and initiate connection 
         //once download is completed.
         bool doNotActivelyParticipateOnDownloadCompletion = default(false);
+        
+        //maximum allowed passive Connection count as a fraction of maximum allowed all connection count
+        double	maxPassiveConnCountFraction = default(0.9);
         // 0 - normal method, 1- fill only seeders, 2- hide downloders
         int		fillMethod= default (0);
 

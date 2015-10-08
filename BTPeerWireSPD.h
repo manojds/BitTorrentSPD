@@ -46,7 +46,7 @@ protected:
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void peerFoundFromTracker(PEER peer);
-    virtual void connectionLostFromPeer(PEER peer);
+    virtual void connectionLostFromPeer(PEER peer, bool isActiveConn);
     virtual void checkRcvdConnIsViable(const PEER & peer);
 
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer, bool isActiveConn);
@@ -64,6 +64,7 @@ protected:
     virtual void disconnectAllActiveConns();
 
     virtual void checkConnections();
+    virtual void checkActiveConnLimit();
     virtual void disconnectBadConnections();
 
     virtual void onLeavingSwarm();
@@ -82,6 +83,8 @@ protected:
     bool                b_DisconnectBadConnections;
     bool                b_DownloadCompleted;
     bool                b_DoNotActivelyParticipateOnCompletion;
+    int                 i_PassiveConnCount;
+    int                 i_MaxPassiveConnCount;
     PEER_FILL_METHOD    fillMethod;
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;

@@ -23,6 +23,7 @@ BTTrackerSPD::BTTrackerSPD():
         fillMethod(FILL_ALL),
         i_RelaySeedCount(0),
         i_RelayCompletedCount(0),
+        i_RelayStartedCount(0),
         b_filterBlackListedPeers(false),
         b_ExcludeRelaysInTruePeerList(false)
 {
@@ -297,13 +298,16 @@ void BTTrackerSPD::incrementRelayCompletedCount()
     i_RelayCompletedCount++;
 }
 
-
+void BTTrackerSPD::incrementRelayStartedCount()
+{
+    i_RelayStartedCount++;
+}
 void BTTrackerSPD::writeStats()
 {
     BTTrackerBase::writeStats();
 
     BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats ******** - Total Relay Count ["<<realyPeersNum()
-            <<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
+            <<"] Relay peer Started Count in Swarm ["<<i_RelayStartedCount<<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
             "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"]");
 
 

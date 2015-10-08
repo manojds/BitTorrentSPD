@@ -56,6 +56,7 @@ public:
     void    decrementRelaySeedCount();
 
     void    incrementRelayCompletedCount();
+    void    incrementRelayStartedCount();
 
 protected:
     virtual void initialize();
@@ -84,6 +85,7 @@ protected:
     std::map<std::string, bool>   relayPeersInSwarm_var;//container for relay peers who participating in the swarm
     int                 i_RelaySeedCount;
     int                 i_RelayCompletedCount;
+    int                 i_RelayStartedCount;
     BTSPDTrackerBlackList blckList;
     bool                b_filterBlackListedPeers;
     bool                b_ExcludeRelaysInTruePeerList;
