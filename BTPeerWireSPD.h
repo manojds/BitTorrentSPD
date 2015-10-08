@@ -36,6 +36,11 @@ protected:
     virtual void handleSelfMessage(cMessage* msg);
     virtual cMessage * createTrackerCommMsg();
 
+
+    //reschedule the tracker communication at the given time.
+    //this function cancel any scheduled tracker communication and reschedule it for the given time
+    virtual void RescheduleTrackerCommAt(simtime_t t);
+
     virtual IPvXAddress getMyIPAddr();
 
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
@@ -72,6 +77,7 @@ protected:
     cSimpleModule*      p_ConnTracker;
     cMessage*           p_NotifyNodeCreation;
     bool                b_enableConnMapDumping;
+    bool                b_PublishTrackerOnCompletion;
     bool                b_PublishMeByTracker;
     bool                b_DisconnectBadConnections;
     bool                b_DownloadCompleted;

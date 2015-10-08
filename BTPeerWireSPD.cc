@@ -35,6 +35,7 @@ BTPeerWireSPD::BTPeerWireSPD() :
         p_ConnTracker(NULL),
         p_NotifyNodeCreation(NULL),
         b_enableConnMapDumping(false),
+        b_PublishTrackerOnCompletion(false),
         b_PublishMeByTracker(true),
         b_DisconnectBadConnections(false),
         b_DownloadCompleted(false),
@@ -61,6 +62,7 @@ void BTPeerWireSPD::initialize()
     s_PatchInfo=s_PlatFormType;
 
     b_enableConnMapDumping      = par("enableConnMapDumping");
+    b_PublishTrackerOnCompletion= par("publishtoTrackerWhenDownloadComplete");
     b_PublishMeByTracker        = par("publishMeByTracker");
     b_DisconnectBadConnections  = par("disconnectBadConnections");
     b_DoNotActivelyParticipateOnCompletion = par("doNotActivelyParticipateOnDownloadCompletion");
@@ -141,6 +143,17 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
 
 }
 
+
+void BTPeerWireSPD::RescheduleTrackerCommAt(simtime_t t)
+{
+    if (evtTrackerComm->isScheduled())
+    {
+        cancelEvent(evtTrackerComm);
+    }
+
+    scheduleTrackerCommAt(t);
+}
+
 void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
 {
     BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed... in ["<<_tDuration<<" sec] ");
@@ -159,6 +172,9 @@ void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
         disconnectAllActiveConns();
 
     notifyDwlCompleteToConnMapper(_tDuration);
+
+    if (b_PublishTrackerOnCompletion)
+        RescheduleTrackerCommAt(simTime());
 
 }
 

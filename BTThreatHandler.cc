@@ -179,7 +179,7 @@ void BTThreatHandler::cleanAdversary()
         sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
     }
 
-    else if (!b_ThreatRemovable)
+    else if (b_Malicious == true && b_ThreatRemovable == false)
     {
         BT_LOG_INFO (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
                 "]  fail to clean the adversary because this threat cannot be cleaned");

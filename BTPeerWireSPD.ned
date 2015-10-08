@@ -26,6 +26,8 @@ simple BTPeerWireSPD extends BTPeerWireBase like TCPApp
 		 
         bool enableConnMapDumping = default(false);	
         
+        bool publishtoTrackerWhenDownloadComplete = default(false);
+        
         //whether this peer information will be published by the tracker in the peer list
         bool publishMeByTracker = default(true);	
         
