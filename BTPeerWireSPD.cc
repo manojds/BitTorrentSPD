@@ -505,7 +505,7 @@ void BTPeerWireSPD::onLeavingSwarm()
 
         BTSPDConnTrackNodeLeaveMsg* nodeLeaveMsg =
                 new BTSPDConnTrackNodeLeaveMsg("BTSPD_CONN_TRACK_NODE_LEAVE_MSG_TYPE",
-                        BTSPD_CONN_TRACK_NEWCONN_MSG_TYPE);
+                        BTSPD_CONN_TRACK_NODE_LEAVE_MSG_TYPE);
 
         nodeLeaveMsg->setMyName(this->getParentModule()->getFullName());
         nodeLeaveMsg->setLeaveTime(simTime().dbl());
