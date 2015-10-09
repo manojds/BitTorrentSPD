@@ -64,7 +64,7 @@ protected:
     virtual void disconnectAllActiveConns();
 
     virtual void checkConnections();
-    virtual void checkActiveConnLimit();
+    virtual void checkPassiveConnLimit();
     virtual void disconnectBadConnections();
 
     virtual void onLeavingSwarm();
@@ -83,6 +83,7 @@ protected:
     bool                b_DisconnectBadConnections;
     bool                b_DownloadCompleted;
     bool                b_DoNotActivelyParticipateOnCompletion;
+    bool                b_PassiveConnectionsBlocked;
     int                 i_PassiveConnCount;
     int                 i_MaxPassiveConnCount;
     PEER_FILL_METHOD    fillMethod;

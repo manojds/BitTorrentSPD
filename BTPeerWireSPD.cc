@@ -40,6 +40,7 @@ BTPeerWireSPD::BTPeerWireSPD() :
         b_DisconnectBadConnections(false),
         b_DownloadCompleted(false),
         b_DoNotActivelyParticipateOnCompletion(false),
+        b_PassiveConnectionsBlocked(false),
         i_PassiveConnCount(0),
         i_MaxPassiveConnCount(0),
         fillMethod(FILL_ALL)
@@ -441,26 +442,37 @@ void BTPeerWireSPD::checkConnections()
 {
     disconnectBadConnections();
 
-    checkActiveConnLimit();
+    checkPassiveConnLimit();
 
     //now let the super class to do its functionality
     BTPeerWireBase::checkConnections();
 }
 
-void BTPeerWireSPD::checkActiveConnLimit()
+void BTPeerWireSPD::checkPassiveConnLimit()
 {
-    if (i_PassiveConnCount > i_MaxPassiveConnCount )
+    //passive connection throtlling is done only if we are still downloading the file.
+    //because seeders donn't need to keep reserve slots for active connection because they already have the file
+    if ( getState() < COMPLETED )
     {
-        BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::checkActiveConnLimit","["<<this->getParentModule()->getFullName()<<
-                    "] Stop listening because, Passive Connection count ["<<i_PassiveConnCount<<"] exceeds max ["<<i_MaxPassiveConnCount<<"]");
-        stopListening();
-    }
+        if ( !b_PassiveConnectionsBlocked  && (i_PassiveConnCount > i_MaxPassiveConnCount ) )
+        {
+            BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::checkPassiveConnLimit","["<<this->getParentModule()->getFullName()<<
+                        "] Stop listening because, Passive Connection count ["<<i_PassiveConnCount<<"] exceeds max ["<<i_MaxPassiveConnCount<<"]");
 
-    if (i_PassiveConnCount < (i_MaxPassiveConnCount - 3) )
-    {
-        BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::checkActiveConnLimit","["<<this->getParentModule()->getFullName()<<
-                    "] Start listening because, Passive Connection count ["<<i_PassiveConnCount<<"] going lower than the limit. max ["<<i_MaxPassiveConnCount<<"]");
-        startListening();
+            b_PassiveConnectionsBlocked = true ;
+
+            stopListening();
+        }
+
+        else if ( b_PassiveConnectionsBlocked && (i_PassiveConnCount < (i_MaxPassiveConnCount - 3) ) )
+        {
+            BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::checkPassiveConnLimit","["<<this->getParentModule()->getFullName()<<
+                        "] Start listening because, Passive Connection count ["<<i_PassiveConnCount<<"] going lower than the limit. max ["<<i_MaxPassiveConnCount<<"]");
+
+            b_PassiveConnectionsBlocked = false ;
+
+            startListening();
+        }
     }
 }
 

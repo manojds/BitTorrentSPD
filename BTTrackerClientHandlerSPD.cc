@@ -116,7 +116,7 @@ void BTTrackerClientHandlerSPD::updateSPDFieldsinTrackerStruct(BTTrackerMsgAnnou
 int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
 {
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::processAnnounce", "Announce request for relay hash from client[address="
-            << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "] with event ["<<amsg->event()<<"]");
+            << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "], name ["<< amsg->peerId()<<"] with event ["<<amsg->event()<<"]");
 
     // temporary peer struct with the announce info
     BTTrackerStructBase* tpeer = NULL;
