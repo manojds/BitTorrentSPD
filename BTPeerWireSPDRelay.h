@@ -66,7 +66,10 @@ private:
     void handleMsgFromRelayTracker(cMessage *msg);
 
 
+    //flag which indicates whether relay peer is currently participating in the swarm
     bool                    b_isParticipatingInSwarm;
+    //flag which indicates at some point relay peer has participated in the swarm
+    bool                    b_ParticipatedInSwarm;
     bool                    b_Downloader;
     bool                    b_PatchInfoAvailable;
 

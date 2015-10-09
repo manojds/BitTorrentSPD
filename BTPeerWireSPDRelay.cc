@@ -15,6 +15,7 @@ Define_Module(BTPeerWireSPDRelay);
 
 BTPeerWireSPDRelay::BTPeerWireSPDRelay():
         b_isParticipatingInSwarm(false),
+        b_ParticipatedInSwarm(false),
         b_Downloader(false),
         b_PatchInfoAvailable(false),
         evtRelayTrackerComm(NULL)
@@ -167,39 +168,17 @@ void BTPeerWireSPDRelay::notifynodeCreationToStatModule()
     p_StatModule->nodeCreated(this->getParentModule()->getFullName(), RELAY_PEER);
 }
 
-void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
-{
-    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
-            "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - New connection arrived from peer ["<<peer.peerId<<"]");
 
-    BTPeerWireSPD::newConnectionFromPeerEstablished(peer, thread);
-
-    std::map<IPvXAddress, PEER>::iterator itr = initiatedPeers.find(peer.ipAddress);
-    if(itr == initiatedPeers.end())
-    {
-        initiatedPeers[peer.ipAddress]=peer;
-    }
-    else
-    {
-        std::stringstream ss;
-        ss<<"["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection came from the same peer  twice. PeerID ["<<
-                peer.peerId<<"] IPaddress ["<<peer.ipAddress<<"]";
-
-        BT_LOG_ERROR( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished", ss.str().c_str());
-
-
-        throw cRuntimeError(ss.str().c_str());
-    }
-}
 
 void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
 {
     if(b_isParticipatingInSwarm == false)
     {
-        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm",
+        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
                 "startActiveParticipationInSwarm - Starting to act as Relay. ");
 
-        b_isParticipatingInSwarm = true;
+        b_isParticipatingInSwarm    = true;
+        b_ParticipatedInSwarm       = true;
 
         startTrackerComm();
 
@@ -230,6 +209,42 @@ void BTPeerWireSPDRelay::stopParticipationInSwarm()
 void BTPeerWireSPDRelay::checkRcvdConnIsViable(const PEER & peer)
 {
     //currently we don't have anything to do here as a relay
+
+}
+
+void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
+{
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
+            "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - New connection arrived from peer ["<<peer.peerId<<"]");
+
+    BTPeerWireSPD::newConnectionFromPeerEstablished(peer, thread);
+
+    std::map<IPvXAddress, PEER>::iterator itr = initiatedPeers.find(peer.ipAddress);
+    if(itr == initiatedPeers.end())
+    {
+        initiatedPeers[peer.ipAddress]=peer;
+    }
+    else
+    {
+        std::stringstream ss;
+        ss<<"["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection came from the same peer  twice. PeerID ["<<
+                peer.peerId<<"] IPaddress ["<<peer.ipAddress<<"]";
+
+        BT_LOG_ERROR( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished", ss.str().c_str());
+
+
+        throw cRuntimeError(ss.str().c_str());
+    }
+
+    //then if we have participated in the swarm previously,
+    //and we have some received connections try to startParticipateIntheSwarm.
+    //if we left the swarm since incoming connections reaches zero, this will trigger re-participate in the swarm.
+    //the if check is necessary to avoid first time particpation, because first time participation triggered
+    //when patch info is received.
+    if (b_ParticipatedInSwarm)
+    {
+        startActiveParticipationInSwarm();
+    }
 
 }
 
