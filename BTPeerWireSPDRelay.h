@@ -53,8 +53,8 @@ protected:
 
     virtual void pauseChokingAlgos();
 
-    virtual void enableTrackerComm();
-    virtual void disableTrackerComm();
+    virtual void startTrackerComm();
+    virtual void stopTrackerComm();
 
     virtual void writeStats();
 
@@ -64,7 +64,7 @@ private:
     void handleMsgFromRelayTracker(cMessage *msg);
 
 
-    bool                    b_TrackerCommIsEnbled;
+    bool                    b_isParticipatingInSwarm;
     bool                    b_Downloader;
     bool                    b_PatchInfoAvailable;
 

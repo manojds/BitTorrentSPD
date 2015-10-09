@@ -14,7 +14,7 @@
 Define_Module(BTPeerWireSPDRelay);
 
 BTPeerWireSPDRelay::BTPeerWireSPDRelay():
-        b_TrackerCommIsEnbled(false),
+        b_isParticipatingInSwarm(false),
         b_Downloader(false),
         b_PatchInfoAvailable(false),
         evtRelayTrackerComm(NULL)
@@ -156,11 +156,10 @@ cMessage * BTPeerWireSPDRelay::createTrackerCommMsg()
 
 void BTPeerWireSPDRelay::scheduleTrackerCommAt(simtime_t t)
 {
-    if(b_TrackerCommIsEnbled)
+    if(b_isParticipatingInSwarm)
     {
         BTPeerWireSPD::scheduleTrackerCommAt(t);
     }
-
 }
 
 void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
@@ -190,20 +189,31 @@ void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerTh
 
 void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
 {
-    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm",
-            "startActiveParticipationInSwarm - Starting to act as Relay. ");
+    if(b_isParticipatingInSwarm == false)
+    {
+        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm",
+                "startActiveParticipationInSwarm - Starting to act as Relay. ");
 
-    enableTrackerComm();
+        b_isParticipatingInSwarm = true;
+
+        startTrackerComm();
+    }
 
 }
 
 void BTPeerWireSPDRelay::stopParticipationInSwarm()
 {
-    BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::stopParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
-            "Stopping participating in swarm");
-    disableTrackerComm();
-    pauseChokingAlgos();
-    closeAllConnections();
+    if(b_isParticipatingInSwarm == true)
+    {
+        BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::stopParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
+                "Stopping participating in swarm");
+
+        b_isParticipatingInSwarm = false;
+
+        stopTrackerComm();
+        pauseChokingAlgos();
+        closeAllConnections();
+    }
 
 }
 
@@ -272,36 +282,25 @@ void BTPeerWireSPDRelay::pauseChokingAlgos()
 
 }
 
-void BTPeerWireSPDRelay::enableTrackerComm()
+void BTPeerWireSPDRelay::startTrackerComm()
 {
-    if(b_TrackerCommIsEnbled == false)
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startTrackerComm","["<<this->getParentModule()->getFullName()<<"]"
+            "Starting Tracker Communication...");
+
+    if(evtTrackerComm->isScheduled() == false)
     {
-        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::enableTrackerComm","["<<this->getParentModule()->getFullName()<<"]"
-                "Enabling Tracker Communication...");
-
-        b_TrackerCommIsEnbled=true;
-
-        if(evtTrackerComm->isScheduled() == false)
-        {
-            scheduleTrackerCommAt(simTime());
-
-        }
+        scheduleTrackerCommAt(simTime());
     }
 }
 
-void BTPeerWireSPDRelay::disableTrackerComm()
-
+void BTPeerWireSPDRelay::stopTrackerComm()
 {
-    if(b_TrackerCommIsEnbled == true)
-    {
-        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::disableTrackerComm","["<<this->getParentModule()->getFullName()<<"]"
-                "Disabling Tracker Communication...");
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::stopTrackerComm","["<<this->getParentModule()->getFullName()<<"]"
+            "Stopping Tracker Communication...");
 
-        b_TrackerCommIsEnbled=false;
-        if(evtTrackerComm->isScheduled() == true)
-        {
-            cancelEvent(evtTrackerComm);
-        }
+    if(evtTrackerComm->isScheduled() == true)
+    {
+        cancelEvent(evtTrackerComm);
     }
 }
 
