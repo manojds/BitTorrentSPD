@@ -17,6 +17,7 @@
 #define BTPEERWIRESPD_H_
 #include "../BitTorrent/BTPeerWireBase.h"
 #include "BTSPDCommon.h"
+#include "BTStatisticsSPD.h"
 
 class BTThreatHandler;
 
@@ -52,6 +53,7 @@ protected:
     virtual void notifyNewAddrToThreatHndlr(const PEER & peer, bool isActiveConn);
 
     virtual void handleNodeCreationEvent();
+    virtual void notifynodeCreationToStatModule();
     virtual void notifyNewConnToConnMapper(const PEER & peer, bool isActive);
     virtual void notifyConnDropToConnMapper(const PEER & peer);
     virtual void notifyDwlCompleteToConnMapper(simtime_t _tDuration);
@@ -71,12 +73,6 @@ protected:
     virtual void onReadyToLeaveSwarm();
 
 
-
-
-
-    BTThreatHandler*    p_ThreatHndlr;
-    cSimpleModule*      p_ConnTracker;
-    cMessage*           p_NotifyNodeCreation;
     bool                b_enableConnMapDumping;
     bool                b_PublishTrackerOnCompletion;
     bool                b_PublishMeByTracker;
@@ -87,6 +83,12 @@ protected:
     int                 i_PassiveConnCount;
     int                 i_MaxPassiveConnCount;
     PEER_FILL_METHOD    fillMethod;
+
+    BTThreatHandler*    p_ThreatHndlr;
+    cSimpleModule*      p_ConnTracker;
+    BTStatisticsSPD*    p_StatModule;
+    cMessage*           p_NotifyNodeCreation;
+
     std::string         s_PlatFormType;
     std::string         s_PatchInfo;
 

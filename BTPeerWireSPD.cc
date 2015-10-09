@@ -31,9 +31,6 @@ Define_Module(BTPeerWireSPD);
 
 
 BTPeerWireSPD::BTPeerWireSPD() :
-        p_ThreatHndlr(NULL),
-        p_ConnTracker(NULL),
-        p_NotifyNodeCreation(NULL),
         b_enableConnMapDumping(false),
         b_PublishTrackerOnCompletion(false),
         b_PublishMeByTracker(true),
@@ -43,7 +40,11 @@ BTPeerWireSPD::BTPeerWireSPD() :
         b_PassiveConnectionsBlocked(false),
         i_PassiveConnCount(0),
         i_MaxPassiveConnCount(0),
-        fillMethod(FILL_ALL)
+        fillMethod(FILL_ALL),
+        p_ThreatHndlr(NULL),
+        p_ConnTracker(NULL),
+        p_StatModule(NULL),
+        p_NotifyNodeCreation(NULL)
 {
 
 }
@@ -59,6 +60,8 @@ void BTPeerWireSPD::initialize()
     BTPeerWireBase::initialize();
 
     p_ThreatHndlr= (BTThreatHandler*)(getParentModule()->getSubmodule("threatHandler"));
+
+    p_StatModule = check_and_cast<BTStatisticsSPD*>(btStatistics);
 
     s_PlatFormType= (getParentModule()->par("plaformType").str());
     //patch information is same as the platform type
@@ -175,6 +178,8 @@ void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
     BTSPDVulnerablePoint * p_VulPnt= check_and_cast<BTSPDVulnerablePoint*>(getParentModule()->getSubmodule("vulnerability"));
     p_VulPnt->vulnerabilityFixed();
 
+    p_StatModule->nodeCompletedTheDownload(this->getParentModule()->getFullName());
+
     //now I can safely publish my self in peerlist because I am not vulnerable anymore
     b_PublishMeByTracker = true;
 
@@ -187,6 +192,8 @@ void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
 
     if (b_PublishTrackerOnCompletion)
         RescheduleTrackerCommAt(simTime());
+
+
 
 }
 
@@ -280,8 +287,8 @@ void BTPeerWireSPD::newConnectionToPeerEstablished(PEER peer, TCPServerThreadBas
 
 void BTPeerWireSPD::peerFoundFromTracker(PEER peer)
 {
-   BT_LOG_DETAIL(btLogSinker, "BTPeerWireSPD::peerFoundFromTracker","New Address found from tracker. node ["<<
-           peer.peerId<<"] Address ["<<peer.ipAddress<<"]");
+   BT_LOG_DETAIL(btLogSinker, "BTPeerWireSPD::peerFoundFromTracker","["<< this->getParentModule()->getFullName()<<
+			"] New Address found from tracker. node ["<< peer.peerId<<"] Address ["<<peer.ipAddress<<"]");
    notifyNewAddrToThreatHndlr(peer, true);
 
 }
@@ -316,6 +323,15 @@ void BTPeerWireSPD::handleNodeCreationEvent()
 
         notifyNodeCreationToConnMapper();
     }
+
+    notifynodeCreationToStatModule();
+
+
+}
+
+void BTPeerWireSPD::notifynodeCreationToStatModule()
+{
+    p_StatModule->nodeCreated(this->getParentModule()->getFullName());
 }
 
 void BTPeerWireSPD::notifyNodeCreationToConnMapper()
@@ -523,6 +539,8 @@ void BTPeerWireSPD::onLeavingSwarm()
         nodeLeaveMsg->setLeaveTime(simTime().dbl());
         sendDirect(nodeLeaveMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
     }
+
+    p_StatModule->nodeExited(this->getParentModule()->getFullName());
 }
 
 void BTPeerWireSPD::onReadyToLeaveSwarm()
@@ -539,6 +557,8 @@ void BTPeerWireSPD::onReadyToLeaveSwarm()
         nodeLeaveMsg->setReadyToLeaveTime(simTime().dbl());
         sendDirect(nodeLeaveMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
     }
+
+    p_StatModule->nodeLeftTheSwarm(this->getParentModule()->getFullName());
 }
 
 

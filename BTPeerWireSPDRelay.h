@@ -43,6 +43,8 @@ protected:
 
     virtual cMessage * createTrackerCommMsg();
 
+    virtual void notifynodeCreationToStatModule();
+
     virtual void newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void newConnectionToPeerEstablished(PEER peer, TCPServerThreadBase* thread);
     virtual void connectionLostFromPeer(PEER peer, bool isActiveConn);

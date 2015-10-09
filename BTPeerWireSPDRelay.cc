@@ -162,6 +162,11 @@ void BTPeerWireSPDRelay::scheduleTrackerCommAt(simtime_t t)
     }
 }
 
+void BTPeerWireSPDRelay::notifynodeCreationToStatModule()
+{
+    p_StatModule->nodeCreated(this->getParentModule()->getFullName(), RELAY_PEER);
+}
+
 void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
@@ -197,6 +202,9 @@ void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
         b_isParticipatingInSwarm = true;
 
         startTrackerComm();
+
+        p_StatModule->nodeIsActiveInSwarm(this->getParentModule()->getFullName());
+
     }
 
 }
@@ -213,6 +221,8 @@ void BTPeerWireSPDRelay::stopParticipationInSwarm()
         stopTrackerComm();
         pauseChokingAlgos();
         closeAllConnections();
+
+        p_StatModule->nodeLeftTheSwarm(this->getParentModule()->getFullName());
     }
 
 }

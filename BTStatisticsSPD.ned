@@ -21,4 +21,5 @@ simple BTStatisticsSPD extends BTStatistics
 {
     parameters:
         @class(BTStatisticsSPD);
+        int		statisticInterval = default (25);
 }

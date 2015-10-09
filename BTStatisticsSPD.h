@@ -15,9 +15,20 @@
 
 #ifndef BTSTATISTICSRELAY_H_
 #define BTSTATISTICSRELAY_H_
+
+#include <string>
+#include <map>
+
 #include "../BitTorrent/BTStatistics.h"
+#include "BTSPDStatisticNodeStructFactory.h"
 
 # define BT_STATS_RELAY_DWL         764
+# define BT_STATS_REGULAR_MSG       765
+
+using std::string;
+using std::map;
+
+
 
 /*!
  * class which collects statistics of BTTorrent Relays Hosts
@@ -32,16 +43,45 @@ public:
 
     virtual void finish();
 
+    virtual void nodeCreated(const std::string & _sNodeName, NODE_TYPE nodeType = NORMAL_PEER);
+    virtual void nodeExited(const std::string & _sNodeName);
+    virtual void nodeIsActiveInSwarm(const std::string & _sNodeName);
+    virtual void nodeLeftTheSwarm(const std::string & _sNodeName);
+    virtual void nodeCompletedTheDownload(const std::string & _sNodeName);
+
 protected:
 
     virtual void initialize();
+    virtual void statTimerFired();
 
+    int         i_StartedNormalPeerCount;
+    int         i_StartedRelayCount;
+
+    int         i_LiveNormalCount;
+    int         i_LiveRelayCount;
+
+    int         i_ActiveNormalCount;
+    int         i_ActiveRelayCount;
+
+    int         i_CompletedNormalCount;
+    int         i_CompletedRelayCount;
+
+    int         i_Statinterval;
+    cMessage*   p_StatMsg;
 
     cStdDev*    dwSuccess_Relay;
     cOutVector  dwSuccess_Relay_vec;
 
     cStdDev*    numBlockFail_Relay;
     cOutVector  numBlockFail_Relay_vec;
+
+    std::string s_FileName;
+
+
+    BTSPDStatisticNodeStructFactory m_Factory;
+
+
+    map<string, NodeStruct*>    map_Peers;
 };
 
 #endif /* BTSTATISTICSRELAY_H_ */

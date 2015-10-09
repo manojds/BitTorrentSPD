@@ -46,7 +46,7 @@ void BTPeerWireClientHandlerSPDRelay::dataArrived(cMessage* mmsg, bool urgent)
     if(msg->getKind() == BTPSPD_PATCH_INFO_RES_MSG_TYPE)
     {
         BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                << "] Patch Platform information reponse arrived....");
+                << "] Patch Platform information reponse arrived.... from ["<< getRemotePeerID()<<"]");
 
         msg=PacketMsg->decapsulate();
         delete PacketMsg;
@@ -54,7 +54,7 @@ void BTPeerWireClientHandlerSPDRelay::dataArrived(cMessage* mmsg, bool urgent)
         if (getState() < CONNECTED)
         {
             BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::dataArrived", "[" << getHostModule()->getParentModule()->getFullName()
-                    << "] the connection is being torn down. Discarding received message ...");
+                    << "] the connection is being torn down. Discarding received message ...from ["<< getRemotePeerID()<<"]");
             delete msg;
             return;
         }
@@ -110,7 +110,7 @@ void BTPeerWireClientHandlerSPDRelay::sendGetPatchInfoRequest()
     if(pPWHost->isPatchInfoAvailable() == false)
     {
         BT_LOG_INFO(btLogSinker, "BTPWClientHndlrSPDR::sendGetPatchInfoRequest", "[" << getHostModule()->getParentModule()->getFullName()
-                            << "] sending patch info request ...");
+                            << "] sending patch info request ... to ["<<getRemotePeerID()<<"]");
 
         cPacket * msg=new cPacket("BTSPD_GET_PATCH_PLATFORM_INFO_MSG",BTSPD_GET_PATCH_PLATFORM_INFO_MSG_TYPE);
         msg->setByteLength(1);
