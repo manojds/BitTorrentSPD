@@ -167,6 +167,7 @@ void BTStatisticsSPD::nodeExited(const std::string & _sNodeName)
         m_Factory.releaseNodeStruct(pNode);
 
         pNode =NULL;
+        --i_LiveNormalCount;
 
     }
     else
