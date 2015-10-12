@@ -8,10 +8,9 @@
 #include "BTSPDStatisticNodeStructFactory.h"
 
 BTSPDStatisticNodeStructFactory::BTSPDStatisticNodeStructFactory() :
-i_NextAvailableSlot(0),
-p_ActiveChunk(NULL)
+BTSimpleObjFactory<NodeStruct>(UNIT_SIZE)
 {
-    renewTheChunk();
+
 }
 
 BTSPDStatisticNodeStructFactory::~BTSPDStatisticNodeStructFactory()
@@ -19,45 +18,14 @@ BTSPDStatisticNodeStructFactory::~BTSPDStatisticNodeStructFactory()
 
 }
 
-NodeStruct * BTSPDStatisticNodeStructFactory::getNodeStruct()
+NodeStruct * BTSPDStatisticNodeStructFactory::getObject()
 {
-    NodeStruct *  pRet(NULL);
-
-    if (lst_FreeList.size() > 0 )
-    {
-        pRet = lst_FreeList.front();
-        lst_FreeList.pop_front();
-
-        pRet->reset();
-    }
-    else
-    {
-        checkForRenewal();
-
-        pRet = p_ActiveChunk + i_NextAvailableSlot;
-
-        i_NextAvailableSlot++;
-    }
+    NodeStruct *  pRet = BTSimpleObjFactory<NodeStruct>::getObject();
+    pRet->reset();
 
     return pRet;
 
 }
 
-void BTSPDStatisticNodeStructFactory::releaseNodeStruct(NodeStruct* _pNode)
-{
-    lst_FreeList.push_back(_pNode);
-}
 
-void BTSPDStatisticNodeStructFactory::checkForRenewal()
-{
-    if (i_NextAvailableSlot >= UNIT_SIZE )
-        renewTheChunk();
-
-}
-
-void BTSPDStatisticNodeStructFactory::renewTheChunk()
-{
-    p_ActiveChunk = new NodeStruct[UNIT_SIZE];
-    i_NextAvailableSlot = 0;
-}
 
