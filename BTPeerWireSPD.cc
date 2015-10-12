@@ -24,6 +24,7 @@
 #include "BTSPDCommonMsgTypes.h"
 #include <algorithm>
 #include "BTPeerWireClientHandlerBase.h"
+#include "../BTMsgFactory.h"
 
 Define_Module(BTPeerWireSPD);
 
@@ -237,7 +238,7 @@ void BTPeerWireSPD::disconnectAllActiveConns()
             BT_LOG_INFO( btLogSinker,"BTPeerWireSPD::disconnectAllActiveConns","["<<this->getParentModule()->getFullName()<<
                     "] Disconnecting Active Connection with peer ["<< entry.getPeerID()<<"].");
 
-            pThreadBase->timerExpired(new cMessage(toString(CLOSE_CONNECTION_TIMER),CLOSE_CONNECTION_TIMER));
+            pThreadBase->timerExpired(BTMsgFactory::getInstance()->getMessageObj(toString(CLOSE_CONNECTION_TIMER),CLOSE_CONNECTION_TIMER));
         }
 
 
@@ -520,7 +521,7 @@ void BTPeerWireSPD::disconnectBadConnections()
 
             BT_LOG_DEBUG(btLogSinker,"BTPeerWireSPD::disconnectBadConnections","["<<this->getParentModule()->getFullName()<<"] disconnecting ["<<peer->getPeerID()<<"]");
 
-            thread->timerExpired(new cMessage(toString(CLOSE_CONNECTION_TIMER),CLOSE_CONNECTION_TIMER));
+            thread->timerExpired(BTMsgFactory::getInstance()->getMessageObj(toString(CLOSE_CONNECTION_TIMER),CLOSE_CONNECTION_TIMER));
         }
     }
 }
