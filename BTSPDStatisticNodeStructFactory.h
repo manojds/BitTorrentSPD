@@ -10,6 +10,7 @@
 #include <string>
 #include <list>
 #include "BTSPDCommon.h"
+#include "BTSimpleObjFactory.h"
 
 using std::string;
 using std::list;
@@ -48,22 +49,15 @@ public:
  * But destroying of those NodeStruct are not handled  currently
  * because handling destroying those object involves lot of house keeping
  */
-class BTSPDStatisticNodeStructFactory
+class BTSPDStatisticNodeStructFactory:public BTSimpleObjFactory<NodeStruct>
 {
 public:
     BTSPDStatisticNodeStructFactory();
     virtual ~BTSPDStatisticNodeStructFactory();
 
 
-    NodeStruct *    getNodeStruct();
-    void            releaseNodeStruct(NodeStruct* _pNode);
+    NodeStruct *    getObject();
 
-protected:
-    void                checkForRenewal();
-    void                renewTheChunk();
-    int                 i_NextAvailableSlot;
-    NodeStruct *        p_ActiveChunk;
-    list<NodeStruct*>   lst_FreeList;
 
 
 

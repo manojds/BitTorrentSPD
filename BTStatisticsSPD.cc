@@ -126,7 +126,7 @@ void BTStatisticsSPD::nodeCreated(const std::string & _sNodeName, NODE_TYPE _eNo
 {
     if ( map_Peers.find(_sNodeName) == map_Peers.end() )
     {
-        NodeStruct* pNode   = m_Factory.getNodeStruct();
+        NodeStruct* pNode   = m_Factory.getObject();
         pNode->s_NodeName   = _sNodeName;
         pNode->e_NodeType   = _eNodeType;
 
@@ -164,7 +164,7 @@ void BTStatisticsSPD::nodeExited(const std::string & _sNodeName)
 
         map_Peers.erase(_sNodeName);
 
-        m_Factory.releaseNodeStruct(pNode);
+        m_Factory.releaseObject(pNode);
 
         pNode =NULL;
         --i_LiveNormalCount;
