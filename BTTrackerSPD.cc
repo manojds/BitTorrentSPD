@@ -159,18 +159,6 @@ cArray& BTTrackerSPD::relayPeers()
 
 
 
-void BTTrackerSPD::cleanRemoveRelayPeer(int index)
-{
-    if (index>=0)
-    {
-        BTTrackerStructBase* peer = (BTTrackerStructBase*)relayPeers()[index];
-        relayPeers().remove(index);
-        delete peer;
-    }
-    else
-        opp_error("Cannot delete peer entry. Indicated peer not found in the set.");
-}
-
 int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
 {
     int iRet(i_NextIndexToFill);
@@ -214,6 +202,7 @@ void BTTrackerSPD::handleMessage(cMessage* msg)
     // local handling of the cleanup message
     if(msg->getKind() == EVT_CLN)
     {
+        BT_LOG_INFO(btLogSinker, "BTTrackerSPD::handleMessage", "Event Cleanup timer fired. current time ["<<simTime()<<"], trying to clean relay peers..");
 
         // traverse the peers pool and remove the inactive entries
         for(int i=0; i<relayPeers_var.size(); i++)
@@ -241,9 +230,25 @@ void BTTrackerSPD::handleMessage(cMessage* msg)
  */
 void BTTrackerSPD::cleanRemoveRelayPeer(BTTrackerStructBase* peer)
 {
-    cleanRemovePeer(relayPeers().find(peer));
+    cleanRemoveRelayPeer(relayPeers().find(peer));
 }
 
+void BTTrackerSPD::cleanRemoveRelayPeer(int index)
+{
+    if (index>=0)
+    {
+
+        BTTrackerStructBase* peer = (BTTrackerStructBase*)relayPeers()[index];
+
+        BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerB::cleanRemoveRelayPeer", "Removing relay peer ["<<peer->peerId()<<
+                "] IP ["<<peer->ipAddress()<<"] port ["<<peer->peerPort()<<"]");
+
+        relayPeers().remove(index);
+        delete peer;
+    }
+    else
+        opp_error("Cannnot delete peer entry. Indicated peer not found in the set.");
+}
 
 bool BTTrackerSPD::containRealyinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const
 {

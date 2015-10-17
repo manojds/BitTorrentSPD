@@ -38,7 +38,6 @@ public:
     void    setRelayPeerPropotionInReply(double relayPeerPropotionInReply);
     bool    useRelayPropotioninRequest() const;
     PEER_FILL_METHOD    getPeerFillMethod() const;
-    void    cleanRemoveRelayPeer(int);
     int     getNextIndexOfRelayPeerToFill();
 
     void    blackListClient(const std::string & _targetIP, const std::string & _sourceIP);
@@ -58,6 +57,8 @@ public:
     void    incrementRelayCompletedCount();
     void    incrementRelayStartedCount();
 
+    void    cleanRemoveRelayPeer(int index);
+
 protected:
     virtual void initialize();
 
@@ -66,6 +67,7 @@ protected:
     void    setRelayInfoHash(const string& infoHash);
 
     void    cleanRemoveRelayPeer(BTTrackerStructBase* peer);
+
 
     virtual void writeStats();
 
