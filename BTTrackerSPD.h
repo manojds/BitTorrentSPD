@@ -19,6 +19,7 @@
 #include "BTSPDCommon.h"
 #include "BTSPDTrackerBlackList.h"
 #include <map>
+#include <set>
 
 
 class INET_API BTTrackerSPD: public BTTrackerBase {
@@ -29,6 +30,7 @@ public:
     const string& relayInfoHash() const;
 
     int containsRelay(BTTrackerStructBase* obj) const;
+    int containsRelay(const std::string & _sPeerID) const;
     cArray& relayPeers();
 
     size_t  realyPeersNum() const;
@@ -58,6 +60,10 @@ public:
     void    incrementRelayStartedCount();
 
     void    cleanRemoveRelayPeer(int index);
+    void    markRelayPeerAsExcluded(const std::string & _sPeerID);
+
+    void    insertRelayPeerIntoMap(const std::string & _sPeerID, int _iIndex);
+    void    removeRelayPeerFromtheMap(const std::string & _sPeerID);
 
 protected:
     virtual void initialize();
@@ -77,20 +83,25 @@ protected:
 
 
 
-    int                 i_NextIndexToFill;
-    size_t              realyPeersNum_var;    // relay peers counter
-    double              relayPeerPropotionInReply_var;
-    bool                useRelayPropotioninRequest_var;
-    PEER_FILL_METHOD    fillMethod;
-    string              realyIfoHash;
-    cArray              relayPeers_var;   // relay peers container
-    std::map<std::string, bool>   relayPeersInSwarm_var;//container for relay peers who participating in the swarm
-    int                 i_RelaySeedCount;
-    int                 i_RelayCompletedCount;
-    int                 i_RelayStartedCount;
-    BTSPDTrackerBlackList blckList;
-    bool                b_filterBlackListedPeers;
-    bool                b_ExcludeRelaysInTruePeerList;
+    int                         i_NextIndexToFill;
+    size_t                      realyPeersNum_var;    // relay peers counter
+    double                      relayPeerPropotionInReply_var;
+    bool                        useRelayPropotioninRequest_var;
+    PEER_FILL_METHOD            fillMethod;
+    string                      realyIfoHash;
+    cArray                      relayPeers_var;   // relay peers container
+    std::map<std::string, int>  map_RelayPeers;     //relay peers, as a map of peer ID to array index
+
+    //container for relay peers who participating in the swarm
+    //this container will be used only relay peer are not treated as true peers when they participates in the swarm
+    std::map<std::string, bool>   relayPeersInSwarm_var;
+    int                         i_RelaySeedCount;
+    int                         i_RelayCompletedCount;
+    int                         i_RelayStartedCount;
+    BTSPDTrackerBlackList       blckList;
+    bool                        b_filterBlackListedPeers;
+    bool                        b_ExcludeRelaysInTruePeerList;
+    std::set<std::string>       set_ExcludedRelays;
 };
 
 #endif /* BTTRACKERRELAYENABLED_H_ */

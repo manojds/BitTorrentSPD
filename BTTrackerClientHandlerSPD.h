@@ -44,6 +44,7 @@ protected:
     int processAnnounceForTrueHashFromRelay(BTTrackerMsgAnnounce* amsg);
 
     virtual void updateSPDFieldsinTrackerStruct(BTTrackerMsgAnnounceSPD* amsg);
+    void updateRelayPeerDetailsFromAnnounceMsg(BTTrackerMsgAnnounce* _pMsg, int _iPeerIndex, bool _bSetIsSeeder);
 
 
     //boolean which indicates that the client making the announce for true info hash is a relay

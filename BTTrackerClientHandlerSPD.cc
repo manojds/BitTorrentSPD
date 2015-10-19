@@ -112,61 +112,70 @@ void BTTrackerClientHandlerSPD::updateSPDFieldsinTrackerStruct(BTTrackerMsgAnnou
 
 }
 
+void BTTrackerClientHandlerSPD::updateRelayPeerDetailsFromAnnounceMsg(BTTrackerMsgAnnounce* _pMsg, int _iPeerIndex, bool _bSetIsSeeder)
+{
+    BTTrackerStructBase* peer = (BTTrackerStructBase*)getHostModule()->relayPeers()[_iPeerIndex];
+    // update
+    peer->setIpAddress(IPvXAddress(getSocket()->getRemoteAddress()));
+    peer->setPeerId(_pMsg->peerId());
+    peer->setPeerPort(_pMsg->peerPort());
+    peer->setKey(_pMsg->key());
+    peer->setLastAnnounce(simTime());
+
+    if (_bSetIsSeeder)
+    {
+        peer->setIsSeed((_pMsg->event() == A_COMPLETED) ? true : false);
+    }
+}
 
 int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
 {
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::processAnnounce", "Announce request for relay hash from client[address="
             << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "], name ["<< amsg->peerId()<<"] with event ["<<amsg->event()<<"]");
 
-    // temporary peer struct with the announce info
-    BTTrackerStructBase* tpeer = NULL;
-    // a peer from the pool
-    BTTrackerStructBase* peer = NULL;
+
     // the position of the peer in the pool
     cPeer = -1;
 
     // sanity checks - failures
 
     // no peer id
-    if (strlen(amsg->peerId()) == 0) {
+    if (strlen(amsg->peerId()) == 0)
+    {
         return A_INVALID_PEERID;
     }
     // invalid port
-    if (amsg->peerPort() == 0) {
+    if (amsg->peerPort() == 0)
+    {
         return A_INVALID_PORT;
     }
 
-    // init the temp peer struct
-    tpeer = createTrackerStructObj(amsg);
+
 
     // search to find if the peer exists in the pool or not
-    cPeer = getHostModule()->containsRelay(tpeer);
+    cPeer = getHostModule()->containsRelay(amsg->peerId());
 
     // differentiate based on the actual message event field
-    switch (amsg->event()) {
+    switch (amsg->event())
+    {
     // started event
     case A_STARTED:
 
         // insert the peer to the peers pool
         if (cPeer == -1) // do the magic only if the peer does not exist
         {
+            // temporary peer struct with the announce info
+            BTTrackerStructBase* tpeer = createTrackerStructObj(amsg);
+
             cPeer = getHostModule()->relayPeers().add(tpeer);
-            getHostModule()->setRealyPeersNum(
-                    getHostModule()->realyPeersNum() + 1);
+            getHostModule()->insertRelayPeerIntoMap(tpeer->peerId(), cPeer);
+
+            getHostModule()->setRealyPeersNum( getHostModule()->realyPeersNum() + 1);
         }
         else // the peer exists, update its fields
         {
-            // get the peer
-            peer = (BTTrackerStructBase*) getHostModule()->relayPeers()[cPeer];
             // update
-            peer->setIpAddress(tpeer->ipAddress());
-            peer->setPeerId(tpeer->peerId());
-            peer->setPeerPort(tpeer->peerPort());
-            peer->setKey(tpeer->key());
-            peer->setLastAnnounce(tpeer->lastAnnounce());
-            peer->setIsSeed(tpeer->isSeed());
-            //Ntinos Katsaros: 22/11/2008
-            delete tpeer;
+            updateRelayPeerDetailsFromAnnounceMsg(amsg, cPeer, true );
         }
 
         // valid announce with started event
@@ -175,9 +184,11 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
 
         // completed event
     case A_COMPLETED:
+    {
 
         // check if the peer is in the peers pool, the peer should have sent an announce with started event before
-        if (cPeer == -1) {
+        if (cPeer == -1)
+        {
             // completed event with no started event before from the same peer
             return A_NO_STARTED;
         }
@@ -185,11 +196,10 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
         // ok the peer is in the pool, update his status and proceed like a normal announce
 
         // get the peer
-        peer = (BTTrackerStructBase*) getHostModule()->relayPeers()[cPeer];
+        BTTrackerStructBase* peer = (BTTrackerStructBase*) getHostModule()->relayPeers()[cPeer];
 
         // update the peer's status and the seeds' count only for the first completed event
         if (!peer->isSeed()) {
-            peer->setIsSeed(true);
             //Commented by MAnoj . 2015-01-25
             // TODO :: uncomment this and correct the behavior if relays
             //can be seeders with respect to relay hash.
@@ -197,41 +207,25 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
         }
 
         // update
-        peer->setIpAddress(tpeer->ipAddress());
-        peer->setPeerId(tpeer->peerId());
-        peer->setPeerPort(tpeer->peerPort());
-        peer->setKey(tpeer->key());
-        peer->setLastAnnounce(tpeer->lastAnnounce());
-
-        //Ntinos Katsaros: 22/11/2008
-        delete tpeer;
+        updateRelayPeerDetailsFromAnnounceMsg(amsg, cPeer, true );
 
         // valid announce with completed event
         return A_VALID_COMPLETED;
         break;
+    }
 
         // normal announce
     case A_NORMAL:
 
         // check if the peer is in the peers pool, the peer should have sent an announce with started event before
-        if (cPeer == -1) {
+        if (cPeer == -1)
+        {
             // normal announce event with no started event before from the same peer
             return A_NO_STARTED;
         }
 
-        // get the peer
-        peer = (BTTrackerStructBase*) getHostModule()->relayPeers()[cPeer];
-
         // update
-        peer->setIpAddress(tpeer->ipAddress());
-        peer->setPeerId(tpeer->peerId());
-        peer->setPeerPort(tpeer->peerPort());
-        peer->setKey(tpeer->key());
-        peer->setLastAnnounce(tpeer->lastAnnounce());
-        peer->setIsSeed(false);
-
-        //Ntinos Katsaros: 22/11/2008
-        delete tpeer;
+        updateRelayPeerDetailsFromAnnounceMsg(amsg, cPeer, false );
 
         // valid normal announce
         return A_VALID_NORMAL;
@@ -241,13 +235,11 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
     case A_STOPPED:
 
         // check if the peer is in the peers pool, the peer should have sent an announce with started event before
-        if (cPeer == -1) {
+        if (cPeer == -1)
+        {
             // stopped event with no started event before from the same peer
             return A_NO_STARTED;
         }
-
-        // get the peer
-        peer = (BTTrackerStructBase*) getHostModule()->relayPeers()[cPeer];
 
         // remove him and if the peer was a seeder change the seeds count
 
@@ -264,19 +256,12 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
         getHostModule()->cleanRemoveRelayPeer(cPeer);
         getHostModule()->setRealyPeersNum(getHostModule()->realyPeersNum() - 1);
 
-        //Ntinos Katsaros: 22/11/2008
-        delete tpeer;
-
         // valid announce with stopped event
         return A_VALID_STOPPED;
         break;
 
         // invalid message event field
     default:
-
-        //Ntinos Katsaros: 22/11/2008
-        delete tpeer;
-
         return A_INVALID_EVENT;
     }
 }
@@ -295,13 +280,14 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
         //now shrink the Peer array to the required size
         rmsg->setPeersArraySize(iMaxTruePeerCount);
     }
+
     //if there are relay peers to fill
     if(  iMaxRelayPeersCount > 0 )
     {
         // temporary peer to add to the response
         PEER ttpeer;
         //number of relay peers which are included as true peers.
-        int iRelayPeerCountAsTruePeers(0);
+        int iExcludedRelayCount(0);
 
         // peers added
         set<int> added_peers;
@@ -338,19 +324,40 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                 //We should not add the same peer requesting in the response
                 if(amsg->peerId()  == ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId())
                     continue;
-                //also check whether this peer already in true peers list
-                //bcz it is participating in the swarm
-                bool bPresent(false);
-                for(int j=0; j< (int)rmsg->peersArraySize(); j++)
+
+                bool bExcludeRelayPeer(false);
+
+                if (getHostModule()->isExcludeRelaysInTruePeerList() == false)
                 {
-                    if( strcmp ((rmsg->peers(j)).peerId.c_str(),  ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId().c_str() ) == 0 )
+                    //if relay peers are not excluded from the true peer list,
+                    //check whether this relay peer already in true peers list
+                    for(int j=0; j< (int)rmsg->peersArraySize(); j++)
                     {
-                        bPresent=true;
-                        break;
+                        if( strcmp ((rmsg->peers(j)).peerId.c_str(),  ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId().c_str() ) == 0 )
+                        {
+                            bExcludeRelayPeer=true;
+                            break;
+                        }
                     }
+
+                }
+                else
+                {
+                    //this means relay peers are not added in the true peer list,
+                    //and relay peers are not considered as true peers when they are participating in the swarm.
+                    //if that is the case a relay peer is in true peer set means it is a relay peer which has the vulnerability
+                    //and now participate in the swarm as a true peer.
+                    //Hence we should not add that peer as a relay peer.
+                    if ( getHostModule()->containsPeer(((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()) )
+                    {
+                        bExcludeRelayPeer = true;
+                        getHostModule()->markRelayPeerAsExcluded(((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId());
+
+                    }
+
                 }
 
-                if(!bPresent)
+                if(!bExcludeRelayPeer)
                 {
                     added_peers.insert(iRndPeer);
 //                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
@@ -359,24 +366,19 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                 }
                 else
                 {
-                    iRelayPeerCountAsTruePeers++;
+                    iExcludedRelayCount++;
                     //there may be case where we don't have enough relay peers to add
-                    //since relay peers are already included as true peers and
+                    //since we have excluded many relay peers due to exclusion criteria
                     //iMaxRelayPeersCount is not calculated with considering that.
 
-                    if ( relayPeers.size() - iRelayPeerCountAsTruePeers < iMaxRelayPeersCount)
+                    if ( relayPeers.size() - iExcludedRelayCount < iMaxRelayPeersCount)
                     {
                         BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                 "reducing iMaxRelayPeersCount from ["<<iMaxRelayPeersCount<<"] to ["<<
-                                relayPeers.size() - iRelayPeerCountAsTruePeers<<"] since not enough relay peers to add");
+                                relayPeers.size() - iExcludedRelayCount<<"] since not enough relay peers to add");
 
-                        iMaxRelayPeersCount = relayPeers.size() - iRelayPeerCountAsTruePeers;
+                        iMaxRelayPeersCount = relayPeers.size() - iExcludedRelayCount;
                     }
-
-
-//                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
-//                            "fillPeersInResponse - not added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
-//                            <<"index ["<<iRndPeer<<"]");
                 }
             }
         }

@@ -244,10 +244,63 @@ void BTTrackerSPD::cleanRemoveRelayPeer(int index)
                 "] IP ["<<peer->ipAddress()<<"] port ["<<peer->peerPort()<<"]");
 
         relayPeers().remove(index);
+        removeRelayPeerFromtheMap(peer->peerId());
         delete peer;
     }
     else
-        opp_error("Cannnot delete peer entry. Indicated peer not found in the set.");
+        opp_error("Cannot delete peer entry. Indicated peer not found in the set.");
+}
+
+int BTTrackerSPD::containsRelay(const std::string & _sPeerID) const
+{
+    int iIndex(-1);
+
+    std::map<std::string, int>::const_iterator itr = map_RelayPeers.find(_sPeerID);
+    if ( itr != map_RelayPeers.end())
+    {
+        iIndex = itr->second;
+    }
+
+    return iIndex;
+}
+
+void BTTrackerSPD::insertRelayPeerIntoMap(const std::string & _sPeerID, int _iIndex)
+{
+    std::map<std::string, int>::iterator itr = map_RelayPeers.find(_sPeerID);
+    if ( itr == map_RelayPeers.end())
+    {
+        map_RelayPeers[_sPeerID] = _iIndex;
+    }
+    else
+    {
+        throw cRuntimeError("BTTrackerSPD::insertPeerIntoMap - Relay Peer [%s] already present in the map. current index [%s], requested index [%s]",
+                _sPeerID.c_str(), itr->second, _iIndex);
+    }
+
+}
+void BTTrackerSPD::removeRelayPeerFromtheMap(const std::string & _sPeerID)
+{
+    std::map<std::string, int>::iterator itr = map_RelayPeers.find(_sPeerID);
+    if ( itr != map_RelayPeers.end())
+    {
+        map_RelayPeers.erase(itr);
+    }
+    else
+    {
+        throw cRuntimeError("BTTrackerSPD::removePeerFromtheMap - Relay Peer [%s] not present in the map.", _sPeerID.c_str());
+    }
+}
+
+
+/*!
+ * Marks a relay peers as excluded.
+ * After that, this particular peer will not be used as a relay peer.
+ */
+void BTTrackerSPD::markRelayPeerAsExcluded(const std::string & _sPeerID)
+{
+    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::markRelayPeerAsExcluded", "Excluding relay peer  ["<<_sPeerID<< "] from relay peers");
+
+    set_ExcludedRelays.insert(_sPeerID);
 }
 
 bool BTTrackerSPD::containRealyinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const
