@@ -10,7 +10,7 @@
 #include "BTPeerWireSPD.h"
 #include <map>
 
-#define INTERNAL_TRACKER_REALY_COM_MSG                  208
+#define INTERNAL_TRACKER_REALY_COM_MSG                  251
 
 
 
@@ -34,7 +34,7 @@ protected:
     /* Redefined methods from BTPeerWireSPD */
     virtual void initialize();
 
-    virtual void startNodeAt(simtime_t t);
+    virtual void doStartNode();
 
     virtual void handleMessage(cMessage *msg);
 

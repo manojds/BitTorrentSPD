@@ -31,8 +31,6 @@ void BTPeerWireSPDRelay::initialize()
 {
     BTPeerWireSPD::initialize();
 
-
-
     //we set patch info to nothing, bcz patch info is not same as our platform
     //patch info can be learned from other peers.
     s_PatchInfo="";
@@ -40,15 +38,15 @@ void BTPeerWireSPDRelay::initialize()
 
 }
 
-void BTPeerWireSPDRelay::startNodeAt(simtime_t t)
+void BTPeerWireSPDRelay::doStartNode()
 {
 
-    BTPeerWireSPD::startNodeAt(t);
+    BTPeerWireSPD::doStartNode();
 
     Enter_Method_Silent();
 
     evtRelayTrackerComm = new cMessage(toString(INTERNAL_TRACKER_REALY_COM_MSG), INTERNAL_TRACKER_REALY_COM_MSG);
-    scheduleAt(t, evtRelayTrackerComm);
+    scheduleAt(simTime(), evtRelayTrackerComm);
 
 
 }

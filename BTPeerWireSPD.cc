@@ -389,7 +389,6 @@ void BTPeerWireSPD::notifyConnDropToConnMapper(const PEER & peer)
 }
 
 
-
 void BTPeerWireSPD::notifyDwlCompleteToConnMapper(simtime_t _tDuration)
 {
     if ( b_enableConnMapDumping)
@@ -407,8 +406,6 @@ void BTPeerWireSPD::notifyDwlCompleteToConnMapper(simtime_t _tDuration)
         sendDirect(msgDWL,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
     }
 }
-
-
 
 
 IPvXAddress BTPeerWireSPD::getMyIPAddr()
