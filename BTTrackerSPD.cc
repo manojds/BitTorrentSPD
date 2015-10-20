@@ -25,7 +25,10 @@ BTTrackerSPD::BTTrackerSPD():
         i_RelayCompletedCount(0),
         i_RelayStartedCount(0),
         b_filterBlackListedPeers(false),
-        b_ExcludeRelaysInTruePeerList(false)
+        b_ExcludeRelaysInTruePeerList(false),
+        b_PoolRelayPeers(false),
+        i_RelayPoolSize(100),
+        i_LastConsolidatedRelayIndex(0)
 {
     // TODO Auto-generated constructor stub
 
@@ -46,16 +49,23 @@ void BTTrackerSPD::initialize()
 
     b_filterBlackListedPeers        = par("filterBlackListedPeers");
 
-    b_ExcludeRelaysInTruePeerList     = par("excludeRelaysFromTruePeerList");
+    b_ExcludeRelaysInTruePeerList   = par("excludeRelaysFromTruePeerList");
+
+    b_PoolRelayPeers                = par("poolRelayPeers");
+
+    i_RelayPoolSize                 = par("relayPoolSize");
+
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerB::initialize", "TrackerSPD initializing.... PoolRelayPeers ["<<b_PoolRelayPeers<<
+                    "] relayPoolSize ["<<i_RelayPoolSize<<"] fill Method ["<<fillMethodToString(fillMethod)<<"]");
 
     unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
 
-    realyPeersNum_var   = 0;
+    relayPeersNum_var   = 0;
 
     blckList.initialize(uiBlackListThreshold);
 
     WATCH(relayPeerPropotionInReply_var);
-    WATCH(realyPeersNum_var);
+    WATCH(relayPeersNum_var);
     WATCH_OBJ(relayPeers_var);
 }
 
@@ -84,6 +94,18 @@ int BTTrackerSPD::containsRelay(BTTrackerStructBase* obj) const
     return -1;
 }
 
+int BTTrackerSPD::containsRelay(const std::string & _sPeerID) const
+{
+    int iIndex(-1);
+
+    std::map<std::string, int>::const_iterator itr = map_RelayPeers.find(_sPeerID);
+    if ( itr != map_RelayPeers.end())
+    {
+        iIndex = itr->second;
+    }
+
+    return iIndex;
+}
 
 /**
  * Get the maximum number of peers which can be included in a response.
@@ -120,7 +142,7 @@ PEER_FILL_METHOD BTTrackerSPD::getPeerFillMethod() const
  */
 size_t BTTrackerSPD::realyPeersNum() const
 {
-    return realyPeersNum_var;
+    return relayPeersNum_var;
 }
 
 /**
@@ -128,7 +150,7 @@ size_t BTTrackerSPD::realyPeersNum() const
  */
 void BTTrackerSPD::setRealyPeersNum(size_t peersNum)
 {
-    realyPeersNum_var = peersNum;
+    relayPeersNum_var = peersNum;
 }
 
 /**
@@ -159,19 +181,19 @@ cArray& BTTrackerSPD::relayPeers()
 
 
 
-int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
-{
-    int iRet(i_NextIndexToFill);
-
-    i_NextIndexToFill = i_NextIndexToFill + intrand(5) + 1 ;
-
-    if ( i_NextIndexToFill >= relayPeers_var.size() )
-    {
-        i_NextIndexToFill = 0;
-    }
-
-    return iRet;
-}
+//int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
+//{
+//    int iRet(i_NextIndexToFill);
+//
+//    i_NextIndexToFill = i_NextIndexToFill + intrand(5) + 1 ;
+//
+//    if ( i_NextIndexToFill >= relayPeers_var.size() )
+//    {
+//        i_NextIndexToFill = 0;
+//    }
+//
+//    return iRet;
+//}
 
 void BTTrackerSPD::blackListClient(const std::string & _targetIP, const std::string & _sourceIP)
 {
@@ -214,8 +236,7 @@ void BTTrackerSPD::handleMessage(cMessage* msg)
             {
                 BT_LOG_INFO(btLogSinker, "BTTrackerSPD::handleMessage","Removing relay peer ["<< tpeer->peerId()
                         <<"] due to inactivity");
-                cleanRemoveRelayPeer(tpeer);
-                realyPeersNum_var--;
+                cleanRemoveRelayPeer(i);
             }
 
         }
@@ -244,25 +265,17 @@ void BTTrackerSPD::cleanRemoveRelayPeer(int index)
                 "] IP ["<<peer->ipAddress()<<"] port ["<<peer->peerPort()<<"]");
 
         relayPeers().remove(index);
+        relayPeersNum_var--;
         removeRelayPeerFromtheMap(peer->peerId());
+        removePeerFromThePool(index);
+
         delete peer;
     }
     else
         opp_error("Cannot delete peer entry. Indicated peer not found in the set.");
 }
 
-int BTTrackerSPD::containsRelay(const std::string & _sPeerID) const
-{
-    int iIndex(-1);
 
-    std::map<std::string, int>::const_iterator itr = map_RelayPeers.find(_sPeerID);
-    if ( itr != map_RelayPeers.end())
-    {
-        iIndex = itr->second;
-    }
-
-    return iIndex;
-}
 
 void BTTrackerSPD::insertRelayPeerIntoMap(const std::string & _sPeerID, int _iIndex)
 {
@@ -296,14 +309,29 @@ void BTTrackerSPD::removeRelayPeerFromtheMap(const std::string & _sPeerID)
  * Marks a relay peers as excluded.
  * After that, this particular peer will not be used as a relay peer.
  */
-void BTTrackerSPD::markRelayPeerAsExcluded(const std::string & _sPeerID)
+void BTTrackerSPD::markRelayPeerAsExcluded(int _iPeerIndex)
 {
-    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::markRelayPeerAsExcluded", "Excluding relay peer  ["<<_sPeerID<< "] from relay peers");
+    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::markRelayPeerAsExcluded", "Excluding relay peer  ["<<_iPeerIndex<<
+            "] from relay peers, peer ID ["<<((BTTrackerStructBase*)relayPeers()[_iPeerIndex])->peerId() <<"]");
 
-    set_ExcludedRelays.insert(_sPeerID);
+    set_ExcludedRelays.insert(_iPeerIndex);
+
+    removePeerFromThePool(_iPeerIndex);
 }
 
-bool BTTrackerSPD::containRealyinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const
+int BTTrackerSPD::addRelayPeer(BTTrackerStructBase* tpeer)
+{
+    int iIndex = relayPeers_var.add(tpeer);
+    relayPeersNum_var++;
+    insertRelayPeerIntoMap(tpeer->peerId(), iIndex);
+
+    consolidateRelayPeerPool();
+
+    return iIndex;
+
+}
+
+bool BTTrackerSPD::containRelayinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const
 {
     _bIsSeed = false;
     std::map<std::string, bool>::const_iterator itr = relayPeersInSwarm_var.find(_sPeerID);
@@ -317,6 +345,132 @@ bool BTTrackerSPD::containRealyinSwarm(const std::string & _sPeerID, bool & _bIs
     {
         return false;
     }
+}
+
+void BTTrackerSPD::removePeerFromThePool(int _iPeerIndex)
+{
+    if (b_PoolRelayPeers)
+    {
+        int ret = set_RelayPeerPool.erase(_iPeerIndex);
+
+        //if Peer is removed from the Pool, Consolidate again
+        if (ret > 0)
+        {
+            consolidateRelayPeerPool();
+        }
+    }
+}
+
+void BTTrackerSPD::consolidateRelayPeerPool()
+{
+    if (b_PoolRelayPeers)
+    {
+        int iAddedCount(0);
+        int iPoolSizeb4Consolidation = set_RelayPeerPool.size();    //only for debug
+
+        //we go full round around relay peer array if necessary
+        //and also do work only if relay pool size lower than the specified pool size
+
+        for ( unsigned int i = 0 ; (i < relayPeers_var.size()) && (set_RelayPeerPool.size() < i_RelayPoolSize) ; i++ )
+        {
+            i_LastConsolidatedRelayIndex++;
+
+            if (i_LastConsolidatedRelayIndex >= relayPeers_var.size() )
+            {
+                i_LastConsolidatedRelayIndex = 0;
+            }
+
+            BTTrackerStructBase* peer = (BTTrackerStructBase*) relayPeers_var[i_LastConsolidatedRelayIndex];
+
+            if (peer == NULL)
+                continue;
+
+            //if peer is already not in the pool an peer is not on the excluded set add peer to the pool.
+
+            if (set_RelayPeerPool.find(i_LastConsolidatedRelayIndex) == set_RelayPeerPool.end() &&
+                    set_ExcludedRelays.find(i_LastConsolidatedRelayIndex) == set_ExcludedRelays.end() )
+            {
+                set_RelayPeerPool.insert(i_LastConsolidatedRelayIndex);
+                iAddedCount++;
+
+            }
+        }
+
+        BT_LOG_ESSEN(btLogSinker, "BTTrackerSPD::consolidateRelayPeerPool", "Consolidated Relay peer Pool, Current Pool size ["<<set_RelayPeerPool.size()
+                << "], pool size before consolidation ["<<iPoolSizeb4Consolidation<<"] Relay peer Array size ["<<relayPeers_var.size()<<"], available relay peers num ["<<
+                relayPeersNum_var<<"] LastConsolidatedIndex ["<< i_LastConsolidatedRelayIndex<<"], Relay Exclude set size [" <<set_ExcludedRelays.size()
+                <<"] Added ["<<iAddedCount <<"] relays to the pool.");
+
+        //assertions
+        if ( i_RelayPoolSize <  (relayPeersNum_var - set_ExcludedRelays.size()) )
+        {
+            ASSERT(set_RelayPeerPool.size() == i_RelayPoolSize );
+        }
+        else
+        {
+            ASSERT(set_RelayPeerPool.size() == (relayPeersNum_var - set_ExcludedRelays.size()) );
+        }
+    }
+}
+
+int BTTrackerSPD::getMaxNumberOfAvailableRelayPeersToFill()
+{
+    if (b_PoolRelayPeers)
+    {
+        return set_RelayPeerPool.size();
+    }
+    else
+    {
+        return relayPeersNum_var;
+    }
+}
+
+void BTTrackerSPD::checkSelectedRelaysAreViable(const set<int> & _setRelays)
+{
+#ifdef MJP_DEBUG
+    set<int>::const_iterator itr = _setRelays.begin();
+
+    for ( ; _setRelays.end() != itr ; ++itr )
+    {
+        if (b_PoolRelayPeers)
+        {
+            //if relay peer pooling is enabled, the peer should be in the pool
+            ASSERT ( set_RelayPeerPool.find(*itr) !=  set_RelayPeerPool.end() );
+        }
+        else if (b_ExcludeRelaysInTruePeerList)
+        {
+            //if relay peers are excluded from the true peers when participating in the swarm
+            //the relay peer should NOT be in excluded peer list
+            ASSERT ( set_ExcludedRelays.find(*itr) !=  set_ExcludedRelays.end() );
+        }
+    }
+
+#endif
+}
+
+int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
+{
+    int index (0);
+    while (true)
+    {
+        index = intrand(relayPeers().size());
+
+        if (b_PoolRelayPeers)
+        {
+            //use peers which are only in pool
+            if (set_RelayPeerPool.find(index) !=  set_RelayPeerPool.end())
+            {
+                return index;
+            }
+            else
+                continue; // if peer is not in the pool, try another one
+        }
+        else
+        {
+            return index;
+        }
+    }
+
 }
 
 void BTTrackerSPD::addRelayPeerintoSwarm(const std::string & _sPeerID, bool isSeed)
@@ -367,7 +521,5 @@ void BTTrackerSPD::writeStats()
     BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats ******** - Total Relay Count ["<<realyPeersNum()
             <<"] Relay peer Started Count in Swarm ["<<i_RelayStartedCount<<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
             "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"]");
-
-
 
 }

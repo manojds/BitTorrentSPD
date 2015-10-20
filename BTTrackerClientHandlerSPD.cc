@@ -150,8 +150,6 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
         return A_INVALID_PORT;
     }
 
-
-
     // search to find if the peer exists in the pool or not
     cPeer = getHostModule()->containsRelay(amsg->peerId());
 
@@ -167,10 +165,7 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
             // temporary peer struct with the announce info
             BTTrackerStructBase* tpeer = createTrackerStructObj(amsg);
 
-            cPeer = getHostModule()->relayPeers().add(tpeer);
-            getHostModule()->insertRelayPeerIntoMap(tpeer->peerId(), cPeer);
-
-            getHostModule()->setRealyPeersNum( getHostModule()->realyPeersNum() + 1);
+            cPeer = getHostModule()->addRelayPeer(tpeer);
         }
         else // the peer exists, update its fields
         {
@@ -254,7 +249,6 @@ int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
 
         //getHostModule()->peers().remove(cPeer);
         getHostModule()->cleanRemoveRelayPeer(cPeer);
-        getHostModule()->setRealyPeersNum(getHostModule()->realyPeersNum() - 1);
 
         // valid announce with stopped event
         return A_VALID_STOPPED;
@@ -271,7 +265,7 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
     //then we start our work
     cArray & relayPeers = getHostModule()->relayPeers();
     int iAvailableTruePeerCount = rmsg->peersArraySize();
-    int iAvaialbeRelayPeerCount = relayPeers.size();
+    int iAvaialbeRelayPeerCount = getHostModule()->getMaxNumberOfAvailableRelayPeersToFill();
     int iMaxTruePeerCount(0);
     int iMaxRelayPeersCount(0);
     determinePeerMix(pSPDMsg->relayPeerRatio(), iAvailableTruePeerCount, iAvaialbeRelayPeerCount, iMaxTruePeerCount, iMaxRelayPeersCount);
@@ -293,22 +287,22 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
         set<int> added_peers;
 
         //if we don't have that much relay peers make the maximum to the amount we have
-        if ( iMaxRelayPeersCount > (int)getHostModule()->realyPeersNum() -1 )
+        if ( iMaxRelayPeersCount > (getHostModule()->getMaxNumberOfAvailableRelayPeersToFill() -1 ) )
         {
-                iMaxRelayPeersCount = getHostModule()->realyPeersNum() -1;
+                iMaxRelayPeersCount = getHostModule()->getMaxNumberOfAvailableRelayPeersToFill() -1;
             // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
             // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
 
-            BT_LOG_DEBUG(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
+            BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                             "reduced  iMaxRelayPeersCount to ["<<iMaxRelayPeersCount<<"] to because only ["<<
-                                            (int)getHostModule()->realyPeersNum()<<"] relay peers available");
+                                            (int)getHostModule()->getMaxNumberOfAvailableRelayPeersToFill()<<"] relay peers available");
         }
 
         for ( ; (int)added_peers.size() < iMaxRelayPeersCount  ; )
 
         {
-            //int iRndPeer = getHostModule()->getNextIndexOfRelayPeerToFill();
-            int iRndPeer = intrand(relayPeers.size());
+            int iRndPeer = getHostModule()->getNextIndexOfRelayPeerToFill();
+            //int iRndPeer = intrand(relayPeers.size());
 
             if(added_peers.find(iRndPeer) != added_peers.end())
             {
@@ -348,10 +342,10 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                     //if that is the case a relay peer is in true peer set means it is a relay peer which has the vulnerability
                     //and now participate in the swarm as a true peer.
                     //Hence we should not add that peer as a relay peer.
-                    if ( getHostModule()->containsPeer(((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()) )
+                    if ( getHostModule()->containsPeer(((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()) != -1 )
                     {
                         bExcludeRelayPeer = true;
-                        getHostModule()->markRelayPeerAsExcluded(((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId());
+                        getHostModule()->markRelayPeerAsExcluded(iRndPeer);
 
                     }
 
@@ -371,17 +365,19 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                     //since we have excluded many relay peers due to exclusion criteria
                     //iMaxRelayPeersCount is not calculated with considering that.
 
-                    if ( relayPeers.size() - iExcludedRelayCount < iMaxRelayPeersCount)
+                    if ( iAvaialbeRelayPeerCount - iExcludedRelayCount < iMaxRelayPeersCount)
                     {
                         BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                 "reducing iMaxRelayPeersCount from ["<<iMaxRelayPeersCount<<"] to ["<<
-                                relayPeers.size() - iExcludedRelayCount<<"] since not enough relay peers to add");
+                                iAvaialbeRelayPeerCount - iExcludedRelayCount<<"] since not enough relay peers to add");
 
-                        iMaxRelayPeersCount = relayPeers.size() - iExcludedRelayCount;
+                        iMaxRelayPeersCount = iAvaialbeRelayPeerCount - iExcludedRelayCount;
                     }
                 }
             }
         }
+
+        getHostModule()->checkSelectedRelaysAreViable(added_peers);
 
         fillPeersinToMsg(rmsg, iMaxTruePeerCount, added_peers, relayPeers, no_peer_id);
     }
@@ -791,7 +787,7 @@ int BTTrackerClientHandlerSPD::processAnnounceForTrueHashFromRelay(BTTrackerMsgA
 
 
     bool bSeed(false);
-    bool bPeerPresent = getHostModule()->containRealyinSwarm(amsg->peerId(), bSeed);
+    bool bPeerPresent = getHostModule()->containRelayinSwarm(amsg->peerId(), bSeed);
 
 
     // sanity checks - failures

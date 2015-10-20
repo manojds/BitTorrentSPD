@@ -47,7 +47,7 @@ public:
     bool    isblackListerPeerFilteringEnabled();
     bool    isExcludeRelaysInTruePeerList();
 
-    bool    containRealyinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const;
+    bool    containRelayinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const;
     void    addRelayPeerintoSwarm(const std::string & _sPeerID, bool isSeed);
     void    removeRelayPeerFromSwarm(const std::string & _sPeerID);
 
@@ -60,10 +60,18 @@ public:
     void    incrementRelayStartedCount();
 
     void    cleanRemoveRelayPeer(int index);
-    void    markRelayPeerAsExcluded(const std::string & _sPeerID);
+    void    markRelayPeerAsExcluded(int _iPeerIndex);
 
     void    insertRelayPeerIntoMap(const std::string & _sPeerID, int _iIndex);
     void    removeRelayPeerFromtheMap(const std::string & _sPeerID);
+
+    int     addRelayPeer(BTTrackerStructBase* tpeer);
+
+    void    consolidateRelayPeerPool();
+    bool    isRelayPeerPoolingEnabled(){return b_PoolRelayPeers;}
+    int     getMaxNumberOfAvailableRelayPeersToFill();
+
+    void    checkSelectedRelaysAreViable(const set<int> & _setRelays);
 
 protected:
     virtual void initialize();
@@ -73,6 +81,7 @@ protected:
     void    setRelayInfoHash(const string& infoHash);
 
     void    cleanRemoveRelayPeer(BTTrackerStructBase* peer);
+    void    removePeerFromThePool(int _iPeerIndex);
 
 
     virtual void writeStats();
@@ -84,13 +93,14 @@ protected:
 
 
     int                         i_NextIndexToFill;
-    size_t                      realyPeersNum_var;    // relay peers counter
+    size_t                      relayPeersNum_var;    // relay peers counter
     double                      relayPeerPropotionInReply_var;
     bool                        useRelayPropotioninRequest_var;
     PEER_FILL_METHOD            fillMethod;
     string                      realyIfoHash;
     cArray                      relayPeers_var;   // relay peers container
     std::map<std::string, int>  map_RelayPeers;     //relay peers, as a map of peer ID to array index
+    std::set<int>               set_RelayPeerPool;  //pool of relay peers which are currently used as relays
 
     //container for relay peers who participating in the swarm
     //this container will be used only relay peer are not treated as true peers when they participates in the swarm
@@ -101,7 +111,10 @@ protected:
     BTSPDTrackerBlackList       blckList;
     bool                        b_filterBlackListedPeers;
     bool                        b_ExcludeRelaysInTruePeerList;
-    std::set<std::string>       set_ExcludedRelays;
+    bool                        b_PoolRelayPeers;
+    int                         i_RelayPoolSize;
+    int                         i_LastConsolidatedRelayIndex;
+    std::set<int>               set_ExcludedRelays;
 };
 
 #endif /* BTTRACKERRELAYENABLED_H_ */
