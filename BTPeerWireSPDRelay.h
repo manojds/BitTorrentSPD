@@ -24,8 +24,8 @@ public:
     virtual void setPatchInfo(const std::string & _sPatchInfo);
     bool    isPatchInfoAvailable() {return b_PatchInfoAvailable; }
 
-    virtual void startActiveParticipationInSwarm();
-    virtual void stopParticipationInSwarm();
+    virtual void startParticipationInSwarm();
+
 
     virtual void checkRcvdConnIsViable(const PEER & peer);
 
@@ -35,6 +35,10 @@ protected:
     virtual void initialize();
 
     virtual void doStartNode();
+
+    virtual void beActiveInSwarm();
+    virtual void beIncativeInSwarm();
+    virtual void scheduleRandomExit();
 
     virtual void handleMessage(cMessage *msg);
 
@@ -69,7 +73,7 @@ private:
     //flag which indicates whether relay peer is currently participating in the swarm
     bool                    b_isParticipatingInSwarm;
     //flag which indicates at some point relay peer has participated in the swarm
-    bool                    b_ParticipatedInSwarm;
+    bool                    b_RelayStarted;
     bool                    b_Downloader;
     bool                    b_PatchInfoAvailable;
 

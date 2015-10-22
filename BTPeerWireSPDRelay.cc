@@ -15,7 +15,7 @@ Define_Module(BTPeerWireSPDRelay);
 
 BTPeerWireSPDRelay::BTPeerWireSPDRelay():
         b_isParticipatingInSwarm(false),
-        b_ParticipatedInSwarm(false),
+        b_RelayStarted(false),
         b_Downloader(false),
         b_PatchInfoAvailable(false),
         evtRelayTrackerComm(NULL)
@@ -49,6 +49,28 @@ void BTPeerWireSPDRelay::doStartNode()
     scheduleAt(simTime(), evtRelayTrackerComm);
 
 
+
+}
+
+void BTPeerWireSPDRelay::scheduleRandomExit()
+{
+    bool bLeaveNetworkRandomly = par("leaveNetworkRandomly");
+    if (bLeaveNetworkRandomly)
+    {
+        int iAverage = par("leaveTimeAverage");
+        int iVariation = par("leveTimeVariation");
+
+        int iLeaveTime = (iAverage - iVariation) + intrand(2*iVariation);
+
+        if (iLeaveTime <= 0)
+            iLeaveTime = 1;
+
+        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::scheduleRandomExit", "["<< this->getParentModule()->getFullName()<<
+                "]  Time ["<< simTime()<<"] scheduling to leave the network after ["<<iLeaveTime<<"] seconds");
+
+
+        scheduleExitMsgAfter(iLeaveTime);
+    }
 }
 
 void BTPeerWireSPDRelay::handleMessage(cMessage *msg)
@@ -124,6 +146,13 @@ void BTPeerWireSPDRelay::handleSelfMessage(cMessage* msg)
 
         break;
 
+    case INTERNAL_EXIT_MSG:
+        BTPeerWireSPD::handleSelfMessage(msg);
+        //if relay peer is exiting we need to stop tracker communication
+        cancelEvent(evtRelayTrackerComm);
+        break;
+
+
     case INTERNAL_EXIT_SAFE_MSG:
     {
         if ( evtRelayTrackerComm != NULL)
@@ -168,30 +197,53 @@ void BTPeerWireSPDRelay::notifynodeCreationToStatModule()
 
 
 
-void BTPeerWireSPDRelay::startActiveParticipationInSwarm()
+void BTPeerWireSPDRelay::startParticipationInSwarm()
 {
-    if(b_isParticipatingInSwarm == false)
+    if ( ! b_RelayStarted)
     {
-        BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
-                "startActiveParticipationInSwarm - Starting to act as Relay. ");
+        if (b_Downloader)
+        {
+            BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
+                    "startActiveParticipationInSwarm - Starting to act as Downloader.... Time ["<<simTime()<<"] ");
+        }
+        else
+        {
+            BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
+                    "startActiveParticipationInSwarm - Starting to act as Relay.... Time ["<<simTime()<<"] ");
+
+            scheduleRandomExit();
+
+        }
+
+        b_RelayStarted       = true;
+        beActiveInSwarm();
+    }
+}
+
+void BTPeerWireSPDRelay::beActiveInSwarm()
+{
+    if( b_RelayStarted == true &&  b_isParticipatingInSwarm == false )
+    {
+        BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::beActiveInSwarm","["<<this->getParentModule()->getFullName()<<"] beActiveInSwarm - Going active in swarm.... Downloader flag ["
+                << b_Downloader<<"] Download Completed flag ["<<b_DownloadCompleted<<"] Time ["<<simTime()<<"] ");
 
         b_isParticipatingInSwarm    = true;
-        b_ParticipatedInSwarm       = true;
 
         startTrackerComm();
 
         p_StatModule->nodeIsActiveInSwarm(this->getParentModule()->getFullName());
-
     }
-
 }
 
-void BTPeerWireSPDRelay::stopParticipationInSwarm()
+
+void BTPeerWireSPDRelay::beIncativeInSwarm()
 {
-    if(b_isParticipatingInSwarm == true)
+    //this is to leave the swarm as relay.
+    //so the node should not be downloader (i.e. it should be a relay) and it should be already participating in the swarm
+    if(b_Downloader == false || b_isParticipatingInSwarm == true)
     {
-        BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::stopParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
-                "Stopping participating in swarm");
+        BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::beIncativeInSwarm","["<<this->getParentModule()->getFullName()<<"] "
+                "Going inactive from swarm..DownloadCompelted Flag ["<<b_DownloadCompleted<<"] Time ["<<simTime()<<"]");
 
         b_isParticipatingInSwarm = false;
 
@@ -213,35 +265,33 @@ void BTPeerWireSPDRelay::checkRcvdConnIsViable(const PEER & peer)
 void BTPeerWireSPDRelay::newConnectionFromPeerEstablished(PEER peer, TCPServerThreadBase* thread)
 {
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished",
-            "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - New connection arrived from peer ["<<peer.peerId<<"]");
+            "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - New connection arrived from peer ["<<peer.peerId<<"] dwonloader flag ["<<b_Downloader<<']');
 
     BTPeerWireSPD::newConnectionFromPeerEstablished(peer, thread);
 
-    std::map<IPvXAddress, PEER>::iterator itr = initiatedPeers.find(peer.ipAddress);
-    if(itr == initiatedPeers.end())
+    if (b_Downloader == false )
     {
-        initiatedPeers[peer.ipAddress]=peer;
-    }
-    else
-    {
-        std::stringstream ss;
-        ss<<"["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection came from the same peer  twice. PeerID ["<<
-                peer.peerId<<"] IPaddress ["<<peer.ipAddress<<"]";
+        std::map<IPvXAddress, PEER>::iterator itr = initiatedPeers.find(peer.ipAddress);
+        if(itr == initiatedPeers.end())
+        {
+            initiatedPeers[peer.ipAddress]=peer;
+        }
+        else
+        {
+            std::stringstream ss;
+            ss<<"["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection came from the same peer  twice. PeerID ["<<
+                    peer.peerId<<"] IPaddress ["<<peer.ipAddress<<"]";
 
-        BT_LOG_ERROR( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished", ss.str().c_str());
+            BT_LOG_ERROR( btLogSinker, "BTPeerWireSPDRelay::newConnectionFromPeerEstablished", ss.str().c_str());
 
 
-        throw cRuntimeError(ss.str().c_str());
-    }
+            throw cRuntimeError(ss.str().c_str());
+        }
 
-    //then if we have participated in the swarm previously,
-    //and we have some received connections try to startParticipateIntheSwarm.
-    //if we left the swarm since incoming connections reaches zero, this will trigger re-participate in the swarm.
-    //the if check is necessary to avoid first time particpation, because first time participation triggered
-    //when patch info is received.
-    if (b_ParticipatedInSwarm)
-    {
-        startActiveParticipationInSwarm();
+        //then if we have participated in the swarm previously,
+        //and we have some received connections try to be active in the swarm.
+        //if we left the swarm since incoming connections reaches zero, this will trigger re-participate in the swarm.
+        beActiveInSwarm();
     }
 
 }
@@ -260,13 +310,15 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer, bool isActiveConn)
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::connectionLostFromPeer",
             "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection Lost with peer ["<<peer.ipAddress<<"]");
 
-
-    //we remove this peer from initiator list if it is a initiator
-    initiatedPeers.erase(peer.ipAddress);
-
-    if(initiatedPeers.size() == 0)
+    if (b_Downloader == false)
     {
-        stopParticipationInSwarm();
+        //we remove this peer from initiator list if it is a initiator
+        initiatedPeers.erase(peer.ipAddress);
+
+        if(initiatedPeers.size() == 0)
+        {
+            beIncativeInSwarm();
+        }
     }
 
     BTPeerWireSPD::connectionLostFromPeer(peer, isActiveConn);
@@ -308,7 +360,7 @@ void BTPeerWireSPDRelay::pauseChokingAlgos()
 void BTPeerWireSPDRelay::startTrackerComm()
 {
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::startTrackerComm","["<<this->getParentModule()->getFullName()<<"]"
-            "Starting Tracker Communication...");
+            " Starting Tracker Communication...");
 
     if(evtTrackerComm->isScheduled() == false)
     {
@@ -318,7 +370,7 @@ void BTPeerWireSPDRelay::startTrackerComm()
 
 void BTPeerWireSPDRelay::stopTrackerComm()
 {
-    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::stopTrackerComm","["<<this->getParentModule()->getFullName()<<"]"
+    BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::stopTrackerComm","["<<this->getParentModule()->getFullName()<<"] "
             "Stopping Tracker Communication...");
 
     if(evtTrackerComm->isScheduled() == true)

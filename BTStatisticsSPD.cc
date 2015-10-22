@@ -17,7 +17,7 @@
 
 #include "BTStatisticsSPD.h"
 #include "../BitTorrent/BTLogImpl.h"
-
+#include "BTSPDTimeUtils.h"
 using namespace std;
 
 Define_Module(BTStatisticsSPD);
@@ -33,7 +33,7 @@ i_CompletedNormalCount(0),
 i_CompletedRelayCount(0),
 i_Statinterval(25),
 p_StatMsg(NULL),
-s_FileName("BTSPD_Stats.txt")
+s_FileName("BTSPD_Stats")
 {
 
 
@@ -62,6 +62,11 @@ void BTStatisticsSPD::initialize()
 
     i_Statinterval = par("statisticInterval");
     p_StatMsg = new cMessage("BT_STATS_REGULAR_MSG", BT_STATS_REGULAR_MSG);
+
+    char pFullFileName[256];
+    BTSPDTimeUtils::fillFileNameWithTimeStamp(s_FileName.c_str(), pFullFileName);
+    s_FileName = pFullFileName;
+
 
     ofstream myfile (s_FileName.c_str());
     if (myfile.is_open() == false)

@@ -235,7 +235,7 @@ void BTTrackerSPD::handleMessage(cMessage* msg)
             if(tpeer && (simTime() - tpeer->lastAnnounce() >= (simtime_t)cleanupInterval_var))
             {
                 BT_LOG_INFO(btLogSinker, "BTTrackerSPD::handleMessage","Removing relay peer ["<< tpeer->peerId()
-                        <<"] due to inactivity");
+                        <<"] due to inactivity.. Time ["<<simTime()<<"]");
                 cleanRemoveRelayPeer(i);
             }
 
@@ -441,7 +441,7 @@ void BTTrackerSPD::checkSelectedRelaysAreViable(const set<int> & _setRelays)
         {
             //if relay peers are excluded from the true peers when participating in the swarm
             //the relay peer should NOT be in excluded peer list
-            ASSERT ( set_ExcludedRelays.find(*itr) !=  set_ExcludedRelays.end() );
+            ASSERT ( set_ExcludedRelays.find(*itr) ==  set_ExcludedRelays.end() );
         }
     }
 
@@ -518,7 +518,7 @@ void BTTrackerSPD::writeStats()
 {
     BTTrackerBase::writeStats();
 
-    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats ******** - Total Relay Count ["<<realyPeersNum()
+    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats Relay ******** - Time ["<<simTime() <<"] Total Relay Count ["<<realyPeersNum()
             <<"] Relay peer Started Count in Swarm ["<<i_RelayStartedCount<<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
             "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"]");
 

@@ -86,7 +86,7 @@ void BTPeerWireClientHandlerSPDRelay::patchInfoReceived(cPacket * msg)
 
     decideToBeDownloaderOrNot();
 
-    pPWSPD->startActiveParticipationInSwarm();
+    pPWSPD->startParticipationInSwarm();
 
     delete msg;
 

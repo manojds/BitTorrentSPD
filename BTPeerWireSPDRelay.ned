@@ -30,6 +30,10 @@ simple BTPeerWireSPDRelay extends BTPeerWireSPD like TCPApp
     parameters:
 		@class(BTPeerWireSPDRelay); 
 		
+		bool	leaveNetworkRandomly 	= default (false);
+		int		leaveTimeAverage		= default (100);
+		int		leveTimeVariation		= default (50);
+		
 		
 		
 

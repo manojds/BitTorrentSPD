@@ -21,6 +21,7 @@
 #include <fstream>
 #include <sys/timeb.h>
 #include "../BitTorrent/BTLogImpl.h"
+#include "BTSPDTimeUtils.h"
 
 Define_Module(BTSPDConnTracker);
 
@@ -84,28 +85,15 @@ void BTSPDConnTracker::constructTerminalNameMapping()
 
 void BTSPDConnTracker::finish()
 {
-    time_t timer;
-    time(&timer);
-
     char pFullFileName[256];
 
-    struct timeb tbNow;
-    char szNow[128];
-
-    ftime(&tbNow);
-    strftime(szNow, sizeof (szNow), "%m%d_%H%M%S", localtime(&tbNow.time));
-
-
-#ifndef WINNT
-snprintf(pFullFileName, 256,"%s_%s.txt", s_FileName.c_str(), szNow);
-#else
-_snprintf(pFullFileName, 256,"%s_%s.txt", s_FileName.c_str(), szNow);
-#endif /* WINNT */
-
+    BTSPDTimeUtils::fillFileNameWithTimeStamp(s_FileName.c_str(), pFullFileName);
 
     if (b_enableConnMapDumping)
         dumpConnMapToFile(map_AllConnections, pFullFileName);
 }
+
+
 
 void BTSPDConnTracker::handleMessage(cMessage *msg)
 {
@@ -194,8 +182,11 @@ void BTSPDConnTracker::handleNewNodeCreationMsg(cMessage* _pMsg)
 
     std::set<std::string> & setConns = map_AllConnections[pMsg->myName()];
     stringstream strm;
-    strm<<"z1 NodeCreationTime["<<pMsg->creationTime()<<"]";
+    strm<<"z1 \n\t\t\tNodeCreationTime["<<pMsg->creationTime()<<"]";
     setConns.insert(strm.str());
+
+    std::set<std::string> & setCurrConns = map_CurrentConnections[pMsg->myName()];
+    setCurrConns.insert(strm.str());
 }
 
 void BTSPDConnTracker::handleNodeLeaveMsg(cMessage* _pMsg)

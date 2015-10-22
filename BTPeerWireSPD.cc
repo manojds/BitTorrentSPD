@@ -171,7 +171,8 @@ void BTPeerWireSPD::RescheduleTrackerCommAt(simtime_t t)
 
 void BTPeerWireSPD::downloadCompleted(simtime_t _tDuration)
 {
-    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<"] Download completed... in ["<<_tDuration<<" sec] ");
+    BT_LOG_INFO(btLogSinker,"BTPeerWireSPD::handleSelfMessage","["<<this->getParentModule()->getFullName()<<
+            "] Download completed... in ["<<_tDuration<<" sec] current Time ["<<simTime()<<"]");
 
     p_ThreatHndlr->cleanAdversary();
 

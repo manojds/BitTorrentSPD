@@ -10,6 +10,7 @@
 
 #include <string>
 
+
 enum PEER_FILL_METHOD
 {
     FILL_ALL =0,
@@ -45,6 +46,9 @@ enum NODE_TYPE
     NORMAL_PEER = 0 ,
     RELAY_PEER = 1
 };
+
+
+
 
 
 
