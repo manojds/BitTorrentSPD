@@ -240,7 +240,7 @@ void BTPeerWireSPDRelay::beIncativeInSwarm()
 {
     //this is to leave the swarm as relay.
     //so the node should not be downloader (i.e. it should be a relay) and it should be already participating in the swarm
-    if(b_Downloader == false || b_isParticipatingInSwarm == true)
+    if(b_Downloader == false && b_isParticipatingInSwarm == true)
     {
         BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::beIncativeInSwarm","["<<this->getParentModule()->getFullName()<<"] "
                 "Going inactive from swarm..DownloadCompelted Flag ["<<b_DownloadCompleted<<"] Time ["<<simTime()<<"]");
