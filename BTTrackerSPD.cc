@@ -55,10 +55,19 @@ void BTTrackerSPD::initialize()
 
     i_RelayPoolSize                 = par("relayPoolSize");
 
-    BT_LOG_INFO(btLogSinker, "BTTrackerClientHandlerB::initialize", "TrackerSPD initializing.... PoolRelayPeers ["<<b_PoolRelayPeers<<
-                    "] relayPoolSize ["<<i_RelayPoolSize<<"] fill Method ["<<fillMethodToString(fillMethod)<<"]");
-
     unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
+
+    BT_LOG_ESSEN(btLogSinker, "BTTrackerClientHandlerB::initialize", "TrackerSPD initializing.... \n"
+            "PoolRelayPeers                 - "<<b_PoolRelayPeers<<"\n"
+            "relayPoolSize                  - "<<i_RelayPoolSize<<"\n"
+            "fill Method                    - "<<fillMethodToString(fillMethod)<<"\n"
+            "useRelayPeerPropotionInRequest - "<<useRelayPropotioninRequest_var<<"\n"
+            "relay peer Proportion          - "<<relayPeerPropotionInReply_var<<"\n"
+            "ExcludeRelaysInTruePeerList    - "<<b_ExcludeRelaysInTruePeerList<<"\n"
+            "filterBlackListedPeers         - "<<b_filterBlackListedPeers<<"\n"
+            "BlackListThreshold             - "<<uiBlackListThreshold);
+
+
 
     relayPeersNum_var   = 0;
 
