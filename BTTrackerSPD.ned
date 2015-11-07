@@ -34,6 +34,6 @@ simple BTTrackerSPD extends BTTrackerBase like TCPApp , UDPApp
         
         bool 	excludeRelaysFromTruePeerList 	= default(false);
         bool 	poolRelayPeers 					= default(false);
-        int		relayPoolSize					= default(100);
+        double	relayPoolFraction				= default(1);
         
 }

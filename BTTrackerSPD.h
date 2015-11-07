@@ -112,7 +112,7 @@ protected:
     bool                        b_filterBlackListedPeers;
     bool                        b_ExcludeRelaysInTruePeerList;
     bool                        b_PoolRelayPeers;
-    int                         i_RelayPoolSize;
+    double                      d_RelayPoolFraction;
     int                         i_LastConsolidatedRelayIndex;
     std::set<int>               set_ExcludedRelays;
 };

@@ -27,7 +27,7 @@ BTTrackerSPD::BTTrackerSPD():
         b_filterBlackListedPeers(false),
         b_ExcludeRelaysInTruePeerList(false),
         b_PoolRelayPeers(false),
-        i_RelayPoolSize(100),
+        d_RelayPoolFraction(1),
         i_LastConsolidatedRelayIndex(0)
 {
     // TODO Auto-generated constructor stub
@@ -53,13 +53,13 @@ void BTTrackerSPD::initialize()
 
     b_PoolRelayPeers                = par("poolRelayPeers");
 
-    i_RelayPoolSize                 = par("relayPoolSize");
+    d_RelayPoolFraction             = par("relayPoolFraction");
 
     unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
 
     BT_LOG_ESSEN(btLogSinker, "BTTrackerClientHandlerB::initialize", "TrackerSPD initializing.... \n"
             "PoolRelayPeers                 - "<<b_PoolRelayPeers<<"\n"
-            "relayPoolSize                  - "<<i_RelayPoolSize<<"\n"
+            "relayPoolFraction              - "<<d_RelayPoolFraction<<"\n"
             "fill Method                    - "<<fillMethodToString(fillMethod)<<"\n"
             "useRelayPeerPropotionInRequest - "<<useRelayPropotioninRequest_var<<"\n"
             "relay peer Proportion          - "<<relayPeerPropotionInReply_var<<"\n"
@@ -375,12 +375,13 @@ void BTTrackerSPD::consolidateRelayPeerPool()
     if (b_PoolRelayPeers)
     {
         int iAddedCount(0);
+        int iRelayPoolSize = d_RelayPoolFraction * peersNum_var;
         int iPoolSizeb4Consolidation = set_RelayPeerPool.size();    //only for debug
 
         //we go full round around relay peer array if necessary
         //and also do work only if relay pool size lower than the specified pool size
 
-        for ( unsigned int i = 0 ; (i < relayPeers_var.size()) && (set_RelayPeerPool.size() < i_RelayPoolSize) ; i++ )
+        for ( unsigned int i = 0 ; (i < relayPeers_var.size()) && (set_RelayPeerPool.size() < iRelayPoolSize) ; i++ )
         {
             i_LastConsolidatedRelayIndex++;
 
@@ -406,16 +407,12 @@ void BTTrackerSPD::consolidateRelayPeerPool()
         }
 
         BT_LOG_ESSEN(btLogSinker, "BTTrackerSPD::consolidateRelayPeerPool", "Consolidated Relay peer Pool, Current Pool size ["<<set_RelayPeerPool.size()
-                << "], pool size before consolidation ["<<iPoolSizeb4Consolidation<<"] Relay peer Array size ["<<relayPeers_var.size()<<"], available relay peers num ["<<
-                relayPeersNum_var<<"] LastConsolidatedIndex ["<< i_LastConsolidatedRelayIndex<<"], Relay Exclude set size [" <<set_ExcludedRelays.size()
-                <<"] Added ["<<iAddedCount <<"] relays to the pool.");
+                << "], ideal Pool Size as of now ["<<iRelayPoolSize <<"], pool size before consolidation ["<<iPoolSizeb4Consolidation<<"] Relay peer Array size ["<<
+                relayPeers_var.size()<<"], available relay peers num ["<< relayPeersNum_var<<"] LastConsolidatedIndex ["<< i_LastConsolidatedRelayIndex<<
+                "], Relay Exclude set size [" <<set_ExcludedRelays.size()<<"] Added ["<<iAddedCount <<"] relays to the pool.");
 
         //assertions
-        if ( i_RelayPoolSize <  (relayPeersNum_var - set_ExcludedRelays.size()) )
-        {
-            ASSERT(set_RelayPeerPool.size() == i_RelayPoolSize );
-        }
-        else
+        if ( iRelayPoolSize >  (relayPeersNum_var - set_ExcludedRelays.size()) )
         {
             ASSERT(set_RelayPeerPool.size() == (relayPeersNum_var - set_ExcludedRelays.size()) );
         }
@@ -527,7 +524,7 @@ void BTTrackerSPD::writeStats()
 {
     BTTrackerBase::writeStats();
 
-    BT_LOG_INFO(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats Relay ******** - Time ["<<simTime() <<"] Total Relay Count ["<<realyPeersNum()
+    BT_LOG_ESSEN(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats Relay ******** - Time ["<<simTime() <<"] Total Relay Count ["<<realyPeersNum()
             <<"] Relay peer Started Count in Swarm ["<<i_RelayStartedCount<<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
             "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"]");
 
