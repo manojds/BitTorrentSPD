@@ -276,7 +276,7 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
     BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                     "relay peer count ["<<getHostModule()->realyPeersNum()<<"] relay pool size ["<<
                                     getHostModule()->getRelayPoolSize()<<"] relay excluded size ["<<
-                                    getHostModule()->getExcludedRelaySetSize()<<"]");
+                                    getHostModule()->getExcludedRelaySetSize()<<"] is Relay ["<<pSPDMsg->isRelay()<<"]");
 
     int iMaxTruePeerCount(0);
     int iMaxRelayPeersCount(0);
@@ -326,11 +326,6 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
             //if there is peer at this index add it
             if(relayPeers[iRndPeer] != NULL)
             {
-                //This announcing peer also could be a relay peer.
-                //So this particular index may be give us the same peer from relay peer array.
-                //We should not add the same peer requesting in the response
-                if(amsg->peerId()  == ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId())
-                    continue;
 
                 bool bExcludeRelayPeer(false);
 
@@ -368,6 +363,12 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
 
                 if(!bExcludeRelayPeer)
                 {
+                    //This announcing peer also could be a relay peer.
+                    //So this particular index may be give us the same peer from relay peer array.
+                    //We should not add the same peer requesting in the response
+                    if(amsg->peerId()  == ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId())
+                        continue;
+
                     added_peers.insert(iRndPeer);
 //                    BT_LOG_DETAIL(btLogSinker, "BTTrackerClientHndlrSPD::fillPeersInResponse",
 //                            "fillPeersInResponse - added peer "<< ((BTTrackerStructBase*)relayPeers[iRndPeer])->peerId()
