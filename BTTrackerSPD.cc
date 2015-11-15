@@ -459,7 +459,7 @@ int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
     int index (0);
     while (true)
     {
-        index = intrand(relayPeers().size());
+        index = intrand(relayPeers().size() + 1);
 
         if (b_PoolRelayPeers)
         {
