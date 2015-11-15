@@ -276,6 +276,9 @@ void BTTrackerSPD::cleanRemoveRelayPeer(int index)
         relayPeers().remove(index);
         relayPeersNum_var--;
         removeRelayPeerFromtheMap(peer->peerId());
+        //if it is a excluded one remove it from teh excluded set
+        set_ExcludedRelays.erase(index);
+
         removePeerFromThePool(index);
 
         delete peer;
