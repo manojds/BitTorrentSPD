@@ -70,6 +70,8 @@ public:
     void    consolidateRelayPeerPool();
     bool    isRelayPeerPoolingEnabled(){return b_PoolRelayPeers;}
     int     getMaxNumberOfAvailableRelayPeersToFill();
+    int     getRelayPoolSize();
+    int     getExcludedRelaySetSize();
 
     void    checkSelectedRelaysAreViable(const set<int> & _setRelays);
 

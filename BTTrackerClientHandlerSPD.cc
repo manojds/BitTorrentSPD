@@ -266,16 +266,28 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
     cArray & relayPeers = getHostModule()->relayPeers();
     int iAvailableTruePeerCount = rmsg->peersArraySize();
     int iAvaialbeRelayPeerCount = getHostModule()->getMaxNumberOfAvailableRelayPeersToFill();
+    if (pSPDMsg->isRelay())
+    {
+        iAvaialbeRelayPeerCount--;
+        // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
+        // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
+    }
+
+    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
+                                    "relay peer count ["<<getHostModule()->realyPeersNum()<<"] relay pool size ["<<
+                                    getHostModule()->getRelayPoolSize()<<"] relay excluded size ["<<
+                                    getHostModule()->getExcludedRelaySetSize()<<"]");
+
     int iMaxTruePeerCount(0);
     int iMaxRelayPeersCount(0);
     determinePeerMix(pSPDMsg->relayPeerRatio(), iAvailableTruePeerCount, iAvaialbeRelayPeerCount, iMaxTruePeerCount, iMaxRelayPeersCount);
+
     //if the true peer count needs to be changed
     if(iAvailableTruePeerCount != iMaxTruePeerCount){
         //now shrink the Peer array to the required size
         rmsg->setPeersArraySize(iMaxTruePeerCount);
     }
 
-    bool bIsRelay = pSPDMsg->isRelay();
 
     //if there are relay peers to fill
     if(  iMaxRelayPeersCount > 0 )
@@ -292,16 +304,11 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
         if ( iMaxRelayPeersCount > iAvaialbeRelayPeerCount  )
         {
             iMaxRelayPeersCount = iAvaialbeRelayPeerCount;
-            if (bIsRelay)
-            {
-                iMaxRelayPeersCount--;
-                // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
-                // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
-            }
+
 
             BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                             "reduced  iMaxRelayPeersCount to ["<<iMaxRelayPeersCount<<"] to because only ["<<
-                                            iAvaialbeRelayPeerCount<<"] relay peers available. is Relays ["<<bIsRelay<<"]");
+                                            iAvaialbeRelayPeerCount<<"] relay peers available. ");
         }
 
         for ( ; (int)added_peers.size() < iMaxRelayPeersCount  ; )
@@ -380,10 +387,6 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                                 iAvaialbeRelayPeerCount - iExcludedRelayCount<<"] since not enough relay peers to add");
 
                         iMaxRelayPeersCount = iAvaialbeRelayPeerCount - iExcludedRelayCount;
-                        if (bIsRelay)
-                        {
-                            iMaxRelayPeersCount--;
-                        }
                     }
                 }
             }

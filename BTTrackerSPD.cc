@@ -431,6 +431,16 @@ int BTTrackerSPD::getMaxNumberOfAvailableRelayPeersToFill()
     }
 }
 
+int BTTrackerSPD::getRelayPoolSize()
+{
+    return set_RelayPeerPool.size();
+}
+
+int BTTrackerSPD::getExcludedRelaySetSize()
+{
+    return set_ExcludedRelays.size();
+}
+
 void BTTrackerSPD::checkSelectedRelaysAreViable(const set<int> & _setRelays)
 {
 #ifdef MJP_DEBUG
