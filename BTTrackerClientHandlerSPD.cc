@@ -275,6 +275,8 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
         rmsg->setPeersArraySize(iMaxTruePeerCount);
     }
 
+    bool bIsRelay = pSPDMsg->isRelay();
+
     //if there are relay peers to fill
     if(  iMaxRelayPeersCount > 0 )
     {
@@ -287,15 +289,19 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
         set<int> added_peers;
 
         //if we don't have that much relay peers make the maximum to the amount we have
-        if ( iMaxRelayPeersCount > (getHostModule()->getMaxNumberOfAvailableRelayPeersToFill() -1 ) )
+        if ( iMaxRelayPeersCount > iAvaialbeRelayPeerCount  )
         {
-                iMaxRelayPeersCount = getHostModule()->getMaxNumberOfAvailableRelayPeersToFill() -1;
-            // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
-            // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
+            iMaxRelayPeersCount = iAvaialbeRelayPeerCount;
+            if (bIsRelay)
+            {
+                iMaxRelayPeersCount--;
+                // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
+                // taking about is relayPeers.size() -1, because we can't send id of a peer to itself
+            }
 
             BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::fillRelayPeers","fillRelayPeers -"
                                             "reduced  iMaxRelayPeersCount to ["<<iMaxRelayPeersCount<<"] to because only ["<<
-                                            (int)getHostModule()->getMaxNumberOfAvailableRelayPeersToFill()<<"] relay peers available");
+                                            iAvaialbeRelayPeerCount<<"] relay peers available. is Relays ["<<bIsRelay<<"]");
         }
 
         for ( ; (int)added_peers.size() < iMaxRelayPeersCount  ; )
@@ -346,6 +352,8 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                     {
                         bExcludeRelayPeer = true;
                         getHostModule()->markRelayPeerAsExcluded(iRndPeer);
+                        //we need to renew the available relay peer count since we just excluded a one
+                        iAvaialbeRelayPeerCount = getHostModule()->getMaxNumberOfAvailableRelayPeersToFill();
 
                     }
 
@@ -372,6 +380,10 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
                                 iAvaialbeRelayPeerCount - iExcludedRelayCount<<"] since not enough relay peers to add");
 
                         iMaxRelayPeersCount = iAvaialbeRelayPeerCount - iExcludedRelayCount;
+                        if (bIsRelay)
+                        {
+                            iMaxRelayPeersCount--;
+                        }
                     }
                 }
             }

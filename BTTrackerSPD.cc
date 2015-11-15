@@ -427,7 +427,7 @@ int BTTrackerSPD::getMaxNumberOfAvailableRelayPeersToFill()
     }
     else
     {
-        return relayPeersNum_var;
+        return relayPeersNum_var - set_ExcludedRelays.size();
     }
 }
 
