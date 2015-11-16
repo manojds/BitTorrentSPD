@@ -62,6 +62,8 @@ protected:
     virtual void startTrackerComm();
     virtual void stopTrackerComm();
 
+    virtual void notifyNodeLeaveToStatModule();
+
     virtual void writeStats();
 
     const char* toString(int);

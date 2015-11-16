@@ -556,6 +556,11 @@ void BTPeerWireSPD::onReadyToLeaveSwarm()
         sendDirect(nodeLeaveMsg,  p_ConnTracker, p_ConnTracker->findGate("direct_in"));
     }
 
+    notifyNodeLeaveToStatModule();
+}
+
+void BTPeerWireSPD::notifyNodeLeaveToStatModule()
+{
     p_StatModule->nodeLeftTheSwarm(this->getParentModule()->getFullName());
 }
 

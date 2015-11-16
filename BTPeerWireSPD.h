@@ -73,6 +73,9 @@ protected:
     virtual void onReadyToLeaveSwarm();
 
 
+    virtual void notifyNodeLeaveToStatModule();
+
+
     bool                b_enableConnMapDumping;
     bool                b_PublishTrackerOnCompletion;
     bool                b_PublishMeByTracker;

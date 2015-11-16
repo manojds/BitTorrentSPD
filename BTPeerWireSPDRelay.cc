@@ -245,15 +245,23 @@ void BTPeerWireSPDRelay::beIncativeInSwarm()
         BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::beIncativeInSwarm","["<<this->getParentModule()->getFullName()<<"] "
                 "Going inactive from swarm..DownloadCompelted Flag ["<<b_DownloadCompleted<<"] Time ["<<simTime()<<"]");
 
-        b_isParticipatingInSwarm = false;
-
         stopTrackerComm();
         pauseChokingAlgos();
         closeAllConnections();
 
-        p_StatModule->nodeLeftTheSwarm(this->getParentModule()->getFullName());
+        notifyNodeLeaveToStatModule();
+
+        b_isParticipatingInSwarm = false;
     }
 
+}
+
+void BTPeerWireSPDRelay::notifyNodeLeaveToStatModule()
+{
+    if (b_isParticipatingInSwarm)
+    {
+        p_StatModule->nodeLeftTheSwarm(this->getParentModule()->getFullName());
+    }
 }
 
 void BTPeerWireSPDRelay::checkRcvdConnIsViable(const PEER & peer)
