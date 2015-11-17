@@ -149,7 +149,10 @@ void BTPeerWireSPDRelay::handleSelfMessage(cMessage* msg)
     case INTERNAL_EXIT_MSG:
         BTPeerWireSPD::handleSelfMessage(msg);
         //if relay peer is exiting we need to stop tracker communication
-        cancelEvent(evtRelayTrackerComm);
+        if (evtRelayTrackerComm != NULL)
+        {
+            cancelEvent(evtRelayTrackerComm);
+        }
         break;
 
 
