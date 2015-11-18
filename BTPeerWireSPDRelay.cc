@@ -396,10 +396,17 @@ void BTPeerWireSPDRelay::stopTrackerComm()
 
 void BTPeerWireSPDRelay::writeStats()
 {
-    BTStatisticsDWLMsg* msgDWL = new BTStatisticsDWLMsg("BT_STATS_RELAY_DWL",BT_STATS_RELAY_DWL);
-    msgDWL->setDownloadTime(SIMTIME_DBL(downloadDuration()));
-    msgDWL->setRemainingBlocks(localBitfield()->numRemainingBlocks());
-    sendDirect(msgDWL,  btStatistics, btStatistics->findGate("direct_in"));
+    if (b_Downloader)
+    {
+        BTPeerWireSPD::writeStats();
+    }
+    else
+    {
+        BTStatisticsDWLMsg* msgDWL = new BTStatisticsDWLMsg("BT_STATS_RELAY_DWL",BT_STATS_RELAY_DWL);
+        msgDWL->setDownloadTime(SIMTIME_DBL(downloadDuration()));
+        msgDWL->setRemainingBlocks(localBitfield()->numRemainingBlocks());
+        sendDirect(msgDWL,  btStatistics, btStatistics->findGate("direct_in"));
+    }
 
 
 }
