@@ -262,6 +262,17 @@ void BTStatisticsSPD::nodeCompletedTheDownload(const std::string & _sNodeName)
     }
 }
 
+void BTStatisticsSPD::incrementTargetCompleteCount()
+{
+    targetOverlayTerminalNum++;
+
+    BT_LOG_ESSEN(btLogSinker,"BTStatisticsSPD::incrementTargetCompleteCount","target completed count incremented to ["<<
+            targetOverlayTerminalNum<<"] current completed count ["<<i_CompletedNormalCount<<"] completed relay count ["<<
+            i_CompletedRelayCount<<"]");
+
+
+}
+
 
 void BTStatisticsSPD::statTimerFired()
 {

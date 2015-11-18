@@ -208,6 +208,8 @@ void BTPeerWireSPDRelay::startParticipationInSwarm()
         {
             BT_LOG_ESSEN( btLogSinker, "BTPeerWireSPDRelay::startActiveParticipationInSwarm","["<<this->getParentModule()->getFullName()<<"]"
                     "startActiveParticipationInSwarm - Starting to act as Downloader.... Time ["<<simTime()<<"] ");
+
+            p_StatModule->incrementTargetCompleteCount();
         }
         else
         {
@@ -321,6 +323,8 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer, bool isActiveConn)
     BT_LOG_INFO( btLogSinker, "BTPeerWireSPDRelay::connectionLostFromPeer",
             "["<< this->getParentModule()->getFullName()<<"] ConnMngmnt - Connection Lost with peer ["<<peer.ipAddress<<"]");
 
+    BTPeerWireSPD::connectionLostFromPeer(peer, isActiveConn);
+
     if (b_Downloader == false)
     {
         //we remove this peer from initiator list if it is a initiator
@@ -331,8 +335,6 @@ void BTPeerWireSPDRelay::connectionLostFromPeer(PEER peer, bool isActiveConn)
             beIncativeInSwarm();
         }
     }
-
-    BTPeerWireSPD::connectionLostFromPeer(peer, isActiveConn);
 }
 
 

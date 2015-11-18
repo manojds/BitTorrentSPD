@@ -49,6 +49,8 @@ public:
     virtual void nodeLeftTheSwarm(const std::string & _sNodeName);
     virtual void nodeCompletedTheDownload(const std::string & _sNodeName);
 
+    virtual void incrementTargetCompleteCount();
+
 protected:
 
     virtual void initialize();
