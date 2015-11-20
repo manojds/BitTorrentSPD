@@ -145,6 +145,11 @@ cMessage * BTPeerWireSPD::createTrackerCommMsg()
             pMsg= new BTRequestTrackerCommSPD(toString(EVT_STOP),EVT_STOP);
             break;
         }
+        case EXITED:
+        {
+            pMsg= new BTRequestTrackerCommSPD(toString(EVT_STOP),EVT_STOP);
+            break;
+        }
         default:
             error("%s:%d at %s() Invalid client state (STATE = %d). \n", __FILE__, __LINE__, __func__,getState());
 

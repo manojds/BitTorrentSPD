@@ -136,6 +136,11 @@ void BTPeerWireSPDRelay::handleSelfMessage(cMessage* msg)
             send(new cMessage(toString(EVT_STOP), EVT_STOP), "relayTrackerOut");
             break;
         }
+        case EXITED:
+        {
+            send(new cMessage(toString(EVT_STOP), EVT_STOP), "relayTrackerOut");
+            break;
+        }
 
         default:
             error("%s:%d at %s() Invalid client state (STATE = %d). \n",
