@@ -84,7 +84,7 @@ void BTThreatHandler::handleMessage(cMessage *msg)
 
 void BTThreatHandler::handleMsgFromBT(cMessage* msg)
 {
-    BT_LOG_INFO (btLogSinker,"BTThreatHandler::handleMsgFromBT","["<<getParentModule()->getFullName()<<"]  Message of kind ["<<
+    BT_LOG_DEBUG (btLogSinker,"BTThreatHandler::handleMsgFromBT","["<<getParentModule()->getFullName()<<"]  Message of kind ["<<
             msg->getKind()<<"] name ["<<msg->getName() <<"] received from PeerWire module");
     //decode the message
     //if attack message go in to malicious mode
@@ -137,7 +137,7 @@ bool BTThreatHandler::activateAdversary()
 
     if(b_Malicious == false )
     {
-        BT_LOG_INFO (btLogSinker,"BTThreatHandler::compromised","["<<getParentModule()->getFullName()<<
+        BT_LOG_ESSEN(btLogSinker,"BTThreatHandler::compromised","["<<getParentModule()->getFullName()<<
                 "] ******* I have been compromised. Activating the Adversary");
         b_Malicious= true;
 
@@ -166,7 +166,7 @@ void BTThreatHandler::cleanAdversary()
     {
         Enter_Method_Silent();
 
-        BT_LOG_INFO (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
+        BT_LOG_ESSEN (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
                 "]  Adversary neutralized !");
         b_Malicious= false;
 
@@ -218,7 +218,7 @@ void BTThreatHandler::tryNextAttack()
                 Victim victim = q_LearnedNodes.front();
                 par("connectAddress")= victim.address.c_str();
 
-                BT_LOG_INFO(btLogSinker,"BTThreatHandler::tryNextAttack","["<<getParentModule()->getFullName()<<
+                BT_LOG_DEBUG(btLogSinker,"BTThreatHandler::tryNextAttack","["<<getParentModule()->getFullName()<<
                         "]  connecting to ["<<victim.address<<"] to attack...");
 
                 //port would be taken from the configuration
@@ -263,7 +263,7 @@ void BTThreatHandler::socketEstablished(int connId, void *ptr)
 
 void BTThreatHandler::sendAttackMsg(const Victim & victim)
 {
-    BT_LOG_INFO(btLogSinker,"BTThreatHandler::sendAttackMsg","["<<getParentModule()->getFullName()<<"]  attacking on ["<<
+    BT_LOG_DEBUG(btLogSinker,"BTThreatHandler::sendAttackMsg","["<<getParentModule()->getFullName()<<"]  attacking on ["<<
             victim.address<<"] ");
 
 
@@ -299,7 +299,7 @@ void BTThreatHandler::socketFailure(int, void*, int)
 
 void BTThreatHandler::newAddrFound(const std::string & _sNodeName, const std::string & _sIP, const std::string & _sPort, bool isActiveConn)
 {
-    BT_LOG_INFO(btLogSinker,"BTThreatHandler::newAddrFound","["<<getParentModule()->getFullName()<<"]  New address found ["<<
+    BT_LOG_DEBUG(btLogSinker,"BTThreatHandler::newAddrFound","["<<getParentModule()->getFullName()<<"]  New address found ["<<
             _sIP<<":"<<_sPort<< "]");
 
     //we act on new addresses only if we are malicious

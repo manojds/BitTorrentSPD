@@ -130,8 +130,9 @@ void BTTrackerClientHandlerSPD::updateRelayPeerDetailsFromAnnounceMsg(BTTrackerM
 
 int BTTrackerClientHandlerSPD::processRelayAnnounce(BTTrackerMsgAnnounce* amsg)
 {
-    BT_LOG_INFO(btLogSinker, "BTTrackerClientHndlrSPD::processAnnounce", "Announce request for relay hash from client[address="
-            << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "], name ["<< amsg->peerId()<<"] with event ["<<amsg->event()<<"]");
+    BT_LOG_ESSEN(btLogSinker, "BTTrackerClientHndlrSPD::processAnnounce", "Announce request for relay hash from client[address="
+            << getSocket()->getRemoteAddress() << ", port=" << getSocket()->getRemotePort() << "], name ["<< amsg->peerId()<<
+            "] with event ["<<amsg->event()<<"] info hash ["<<amsg->infoHash()<<"]");
 
 
     // the position of the peer in the pool
