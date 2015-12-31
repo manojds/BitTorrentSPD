@@ -457,6 +457,8 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
 void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes,
         int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount )
 {
+    double dRelayPeerPcntgInTracker = getHostModule()->relayPeerPropotionInReply();
+
     int iMaxPeersInRes=getHostModule()->maxPeersInReply();
     bool bUseRelayPropotioninRequest=getHostModule()->useRelayPropotioninRequest();
 
@@ -465,9 +467,20 @@ void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcnt
     double dRelayPeerPcntg(0.0);
 
     if(bUseRelayPropotioninRequest == false)
-        dRelayPeerPcntg=getHostModule()->relayPeerPropotionInReply();
+    {
+        dRelayPeerPcntg= dRelayPeerPcntgInTracker;
+    }
     else
-        dRelayPeerPcntg=_dRequestedRelayPeerPcntg;
+    {
+        if (getHostModule()->isObscureSeedersEnabled() && _dRequestedRelayPeerPcntg < dRelayPeerPcntgInTracker)
+        {
+            dRelayPeerPcntg = dRelayPeerPcntgInTracker;
+        }
+        else
+        {
+            dRelayPeerPcntg=_dRequestedRelayPeerPcntg;
+        }
+    }
 
     //if ratio is negative or greater than one, it is invalid
     if( (dRelayPeerPcntg + dDelta) < 0 || (dRelayPeerPcntg - dDelta) > 1 )

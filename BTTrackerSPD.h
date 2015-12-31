@@ -46,6 +46,7 @@ public:
     bool    isClientBlackListed(const std::string & _clientIP);
     bool    isblackListerPeerFilteringEnabled();
     bool    isExcludeRelaysInTruePeerList();
+    bool    isObscureSeedersEnabled();
 
     bool    containRelayinSwarm(const std::string & _sPeerID, bool & _bIsSeed) const;
     void    addRelayPeerintoSwarm(const std::string & _sPeerID, bool isSeed);
@@ -115,6 +116,7 @@ protected:
     bool                        b_ExcludeRelaysInTruePeerList;
     bool                        b_PoolRelayPeers;
     double                      d_RelayPoolFraction;
+    bool                        b_ObscureSeeders;
     int                         i_LastConsolidatedRelayIndex;
     std::set<int>               set_ExcludedRelays;
 };

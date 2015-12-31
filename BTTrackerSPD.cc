@@ -55,6 +55,8 @@ void BTTrackerSPD::initialize()
 
     d_RelayPoolFraction             = par("relayPoolFraction");
 
+    b_ObscureSeeders                = par("obscureSeeders");
+
     unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
 
     BT_LOG_ESSEN(btLogSinker, "BTTrackerClientHandlerB::initialize", "TrackerSPD initializing.... \n"
@@ -64,6 +66,7 @@ void BTTrackerSPD::initialize()
             "useRelayPeerPropotionInRequest - "<<useRelayPropotioninRequest_var<<"\n"
             "relay peer Proportion          - "<<relayPeerPropotionInReply_var<<"\n"
             "ExcludeRelaysInTruePeerList    - "<<b_ExcludeRelaysInTruePeerList<<"\n"
+            "ObscureSeeders                 - "<<b_ObscureSeeders<<"\n"
             "filterBlackListedPeers         - "<<b_filterBlackListedPeers<<"\n"
             "BlackListThreshold             - "<<uiBlackListThreshold);
 
@@ -228,6 +231,10 @@ bool BTTrackerSPD::isExcludeRelaysInTruePeerList()
     return b_ExcludeRelaysInTruePeerList;
 }
 
+bool BTTrackerSPD::isObscureSeedersEnabled()
+{
+    return b_ObscureSeeders;
+}
 void BTTrackerSPD::handleMessage(cMessage* msg)
 {
     // local handling of the cleanup message
