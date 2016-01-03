@@ -50,8 +50,7 @@ void BTThreatHandler::initialize()
     TCPGenericCliAppBase::initialize();
 
     b_Malicious= par("malicious");
-
-    b_ThreatRemovable= par("threatRemoveable");
+    b_IsThreatEpidemic = par("isThreatEpidemic");
 
     d_AttackingPorbability= par("attackingProbability");
 
@@ -162,7 +161,9 @@ bool BTThreatHandler::activateAdversary()
 
 void BTThreatHandler::cleanAdversary()
 {
-    if(b_Malicious == true && b_ThreatRemovable == true)
+    bool bThreatRemovable= par("threatRemoveable");
+
+    if(b_Malicious == true && bThreatRemovable == true)
     {
         Enter_Method_Silent();
 
@@ -179,7 +180,7 @@ void BTThreatHandler::cleanAdversary()
         sendDirect(pMsg,  p_SecStatistics, p_SecStatistics->findGate("direct_in"));
     }
 
-    else if (b_Malicious == true && b_ThreatRemovable == false)
+    else if (b_Malicious == true && bThreatRemovable == false)
     {
         BT_LOG_INFO (btLogSinker,"BTThreatHandler::cleanAdversary","["<<getParentModule()->getFullName()<<
                 "]  fail to clean the adversary because this threat cannot be cleaned");
@@ -303,7 +304,7 @@ void BTThreatHandler::newAddrFound(const std::string & _sNodeName, const std::st
             _sIP<<":"<<_sPort<< "]");
 
     //we act on new addresses only if we are malicious
-    if(b_Malicious)
+    if(b_Malicious && b_IsThreatEpidemic)
     {
         Victim victim;
         victim.address = _sIP;
