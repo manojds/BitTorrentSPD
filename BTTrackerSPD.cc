@@ -385,7 +385,7 @@ void BTTrackerSPD::consolidateRelayPeerPool()
     if (b_PoolRelayPeers)
     {
         int iAddedCount(0);
-        int iRelayPoolSize = d_RelayPoolFraction * peersNum_var;
+        int iRelayPoolSize = d_RelayPoolFraction * (peersNum() - seeds() ); // relay pool size is adjusted based on the leeacher node count
         int iPoolSizeb4Consolidation = set_RelayPeerPool.size();    //only for debug
 
         //we go full round around relay peer array if necessary
