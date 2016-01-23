@@ -388,6 +388,15 @@ void BTTrackerSPD::consolidateRelayPeerPool()
         int iRelayPoolSize = d_RelayPoolFraction * (peersNum() - seeds() ); // relay pool size is adjusted based on the leeacher node count
         int iPoolSizeb4Consolidation = set_RelayPeerPool.size();    //only for debug
 
+        //if relay pool size is larger than the required size remove some relays from the pool
+        if ( iRelayPoolSize > set_RelayPeerPool.size())
+        {
+            while ( iRelayPoolSize ==  set_RelayPeerPool.size())
+            {
+                set_RelayPeerPool.erase(intrand(relayPeers().size()));
+            }
+        }
+
         //we go full round around relay peer array if necessary
         //and also do work only if relay pool size lower than the specified pool size
 
@@ -441,6 +450,12 @@ int BTTrackerSPD::getMaxNumberOfAvailableRelayPeersToFill()
     }
 }
 
+void BTTrackerSPD::setPeersNum(size_t peersNum)
+{
+    BTTrackerBase::setPeersNum(peersNum);
+    consolidateRelayPeerPool();
+}
+
 int BTTrackerSPD::getRelayPoolSize()
 {
     return set_RelayPeerPool.size();
@@ -479,7 +494,7 @@ int BTTrackerSPD::getNextIndexOfRelayPeerToFill()
     int index (0);
     while (true)
     {
-        index = intrand(relayPeers().size() + 1);
+        index = intrand(relayPeers().size());
 
         if (b_PoolRelayPeers)
         {

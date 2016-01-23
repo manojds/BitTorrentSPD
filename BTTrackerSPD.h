@@ -27,6 +27,8 @@ public:
     BTTrackerSPD();
     virtual ~BTTrackerSPD();
 
+    virtual void setPeersNum(size_t);
+
     const string& relayInfoHash() const;
 
     int containsRelay(BTTrackerStructBase* obj) const;
