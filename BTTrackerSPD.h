@@ -118,6 +118,9 @@ protected:
     bool                        b_ExcludeRelaysInTruePeerList;
     bool                        b_PoolRelayPeers;
     double                      d_RelayPoolFraction;
+    bool                        b_BaseRealyPoolOnLeeachers;
+    bool                        b_ShrinkRelayPool;
+    double                      d_ShrinkFactor;
     bool                        b_ObscureSeeders;
     int                         i_LastConsolidatedRelayIndex;
     std::set<int>               set_ExcludedRelays;

@@ -37,5 +37,8 @@ simple BTTrackerSPD extends BTTrackerBase like TCPApp , UDPApp
         //if obscureSeeders enabled tracker will never decrease the relay peer percentage in peer list than the relayPeerPropotionInReply
         bool	obscureSeeders					= default(false);	
         double	relayPoolFraction				= default(1);
+        bool	baseRealyPoolOnLeeachers		= default(true);
+        bool	shrinkRelayPool					= default(true);
+        double	shrinkFactor					= default(1);
         
 }

@@ -55,6 +55,11 @@ void BTTrackerSPD::initialize()
 
     d_RelayPoolFraction             = par("relayPoolFraction");
 
+    b_BaseRealyPoolOnLeeachers      = par("baseRealyPoolOnLeeachers");
+    b_ShrinkRelayPool               = par("shrinkRelayPool");
+
+    d_ShrinkFactor                  = par("shrinkFactor");
+
     b_ObscureSeeders                = par("obscureSeeders");
 
     unsigned int uiBlackListThreshold = (int)par("blackListThreshold");
@@ -385,13 +390,25 @@ void BTTrackerSPD::consolidateRelayPeerPool()
     if (b_PoolRelayPeers)
     {
         int iAddedCount(0);
-        int iRelayPoolSize = d_RelayPoolFraction * (peersNum() - seeds() ); // relay pool size is adjusted based on the leeacher node count
+        int iRelayPoolSize(1);
+        if (b_BaseRealyPoolOnLeeachers)
+        {
+            iRelayPoolSize = d_RelayPoolFraction * (peersNum() - seeds() ); // relay pool size is adjusted based on the leeacher node count
+        }
+        else
+        {
+            iRelayPoolSize = d_RelayPoolFraction * peersNum();
+        }
+
+        int i_RelayPoolShrinkSize = d_ShrinkFactor * iRelayPoolSize;
+
         int iPoolSizeb4Consolidation = set_RelayPeerPool.size();    //only for debug
 
         //if relay pool size is larger than the required size remove some relays from the pool
-        if ( iRelayPoolSize > set_RelayPeerPool.size())
+        if ( b_ShrinkRelayPool )
         {
-            while ( iRelayPoolSize ==  set_RelayPeerPool.size())
+
+            while ( set_RelayPeerPool.size() > i_RelayPoolShrinkSize )
             {
                 set_RelayPeerPool.erase(intrand(relayPeers().size()));
             }
@@ -561,6 +578,6 @@ void BTTrackerSPD::writeStats()
 
     BT_LOG_ESSEN(btLogSinker, "BTTrackerSPD::writeStats", "******** Tracker Stats Relay ******** - Time ["<<simTime() <<"] Total Relay Count ["<<realyPeersNum()
             <<"] Relay peer Started Count in Swarm ["<<i_RelayStartedCount<<"] Relay peer count in swarm ["<<relayPeersInSwarm_var.size()<<
-            "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"]");
+            "] Relay seeder count ["<<i_RelaySeedCount<<"], relay completed count ["<<i_RelayCompletedCount<<"] relay pool Size ["<<set_RelayPeerPool.size()<<"]");
 
 }
