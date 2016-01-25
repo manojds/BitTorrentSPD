@@ -442,6 +442,13 @@ void BTTrackerSPD::consolidateRelayPeerPool()
             }
         }
 
+        if (iPoolSizeb4Consolidation != set_RelayPeerPool.size())
+        {
+            BT_LOG_ESSEN(btLogSinker, "BTTrackerSPD::consolidateRelayPeerPool", "Relay Pool Size Changed. Previous Size ["<<iPoolSizeb4Consolidation
+                    <<"] Current Size ["<<set_RelayPeerPool.size()<<"] ideal Pool Size as of now ["<<iRelayPoolSize <<"], available relay peers num ["<<
+                    relayPeersNum_var<<"] Shrink Size ["<<i_RelayPoolShrinkSize<<"] True peer count ["<< peersNum() <<"] true seed count ["<<seeds()<<"]");
+        }
+
         BT_LOG_ESSEN(btLogSinker, "BTTrackerSPD::consolidateRelayPeerPool", "Consolidated Relay peer Pool, Current Pool size ["<<set_RelayPeerPool.size()
                 << "], ideal Pool Size as of now ["<<iRelayPoolSize <<"], pool size before consolidation ["<<iPoolSizeb4Consolidation<<"] Relay peer Array size ["<<
                 relayPeers_var.size()<<"], available relay peers num ["<< relayPeersNum_var<<"] LastConsolidatedIndex ["<< i_LastConsolidatedRelayIndex<<
