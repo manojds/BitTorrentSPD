@@ -300,6 +300,21 @@ void BTStatisticsSPD::finish()
 {
     BT_LOG_ESSEN(btLogSinker,"BTStatisticsSPD::doFinish","Finishing ...");
 
+
+    ofstream myfile (s_FileName.c_str(), ios::app);
+    if (myfile.is_open() == false)
+    {
+      throw cRuntimeError("Failed to open file [%s] for stat writing", s_FileName.c_str());
+      return;
+    }
+
+    myfile<<simTime()<<" , [True] , Average Download Time ,"<<dwSuccess->getMean()<<" , Max ,"<<dwSuccess->getMax()<<" , Min ,"<<dwSuccess->getMin()<<
+            " , Standard deviation ,"<<dwSuccess->getStddev()<<endl;
+    myfile<<simTime()<<" , [Relay] , Average Download Time ,"<<dwSuccess_Relay->getMean()<<" , Max ,"<<dwSuccess_Relay->getMax()<<" , Min ,"<<dwSuccess_Relay->getMin()<<
+            " , Standard deviation ,"<<dwSuccess_Relay->getStddev()<<endl;
+    myfile.close();
+
+
     BT_LOG_ESSEN(btLogSinker,"BTStatisticsSPD::doFinish","Relay Download duration Mean ["<<dwSuccess_Relay->getMean()<<
             "] STD Dev["<<dwSuccess_Relay->getStddev()<<"] Count ["<<dwSuccess_Relay->getCount()<<"]");
 
