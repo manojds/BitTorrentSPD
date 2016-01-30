@@ -267,7 +267,7 @@ void BTTrackerClientHandlerSPD::fillRelayPeers(BTTrackerMsgResponse *rmsg, BTTra
     cArray & relayPeers = getHostModule()->relayPeers();
     int iAvailableTruePeerCount = rmsg->peersArraySize();
     int iAvaialbeRelayPeerCount = getHostModule()->getMaxNumberOfAvailableRelayPeersToFill();
-    if (pSPDMsg->isRelay())
+    if (pSPDMsg->isRelay() && iAvaialbeRelayPeerCount > 0)
     {
         iAvaialbeRelayPeerCount--;
         // reason for -1 : if the relay peer is making this request and actual relay peer array size we are
@@ -457,6 +457,17 @@ void BTTrackerClientHandlerSPD::fillPeersInResponse(BTTrackerMsgAnnounce* amsg, 
 void BTTrackerClientHandlerSPD::determinePeerMix(double _dRequestedRelayPeerPcntg, int iCurrenTruePeerCountinRes,
         int _iAvailableRelayPeerCount, int & _iTruePeerCount, int & _iRelayPeerCount )
 {
+    if (_iAvailableRelayPeerCount < 0)
+    {
+        throw cRuntimeError("BTTrackerClientHandlerSPD::determinePeerMix - Available Relay peer count is lesser than zero. current value [%d]",
+                _iAvailableRelayPeerCount);
+    }
+
+    if (iCurrenTruePeerCountinRes < 0)
+    {
+        throw cRuntimeError("BTTrackerClientHandlerSPD::determinePeerMix - True peer count in response is lesser than zero. current value [%d]",
+                iCurrenTruePeerCountinRes);
+    }
     double dRelayPeerPcntgInTracker = getHostModule()->relayPeerPropotionInReply();
 
     int iMaxPeersInRes=getHostModule()->maxPeersInReply();
