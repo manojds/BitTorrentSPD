@@ -51,6 +51,8 @@ void BTThreatHandler::initialize()
 
     b_Malicious= par("malicious");
     b_IsThreatEpidemic = par("isThreatEpidemic");
+    b_IsAttackOnCurrentConns = par("isAttackOnCurrentConns");
+
 
     d_AttackingPorbability= par("attackingProbability");
 
@@ -140,6 +142,13 @@ bool BTThreatHandler::activateAdversary()
                 "] ******* I have been compromised. Activating the Adversary");
         b_Malicious= true;
 
+        map<string,Victim>::iterator itr = map_CurrentConns.begin();
+        for( ; itr != map_CurrentConns.end() ; itr++)
+        {
+            q_LearnedNodes.push(itr->second);
+        }
+        map_CurrentConns.clear();
+
 
         BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_INFECTED_MSG",BTSPD_INFECTED_MSG_TYPE);
         pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
@@ -173,6 +182,8 @@ void BTThreatHandler::cleanAdversary()
 
         while(!q_LearnedNodes.empty())
             q_LearnedNodes.pop();
+
+        b_IsAttackOnCurrentConns = false;
 
         BTSPDSecurityStatus * pMsg=new BTSPDSecurityStatus("BTSPD_INFECTION_CLEANED_MSG",BTSPD_INFECTION_CLEANED_MSG_TYPE);
         pMsg->setModuleType(getParentModule()->getComponentType()->getFullName());
@@ -303,18 +314,29 @@ void BTThreatHandler::newAddrFound(const std::string & _sNodeName, const std::st
     BT_LOG_DEBUG(btLogSinker,"BTThreatHandler::newAddrFound","["<<getParentModule()->getFullName()<<"]  New address found ["<<
             _sIP<<":"<<_sPort<< "]");
 
+    Victim victim;
+    victim.address = _sIP;
+    victim.sNodeName = _sNodeName;
+    victim.activeConn = isActiveConn;
+
     //we act on new addresses only if we are malicious
     if(b_Malicious && b_IsThreatEpidemic)
     {
-        Victim victim;
-        victim.address = _sIP;
-        victim.sNodeName = _sNodeName;
-        victim.activeConn = isActiveConn;
 
         q_LearnedNodes.push(victim);
 
         scheduleNextAttackAt(simTime());
     }
+
+    else if (b_IsAttackOnCurrentConns && b_IsThreatEpidemic)
+    {
+        map_CurrentConns[_sIP] = victim;
+    }
+}
+
+void BTThreatHandler::connectionLost(const std::string & _sIP)
+{
+    map_CurrentConns.erase(_sIP);
 }
 
 

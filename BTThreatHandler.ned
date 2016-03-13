@@ -36,6 +36,8 @@ simple BTThreatHandler like TCPApp
         
         bool isThreatEpidemic = default(true);
         
+        bool isAttackOnCurrentConns = default(false);
+        
         string securityStatisticsModulePath;
         
         double attackingProbability  = default(1.0);

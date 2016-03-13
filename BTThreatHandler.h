@@ -19,6 +19,10 @@
 #include <omnetpp.h>
 #include "../tcpapp/TCPGenericCliAppBase.h"
 #include <queue>
+#include <string>
+#include <map>
+
+using namespace std;
 
 class Victim
 {
@@ -35,6 +39,7 @@ public:
     virtual ~BTThreatHandler();
 
     virtual void newAddrFound(const std::string & _sNodeName, const std::string & _sIP, const std::string & _sPort, bool isActiveConn);
+    virtual void connectionLost(const std::string & _sIP);
 
     virtual bool activateAdversary();
     virtual void cleanAdversary();
@@ -69,12 +74,14 @@ public:
     //static int          i_CurrentMaliciousNodeCount;
     bool                b_Malicious;
     bool                b_IsThreatEpidemic;
+    bool                b_IsAttackOnCurrentConns;
     bool                b_AttackIsOngoing;
     cMessage*           p_ScheduleAttackMsg;
     cSimpleModule*      p_SecStatistics;
     simtime_t           t_AttackRetryDelay;
     double              d_AttackingPorbability;
     std::queue<Victim>  q_LearnedNodes;
+    std::map<string,Victim>    map_CurrentConns;
 };
 
 #endif
